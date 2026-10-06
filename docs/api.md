@@ -21,7 +21,7 @@ All bodies are JSON, snake_case. Datetimes are ISO 8601 UTC. In-meeting times ar
 | Status | code examples |
 |---|---|
 | 400 | `UNSUPPORTED_FILE`, `EMPTY_TRANSCRIPT`, `TRANSCRIPT_PARSE_ERROR` |
-| 404 | `MEETING_NOT_FOUND`, `ACTION_ITEM_NOT_FOUND` (another user's meeting is also 404, never 403) |
+| 404 | `MEETING_NOT_FOUND`, `ACTION_ITEM_NOT_FOUND`, `SEGMENT_NOT_FOUND`, `SUMMARY_NOT_FOUND` (another user's data is also 404, never 403) |
 | 409 | `CONFLICT` |
 | 413 | `FILE_TOO_LARGE` (upload > 2 MB) |
 | 422 | `VALIDATION_ERROR` (details = list of field errors) |
@@ -126,6 +126,7 @@ Transcript search/highlighting is done client-side (the whole transcript is alre
 
 ### `PATCH /transcript-segments/{segment_id}` (optional)
 `{ "text": "...", "speaker_label": "..." }` → 200 segment. Fix transcription errors.
+Both fields optional, trimmed, must not be empty or null. Timestamps are not editable: sending any other field → 422.
 
 ---
 
@@ -134,10 +135,13 @@ Transcript search/highlighting is done client-side (the whole transcript is alre
 ### `POST /meetings/{id}/summary/generate`
 Regenerates summary, chapters, and (if `include_action_items: true`) appends extracted action items.
 Uses the LLM generator when `LLM_API_KEY` is configured, otherwise the deterministic mock.
-Body: `{ "include_action_items": false }` → 200 `{ summary, chapters }`
+Body (optional): `{ "include_action_items": false }` → 200 `{ summary, chapters }`
+Replaces the existing summary and chapters in one transaction. Extracted action items are appended after the
+existing ones, skipping any whose text already exists (case-insensitive, trimmed). No transcript → 400 `EMPTY_TRANSCRIPT`.
 
 ### `PATCH /meetings/{id}/summary`
 `{ "overview": "...", "bullet_points": [...], "keywords": [...] }` → 200 summary (manual edits)
+All fields optional, none nullable. `generated_by` is left unchanged (there is no `manual` value). No summary yet → 404 `SUMMARY_NOT_FOUND`.
 
 ---
 
@@ -152,19 +156,26 @@ Body: `{ "include_action_items": false }` → 200 `{ summary, chapters }`
 
 ### `POST /meetings/{id}/action-items`
 `{ "text": "...", "assignee_id": 2, "due_date": "2026-10-10" }` → 201
+`text` is 1–500 chars after trimming. `assignee_id` must be a participant of this meeting, else 422. Appended at `position = max + 1`.
 
 ### `PATCH /action-items/{id}`
-Any of `text`, `assignee_id`, `due_date`, `is_completed`. Setting `is_completed` sets/clears `completed_at`. → 200
+Any of `text`, `assignee_id`, `due_date`, `is_completed`. → 200
+`assignee_id` and `due_date` accept an explicit `null` (unassign / clear); an omitted field is left alone. `text` and
+`is_completed` cannot be null. `completed_at` is set when `is_completed` flips to true and cleared when it flips back.
 
 ### `DELETE /action-items/{id}` → 204
 
 ### `GET /action-items?status=open|completed&page=&limit=` (Home dashboard: "my tasks" across meetings)
+Across the current user's meetings, newest first. → `{ items, total, page, limit }`; each item is an `ActionItem`
+plus `meeting_title` (`meeting_id` is already on every item). `status` omitted = both; any other value → 422.
 
 ---
 
 ## Participants
 
-### `GET /participants?q=` → `{ items: [...] }` (filter dropdown, assignee picker)
+### `GET /participants?q=` → `{ items: [{ id, name, email, avatar_color }] }` (filter dropdown, assignee picker)
+`q` = case-insensitive substring of name or email. Only people who attend one of the current user's meetings;
+ordered by name, at most 100.
 
 ---
 
@@ -183,6 +194,9 @@ Frontend links to `/meetings/3?t=655000` which seeks the player on load.
 ## Export (bonus)
 
 ### `GET /meetings/{id}/export?format=txt|md` → file download (`Content-Disposition: attachment`)
+`Content-Disposition: attachment; filename="<slugified-title>.<format>"`. `format` is required; anything else → 422.
+`md`: title, date, participants, summary, chapters, action items (`- [ ]` / `- [x]`), transcript as
+`[HH:MM:SS] Speaker: text`. `txt`: title, date, participants, transcript. Empty sections are omitted.
 
 ## Ask (bonus, LLM only)
 

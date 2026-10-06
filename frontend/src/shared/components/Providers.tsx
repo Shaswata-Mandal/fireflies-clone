@@ -3,6 +3,8 @@
 import { QueryClientProvider } from "@tanstack/react-query";
 import { useState, type ReactNode } from "react";
 import { Toaster } from "react-hot-toast";
+import { TooltipProvider } from "@/shared/components/ui/tooltip";
+import { UIProvider } from "@/shared/context/UIContext";
 import { makeQueryClient } from "@/shared/lib/query-client";
 
 interface ProvidersProps {
@@ -24,7 +26,10 @@ export function Providers({ children }: ProvidersProps) {
 
   return (
     <QueryClientProvider client={queryClient}>
-      {children}
+      <UIProvider>
+        {/* One provider so every tooltip shares open delay and skip-delay behaviour. */}
+        <TooltipProvider>{children}</TooltipProvider>
+      </UIProvider>
       <Toaster position="top-right" toastOptions={{ style: TOAST_STYLE }} />
     </QueryClientProvider>
   );

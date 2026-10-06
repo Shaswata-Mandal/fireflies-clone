@@ -137,3 +137,48 @@ Format: **Decision** — why — alternatives considered.
     the meeting is created without a summary. `generated_by` is `llm` when `LLM_API_KEY` is set, else `mock`; the
     LLM generator's internal fallback to the mock is not reported by the util, so it is still labelled `llm`.
 
+47. **PATCH null handling via `model_fields_set`** — "field not sent" and "sent as null" are different intents
+    for `assignee_id` / `due_date` (unassign / clear), so the service checks `model_fields_set`. A validator
+    rejects `null` for fields that cannot be empty (`text`, `is_completed`, segment/summary text), so the DB
+    never sees a NOT NULL violation. Alt: sentinel default values — less readable in Pydantic.
+48. **`completed_at` only changes when `is_completed` flips** — re-sending `true` keeps the original completion
+    time; `false` clears it. The service owns it (not a DB trigger) so the rule is testable and visible.
+49. **Cross-user access is 404, via a join on `meetings.owner_id`** — segments and action items have no owner
+    column, so their repositories join `meetings` and filter by owner. Missing and foreign rows are
+    indistinguishable, so ids can't be probed.
+50. **Regeneration updates the summary row in place and re-inserts chapters** — `summaries.meeting_id` is UNIQUE
+    so a second row is impossible; chapters are bulk-deleted and flushed before the inserts because of
+    UNIQUE(meeting_id, position). All inside one transaction: a generator failure keeps the old summary.
+51. **Action-item dedupe on append** — key = `text.strip().casefold()` against existing items and earlier items
+    in the same batch; new items go after `max(position)`. Manual items are never overwritten by regeneration.
+52. **`builder.py` is a DB-free module, not a service** — meetings (create) and summaries (regenerate) both
+    turn generator output into ORM objects; a shared service would create an import cycle
+    (summaries → meetings for ownership checks). `exports` is its own module for the same reason.
+53. **Manual summary edits keep `generated_by`** — the enum and its DB CHECK only allow `seed | mock | llm`;
+    adding `manual` needs a migration. Revisit if the UI should show an "edited" badge.
+54. **Export formatting is a pure function** — `utils/export_formatter.py` takes plain dataclasses, so output is
+    unit-tested without a DB; the service only flattens ORM rows. Filenames are ASCII-slugified (also stops
+    header injection / path tricks via the title).
+55. **Sidebar follows the screenshots, not the CLAUDE.md §6 list** — 01/02 show Home, AskFred | Meetings, Tasks,
+    AI Skills | Analytics, Voice Agents | Upgrade, then Integrations, Settings; no Uploads or Team. Uploads is
+    reached via the Capture button, Team via the avatar menu. Out-of-scope items (AI Skills, Voice Agents,
+    Upgrade, Email Assistant) are buttons with a "Coming soon" toast, so nothing is a dead link.
+56. **Nav items are data (`constants/navigation.ts`)** — the desktop sidebar and the mobile drawer render the
+    same `<Sidebar>` from one list, so they can't drift. Active state = `usePathname` + `isRouteActive`
+    (Home exact, others prefix so `/meetings/12` highlights Meetings).
+57. **Radix (via shadcn) for menus, popovers, tooltips and the drawer** — Esc to close, focus return to the
+    trigger, arrow-key navigation and the drawer's focus trap are hard to get right by hand. shadcn files keep
+    their kebab-case names in `ui/` (vendored code); our components are PascalCase.
+58. **Sidebar collapse persisted in localStorage, applied after mount** — the server can't read storage, so
+    reading it during render would cause a hydration mismatch. Cost: a collapsed sidebar renders expanded for
+    one frame. All storage access goes through `utils/safe-storage.ts` (try/catch; private mode / blocked
+    storage just means "not remembered"). Alt: a cookie read on the server — more moving parts for a demo.
+59. **Notifications are client-only mock state** (`constants/notifications.ts` + `useNotifications`) — no table or
+    endpoint exists (out of scope). The hook returns the shape a TanStack Query hook would, so a real API
+    later changes one file. Badge is a count pill (screenshot shows a plain dot) so read/unread is visible.
+60. **Billing and promo UI left out** — "3 Free meetings", plan/storage bars, the avatar menu's app-download
+    column and the notifications desktop-app footer would be fake data or Fireflies brand assets. Upgrade
+    buttons stay (visual parity) and toast "Coming soon".
+61. **AskFred is UI only** — dock on Home (07), panel anywhere (06/15). `AppShell` owns a `hasAskedFred` flag
+    shared by both, so asking from the dock opens the panel and shows the "coming soon" note there.
+    The collapsed rail gets an avatar-only account trigger (02 has none, which would make the menu unreachable).

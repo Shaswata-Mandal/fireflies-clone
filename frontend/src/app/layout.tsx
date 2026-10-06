@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
+import { AppShell } from "@/shared/components/layout/AppShell";
 import { Providers } from "@/shared/components/Providers";
 import "@/styles/globals.css";
 
@@ -24,8 +25,10 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       className={`${inter.variable} dark h-full antialiased`}
       suppressHydrationWarning
     >
-      <body className="flex min-h-full flex-col">
-        <Providers>{children}</Providers>
+      <body className="h-full">
+        <Providers>
+          <AppShell>{children}</AppShell>
+        </Providers>
       </body>
     </html>
   );

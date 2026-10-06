@@ -78,11 +78,14 @@
   --primary-subtle: #f4f3ff;
   --primary-subtle-2: #ebe9fe;
   --primary-muted: #d9d6fe;
+  --primary-send: #d9d6fe;
 
   /* status */
   --success-bg: #ecfdf3;
   --success-fg: #067647;
   --success-solid: #17b26a;
+  --success-btn-bg: #dcfae6;
+  --success-btn-fg: #067647;
   --info-bg: #ecfdff;
   --info-fg: #0e7090;
   --info-icon: #2e90fa;
@@ -134,11 +137,14 @@
   --primary-subtle: #1f1b3f;
   --primary-subtle-2: #17152e;
   --primary-muted: #27224b;
+  --primary-send: #2c2659; /* AskFred send button, idle */
 
   /* status */
   --success-bg: #10291b;
   --success-fg: #72e39c;
   --success-solid: #2e6746;
+  --success-btn-bg: #1c362d; /* green "Upgrade" button */
+  --success-btn-fg: #3c8558;
   --info-bg: #0d2630;
   --info-fg: #5ee0f3;
   --info-icon: #4d91e1;
@@ -229,6 +235,7 @@
   --color-primary-subtle: var(--primary-subtle);
   --color-primary-subtle-2: var(--primary-subtle-2);
   --color-primary-muted: var(--primary-muted);
+  --color-primary-send: var(--primary-send);
 
   /* surfaces → bg-page, bg-card, bg-surface, bg-hover, bg-active, bg-segment-active, bg-overlay */
   --background-color-page: var(--bg-page);
@@ -260,6 +267,8 @@
   --color-success: var(--success-fg);
   --color-success-subtle: var(--success-bg);
   --color-success-solid: var(--success-solid);
+  --color-success-btn: var(--success-btn-bg);
+  --color-success-btn-fg: var(--success-btn-fg);
   --color-info: var(--info-fg);
   --color-info-subtle: var(--info-bg);
   --color-info-icon: var(--info-icon);

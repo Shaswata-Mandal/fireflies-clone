@@ -27,19 +27,21 @@ Tick boxes as you go — this file is also Claude's progress tracker.
 
 ## Phase 2 — Backend API (3h)
 - [x] Meetings: list (filters, sort, pagination), read, create (JSON + upload), patch, delete
-- [ ] Transcript: get, patch segment
-- [ ] Action items: list, create, patch (complete toggle), delete; cross-meeting list
-- [ ] Summary: generate, patch
-- [ ] Participants list, `/me`
+- [x] Transcript: get, patch segment
+- [x] Action items: list, create, patch (complete toggle), delete; cross-meeting list
+- [x] Summary: generate, patch
+- [x] Participants list, `/me`
 - [ ] Tests: 1 happy + 1 error test per router; cascade-delete test
 
 ## Phase 3 — Frontend shell + library (4h)
-- [ ] App layout: Sidebar, Navbar (search, Upload button, bell, avatar menu), mobile drawer
+- [x] App layout: Sidebar, Navbar (search, Upload button, bell, avatar menu), mobile drawer
+      (+ notifications popover with mock data, AskFred panel/dock UI placeholder)
 - [ ] `api-client.ts` with error interceptor → toast, `query-client.ts`, query keys
 - [ ] Meetings page: list/cards with title, date, duration, participant avatars, summary preview;
       search (debounced), participant filter, date-range filter, sort; skeleton/empty/error states
 - [ ] Create meeting modal: tabs Upload file / Paste transcript / Manual form; react-hook-form + zod
-- [ ] Placeholder pages: Integrations, Analytics, Team, Settings (Coming Soon cards styled like Fireflies)
+- [x] Placeholder pages: Integrations, Analytics, Team, Settings (Coming Soon cards styled like Fireflies)
+      (also Home, Meetings, Tasks, Uploads until their slices land)
 
 ## Phase 4 — Meeting detail (6h) ← highest weight
 - [ ] Header: title (inline edit), date, duration, avatars, actions menu (Edit, Export, Delete w/ confirm)
@@ -54,7 +56,7 @@ Tick boxes as you go — this file is also Claude's progress tracker.
 
 ## Phase 5 — Bonus (2.5h, pick in order)
 - [ ] Dark mode toggle
-- [ ] Export TXT / Markdown
+- [ ] Export TXT / Markdown (backend endpoint done; UI pending)
 - [ ] Global search (FTS5) in navbar dropdown → deep link
 - [ ] Home dashboard: recent meetings + open action items across meetings
 - [ ] Ask about this meeting (LLM) — only if time remains
