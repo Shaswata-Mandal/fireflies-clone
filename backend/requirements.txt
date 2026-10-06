@@ -1,0 +1,14 @@
+fastapi>=0.115
+uvicorn[standard]>=0.30
+sqlalchemy>=2.0
+alembic>=1.13
+pydantic>=2.7
+pydantic-settings>=2.3
+python-multipart>=0.0.9
+webvtt-py>=0.5
+anthropic>=0.40
+# dev
+pytest>=8.2
+httpx>=0.27
+ruff>=0.5
+black>=24.4
