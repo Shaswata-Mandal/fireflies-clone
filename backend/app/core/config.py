@@ -22,7 +22,9 @@ class Settings(BaseSettings):
 
     # Optional: when no key is set the deterministic mock summary generator is used.
     LLM_API_KEY: str | None = None
-    LLM_MODEL: str = "claude-sonnet-5-5"
+    # Grok (xAI) exposes an OpenAI-compatible API, so any compatible provider works via these two.
+    LLM_BASE_URL: str = "https://api.x.ai/v1"
+    LLM_MODEL: str = "grok-4"
 
     @property
     def is_production(self) -> bool:

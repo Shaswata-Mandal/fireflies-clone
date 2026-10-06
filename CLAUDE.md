@@ -28,7 +28,7 @@ over clever code.
 | Backend | Python 3.11+, FastAPI, Pydantic v2, pydantic-settings |
 | ORM / migrations | SQLAlchemy 2.0 (typed `Mapped[]` style), Alembic |
 | Database | SQLite (`PRAGMA foreign_keys=ON` on every connection) |
-| LLM (optional) | Anthropic API if `LLM_API_KEY` is set; otherwise deterministic mock generator |
+| LLM (optional) | Grok (xAI, OpenAI-compatible API via the `openai` SDK) if `LLM_API_KEY` is set; otherwise deterministic mock generator |
 | Tests | pytest + FastAPI TestClient (backend) |
 | Lint/format | Ruff + Black (Python), ESLint + Prettier (TS) |
 | Deploy | Backend → Render/Railway, Frontend → Vercel |
@@ -131,7 +131,7 @@ fireflies-clone/
 
 ### Config
 - All env vars read in `core/config.py` via `Settings(BaseSettings)`. No `os.getenv` elsewhere.
-- Required: `DATABASE_URL`, `CORS_ORIGINS`. Optional: `LLM_API_KEY`, `LLM_MODEL`, `ENV`.
+- Required: `DATABASE_URL`, `CORS_ORIGINS`. Optional: `LLM_API_KEY`, `LLM_BASE_URL`, `LLM_MODEL`, `ENV`.
 
 ### Auth
 - No real auth. `core/deps.py::get_current_user` returns the seeded default user (id=1).

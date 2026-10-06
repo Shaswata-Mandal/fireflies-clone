@@ -39,7 +39,7 @@ One default user is seeded (id=1). There is no password column: auth is out of s
 | column | type | notes |
 |---|---|---|
 | id | INTEGER PK | |
-| owner_id | INTEGER NOT NULL FK → users.id ON DELETE CASCADE | indexed |
+| owner_id | INTEGER NOT NULL FK → users.id ON DELETE CASCADE | indexed (leading column of `ix_meetings_owner_date`) |
 | title | TEXT NOT NULL | 1–200 chars |
 | meeting_date | DATETIME NOT NULL | when the meeting happened (UTC); indexed for sort/filter |
 | duration_ms | INTEGER NOT NULL DEFAULT 0 | derived from last segment end if not given |
@@ -48,7 +48,9 @@ One default user is seeded (id=1). There is no password column: auth is out of s
 | platform | TEXT NULL | display only: `zoom`, `google_meet`, `teams`, `upload` |
 | created_at / updated_at | DATETIME NOT NULL | |
 
-Indexes: `ix_meetings_owner_date (owner_id, meeting_date DESC)`, `ix_meetings_title`.
+Indexes: `ix_meetings_owner_date (owner_id, meeting_date)`, `ix_meetings_title`.
+(ASC on purpose: SQLite scans the index backwards for `ORDER BY meeting_date DESC` at no extra cost,
+and a DESC index can't be reflected by Alembic autogenerate.)
 
 ### participants
 | column | type | notes |
@@ -81,8 +83,10 @@ PK `(meeting_id, participant_id)`.
 | end_ms | INTEGER NOT NULL | CHECK end_ms >= start_ms |
 | text | TEXT NOT NULL | |
 | position | INTEGER NOT NULL | 0-based order within meeting |
+| created_at | DATETIME NOT NULL | |
 
-Indexes: `UNIQUE (meeting_id, position)`, `ix_segments_meeting_start (meeting_id, start_ms)`.
+Indexes: `UNIQUE (meeting_id, position)`, `ix_segments_meeting_start (meeting_id, start_ms)`,
+`ix_transcript_segments_participant_id`.
 
 ### summaries (1:1 with meetings)
 | column | type | notes |
@@ -106,6 +110,7 @@ they are never queried individually, so a separate table would add joins with no
 | title | TEXT NOT NULL | |
 | start_ms | INTEGER NOT NULL | click → seek |
 | position | INTEGER NOT NULL | |
+| created_at | DATETIME NOT NULL | |
 
 Index: `UNIQUE (meeting_id, position)`.
 
@@ -115,20 +120,21 @@ Index: `UNIQUE (meeting_id, position)`.
 | id | INTEGER PK | |
 | meeting_id | INTEGER NOT NULL FK → meetings.id ON DELETE CASCADE | indexed |
 | text | TEXT NOT NULL | 1–500 chars |
-| assignee_id | INTEGER NULL FK → participants.id ON DELETE SET NULL | |
+| assignee_id | INTEGER NULL FK → participants.id ON DELETE SET NULL | indexed |
 | due_date | DATE NULL | |
 | is_completed | BOOLEAN NOT NULL DEFAULT 0 | |
 | completed_at | DATETIME NULL | set by service when toggled |
-| source_segment_id | INTEGER NULL FK → transcript_segments.id ON DELETE SET NULL | "jump to where this was said" |
+| source_segment_id | INTEGER NULL FK → transcript_segments.id ON DELETE SET NULL | indexed; "jump to where this was said" |
 | position | INTEGER NOT NULL | display order |
 | created_at / updated_at | DATETIME NOT NULL | |
 
 ### tags / meeting_tags (bonus)
-`tags(id, name UNIQUE, color)`; `meeting_tags(meeting_id FK CASCADE, tag_id FK CASCADE, PK(meeting_id, tag_id))`.
+`tags(id, name UNIQUE, color, created_at)`; `meeting_tags(meeting_id FK CASCADE, tag_id FK CASCADE indexed, PK(meeting_id, tag_id))`.
 
 ### segments_fts (bonus: global search)
 SQLite FTS5 virtual table: `CREATE VIRTUAL TABLE segments_fts USING fts5(text, content='transcript_segments', content_rowid='id');`
-kept in sync with triggers (created in an Alembic migration). Enables fast ranked full-text search
+kept in sync with triggers (created in its own hand-written Alembic migration in the global-search
+slice; autogenerate can't see virtual tables). Enables fast ranked full-text search
 across all meetings with `snippet()` for highlighted previews.
 
 ## Design decisions (for the interview)
@@ -141,5 +147,9 @@ across all meetings with `snippet()` for highlighted previews.
   meeting; references to people (assignee, speaker) are nulled, never cascading data loss.
 - **Summary is 1:1 via UNIQUE FK**, separate from meetings so regeneration doesn't touch meeting rows
   and the meetings list query stays light.
+- **Enums** (`source`, `platform`, `role`, `generated_by`) are TEXT with a named CHECK constraint
+  (`ck_<table>_<enum>`), since SQLite has no enum type.
+- **Every FK is indexed** (SQLite doesn't do it automatically); a composite index whose leading column
+  is the FK counts.
 - **SQLite specifics**: `PRAGMA foreign_keys=ON` per connection (off by default); WAL mode for better
   concurrent reads. Moving to PostgreSQL only requires changing `DATABASE_URL` (JSON → JSONB).

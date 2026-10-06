@@ -39,3 +39,57 @@ Format: **Decision** — why — alternatives considered.
     one `ApiError` (`status`, `code`, `message`, `details`) but shows nothing. Mutation errors are toasted
     once in `MutationCache.onError` (opt-out via `meta.suppressErrorToast`); queries show inline error
     states instead. Alt: toast in the interceptor — double toasts and toasts for background refetches.
+16. **`UTCDateTime` column type** — SQLite stores no timezone, so plain `DateTime` reads back naive and
+    the API would emit ambiguous `2026-10-01T09:30:00`. The TypeDecorator stores naive UTC, returns
+    aware UTC (serialises with `+00:00`), and *rejects* naive input so a local-time bug fails loudly
+    at write time. Alt: convert in every Pydantic schema — easy to forget in one place.
+17. **Enums as TEXT + named CHECK (`native_enum=False`)** — SQLite has no enum type; the CHECK keeps bad
+    values out even for raw SQL. Python side uses `StrEnum` (no magic strings). Autogenerate rendered
+    each enum CHECK three times, so migration 0001 was hand-trimmed to the one `sa.Enum` creates.
+18. **`passive_deletes=True` on owned children** — the DB's `ON DELETE CASCADE` deletes segments etc.;
+    without it SQLAlchemy would `SELECT` every segment of a meeting just to delete them one by one.
+    `cascade="all, delete-orphan"` is kept so removing a child from a collection still deletes it.
+19. **Index every FK** — SQLite doesn't auto-index FKs; without one, `ON DELETE SET NULL/CASCADE` on a
+    participant or segment scans the whole child table. Composite indexes whose leading column is the FK
+    (`(meeting_id, position)`, `(owner_id, meeting_date)`) double as the FK index.
+20. **`(owner_id, meeting_date)` ASC, not DESC** — SQLite walks a B-tree index backwards for
+    `ORDER BY meeting_date DESC` at the same cost, and a DESC index is an expression index Alembic
+    can't reflect (it would warn on every autogenerate and escape the drift test).
+21. **Migrations never import app code** — `render_item` in `env.py` renders `UTCDateTime` as plain
+    `sa.DateTime()` (identical on disk), so refactoring app code can't break an applied migration.
+22. **Migration drift test** — `tests/test_migrations.py` upgrades an empty DB to head and runs
+    `alembic check`; a model change without a migration fails CI instead of failing in production.
+23. **Model registry (`app/models.py`)** — one import registers every table on `Base.metadata`;
+    Alembic, tests and `main.py` use it, so string relationships (`"Participant"`) always resolve.
+24. **`get_current_user` goes through `users.service`** — even a fake-auth dependency respects
+    deps → service → repository; a missing default user raises `USER_NOT_FOUND` (DB not seeded)
+    instead of a 500 on `None`.
+25. **FTS5 `segments_fts` deferred to the global-search slice** — virtual tables and their sync triggers
+    are invisible to autogenerate, so they get their own hand-written migration when search is built.
+26. **Own ~60-line VTT parser, `webvtt-py` removed from requirements** — the library has its own error type
+    (no line numbers in our envelope), requires `HH:MM:SS` (rejects `MM:SS.mmm`), doesn't know the
+    `Name:` speaker-prefix convention, and we'd still post-process every cue. Own code gives line numbers.
+27. **Parser raises `AppException` subclasses directly** — `utils/transcript_parser.py` imports
+    `core/exceptions.py`, so FastAPI is a *transitive* import (no direct FastAPI/DB use, still unit-testable
+    without either). Cheaper than duplicating the exception hierarchy.
+28. **`end_ms` fallback** — missing end = next segment's start (after sorting); last segment =
+    `start + DEFAULT_LAST_SEGMENT_MS` (5 s). Sort is stable so equal starts keep file order. Segments with
+    empty text are dropped; a file left with none raises `EMPTY_TRANSCRIPT`.
+29. **JSON errors cite the array position** (`details: {"segment": n}`) because JSON has no meaningful lines;
+    TXT/VTT/JSON-syntax errors use `details: {"line": n}`. Numeric strings and booleans are rejected as times.
+30. **`detect_format` is strict about extensions** — a known extension wins; an unknown one (`.pdf`) is
+    `UNSUPPORTED_FILE` even if the content looks like a transcript; content sniffing only runs when the
+    filename has no extension (e.g. pasted text). TXT is sniffed before JSON because both can start with `[`.
+31. **LLM provider is Grok (xAI) through the `openai` SDK, not Anthropic** — xAI's API is OpenAI-compatible,
+    so the only new pieces are the `openai` dependency (replaces `anthropic`, which was unused) and
+    `LLM_BASE_URL`. Model name still comes only from `settings.LLM_MODEL`; swapping provider = env change.
+32. **Generator takes plain dataclasses and returns indices, not IDs** — `SegmentInput` in,
+    `source_segment_index` (position in the input list) out, so the util has no DB/ORM knowledge; the
+    service maps index → `transcript_segments.id`. LLM action items with a missing/out-of-range index or an
+    unknown assignee are kept with `None` for that field rather than dropped (the DB columns are nullable).
+33. **LLM generator never raises** — any failure (timeout, API error, bad JSON, schema mismatch) logs a
+    warning and returns the mock's result, so summaries always exist. `max_retries=0` + 30 s timeout keeps
+    a bad key from stalling a request. Long transcripts keep head and tail, dropping the middle with a marker.
+34. **Mock is deterministic by construction** — ties in word frequency break alphabetically, chapters are
+    equal *time* windows (empty windows skipped, so short transcripts get fewer chapters instead of fake ones),
+    and each chapter bullet quotes the window's longest sentence (first sentences are often just "Yes.").

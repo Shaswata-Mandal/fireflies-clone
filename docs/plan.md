@@ -14,11 +14,12 @@ Tick boxes as you go — this file is also Claude's progress tracker.
       (also done early: `api-client.ts` + `ApiError`, `query-client.ts`, `Providers`)
 
 ## Phase 1 — Backend data layer (3h)
-- [ ] Models for all tables in `docs/schema.md` + first Alembic migration
-- [ ] `utils/transcript_parser.py` (txt/vtt/json) + unit tests (most testable code in the app)
-- [ ] `utils/summary_generator.py`: `SummaryGenerator` protocol, `MockSummaryGenerator`
+- [x] Models for all tables in `docs/schema.md` + first Alembic migration
+      (+ `get_current_user`; FTS5 `segments_fts` deferred to the Phase 5 global-search slice)
+- [x] `utils/transcript_parser.py` (txt/vtt/json) + unit tests (most testable code in the app)
+- [x] `utils/summary_generator.py`: `SummaryGenerator` protocol, `MockSummaryGenerator`
       (keyword frequency + chapter split by time + regex for "I'll / we need to / action:"),
-      `LLMSummaryGenerator` (only if key set)
+      `LLMSummaryGenerator` (Grok/xAI via OpenAI-compatible API; only if key set)
 - [ ] Seed: 6 meetings in `seed/data/*.json` — realistic, 60–150 segments each, 2–6 speakers,
       varied topics (product roadmap, sales call, hiring interview, sprint retro, customer onboarding,
       investor update), with summaries, chapters, action items (some completed). `seed.py` idempotent;
