@@ -22,3 +22,9 @@ Format: **Decision** — why — alternatives considered.
     feedback, no extra requests. Global search is server-side (FTS5) because data spans meetings.
 11. **Simulated player when no media** — spec allows placeholder media; a rAF clock keeps sync
     behaviour identical to a real `<audio>` element behind the same `usePlayer` interface.
+12. **Constraint naming convention + Alembic `render_as_batch`** — SQLite can't `ALTER` columns or
+    constraints; batch mode recreates the table, which needs every constraint to have a stable name.
+    Alt: hand-written table-copy migrations — error-prone.
+13. **Sync SQLAlchemy, session per request, `check_same_thread=False`** — FastAPI runs sync deps in a
+    threadpool, so a connection may cross threads; safe because sessions are never shared between
+    requests. Alt: async SQLAlchemy + aiosqlite — more moving parts, no real gain on SQLite.

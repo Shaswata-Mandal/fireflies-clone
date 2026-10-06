@@ -6,8 +6,8 @@ Tick boxes as you go — this file is also Claude's progress tracker.
 ## Phase 0 — Setup (1.5h)
 - [ ] Sign up on Fireflies, capture screenshots into `docs/reference/` (sidebar, meetings list, meeting
       detail with summary + transcript + player, upload modal, settings, empty states, dark mode)
-- [ ] `git init`, first commit with CLAUDE.md + docs
-- [ ] Backend scaffold: venv, requirements, `core/` (config, database, exceptions, deps, logging),
+- [x] `git init`, first commit with CLAUDE.md + docs
+- [x] Backend scaffold: venv, requirements, `core/` (config, database, exceptions, deps, logging),
       `main.py` with `/health`, Alembic init, Ruff/Black config, pytest config
 - [ ] Frontend scaffold: `create-next-app` (TS, Tailwind, App Router, src dir, ESLint), Prettier,
       TanStack Query + axios + react-hot-toast + lucide + shadcn init, `globals.css` tokens, folder layout
