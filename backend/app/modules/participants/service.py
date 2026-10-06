@@ -1,4 +1,4 @@
-"""Participant lookup shared by the meetings service."""
+"""Participant lookup/search; shared by the meetings and action-items services."""
 
 import zlib
 
@@ -6,6 +6,7 @@ from sqlalchemy.orm import Session
 
 from app.modules.participants import repository
 from app.modules.participants.models import Participant
+from app.modules.users.models import User
 
 # Same palette family as the seed data, so generated avatars match the theme.
 AVATAR_COLORS = (
@@ -37,3 +38,12 @@ def find_or_create(db: Session, name: str, email: str | None = None) -> Particip
     if existing is not None:
         return existing
     return repository.create(db, name, email, _avatar_color(name))
+
+
+def list_participants(db: Session, owner: User, q: str | None) -> list[Participant]:
+    """People from the owner's own meetings only; never leaks participants of other users."""
+    return repository.search_for_owner(db, owner.id, q.strip() if q else None)
+
+
+def is_in_meeting(db: Session, meeting_id: int, participant_id: int) -> bool:
+    return repository.is_in_meeting(db, meeting_id, participant_id)

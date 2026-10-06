@@ -12,9 +12,8 @@ from pydantic import TypeAdapter
 from pydantic import ValidationError as PydanticValidationError
 from sqlalchemy.orm import Session
 
-from app.core.config import settings
 from app.core.db_types import utcnow
-from app.core.enums import GeneratedBy, MeetingPlatform, MeetingSource, ParticipantRole
+from app.core.enums import MeetingPlatform, MeetingSource, ParticipantRole
 from app.core.exceptions import (
     EmptyTranscriptError,
     FileTooLargeError,
@@ -43,10 +42,10 @@ from app.modules.meetings.schemas import (
 )
 from app.modules.participants import service as participants_service
 from app.modules.participants.models import Participant
+from app.modules.summaries.builder import build_summary_graph
 from app.modules.summaries.models import Chapter, Summary
 from app.modules.transcripts.models import TranscriptSegment
 from app.modules.users.models import User
-from app.utils.summary_generator import SegmentInput, get_summary_generator
 from app.utils.transcript_parser import (
     UNKNOWN_SPEAKER,
     ParsedSegment,
@@ -124,7 +123,7 @@ def _to_detail(meeting: Meeting) -> MeetingDetail:
     )
 
 
-def _get_owned_or_404(db: Session, owner: User, meeting_id: int) -> Meeting:
+def get_owned_or_404(db: Session, owner: User, meeting_id: int) -> Meeting:
     # Someone else's meeting looks exactly like a missing one, so ids can't be probed.
     meeting = repository.get_owned(db, owner.id, meeting_id)
     if meeting is None:
@@ -147,7 +146,7 @@ def list_meetings(
 
 
 def get_meeting(db: Session, owner: User, meeting_id: int) -> MeetingDetail:
-    return _to_detail(_get_owned_or_404(db, owner, meeting_id))
+    return _to_detail(get_owned_or_404(db, owner, meeting_id))
 
 
 # ── Create ──────────────────────────────────────────────────────────────────────────────────────
@@ -198,39 +197,11 @@ def _generate_summary(
     segments: list[TranscriptSegment], people: dict[str, Participant | None]
 ) -> tuple[Summary, list[Chapter], list[ActionItem]] | None:
     """Run the summary generator; a failure is logged and the meeting is created without one."""
-    inputs = [SegmentInput(s.speaker_label, s.start_ms, s.end_ms, s.text) for s in segments]
     try:
-        generated = get_summary_generator(settings).generate(inputs)
+        return build_summary_graph(segments, people)
     except Exception:
         logger.exception("Summary generation failed; creating the meeting without a summary")
         return None
-
-    generated_by = GeneratedBy.LLM if settings.LLM_API_KEY else GeneratedBy.MOCK
-    summary = Summary(
-        overview=generated.overview,
-        bullet_points=generated.bullet_points,
-        keywords=generated.keywords,
-        generated_by=generated_by,
-    )
-    chapters = [
-        Chapter(title=c.title, start_ms=c.start_ms, position=i)
-        for i, c in enumerate(generated.chapters)
-    ]
-    action_items = []
-    for position, item in enumerate(generated.action_items):
-        index = item.source_segment_index
-        source_segment = None
-        if index is not None and 0 <= index < len(segments):
-            source_segment = segments[index]
-        action_items.append(
-            ActionItem(
-                text=item.text,
-                assignee=people.get(item.assignee_label) if item.assignee_label else None,
-                source_segment=source_segment,
-                position=position,
-            )
-        )
-    return summary, chapters, action_items
 
 
 def _build_meeting(
@@ -357,7 +328,7 @@ def create_meeting_from_upload(
 
 
 def update_meeting(db: Session, owner: User, meeting_id: int, data: MeetingUpdate) -> MeetingDetail:
-    meeting = _get_owned_or_404(db, owner, meeting_id)
+    meeting = get_owned_or_404(db, owner, meeting_id)
     try:
         if data.title is not None:
             meeting.title = data.title
@@ -380,7 +351,7 @@ def update_meeting(db: Session, owner: User, meeting_id: int, data: MeetingUpdat
 
 def delete_meeting(db: Session, owner: User, meeting_id: int) -> None:
     """Children are removed by the database's ON DELETE CASCADE (see Meeting relationships)."""
-    meeting = _get_owned_or_404(db, owner, meeting_id)
+    meeting = get_owned_or_404(db, owner, meeting_id)
     repository.delete(db, meeting)
     db.commit()
 

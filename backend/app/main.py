@@ -12,7 +12,13 @@ from app.core.config import API_V1_PREFIX, settings
 from app.core.database import SessionLocal
 from app.core.exceptions import register_exception_handlers
 from app.core.logging import setup_logging
+from app.modules.action_items.router import router as action_items_router
+from app.modules.exports.router import router as exports_router
 from app.modules.meetings.router import router as meetings_router
+from app.modules.participants.router import router as participants_router
+from app.modules.summaries.router import router as summaries_router
+from app.modules.transcripts.router import router as transcripts_router
+from app.modules.users.router import router as users_router
 from app.seed.seed import seed_if_empty
 
 logger = logging.getLogger(__name__)
@@ -48,7 +54,16 @@ def create_app() -> FastAPI:
         return {"status": "ok"}
 
     # Feature routers are included here under API_V1_PREFIX as modules are built.
-    app.include_router(meetings_router, prefix=API_V1_PREFIX)
+    for router in (
+        meetings_router,
+        transcripts_router,
+        action_items_router,
+        summaries_router,
+        participants_router,
+        exports_router,
+        users_router,
+    ):
+        app.include_router(router, prefix=API_V1_PREFIX)
 
     return app
 

@@ -1,7 +1,11 @@
-from sqlalchemy import func, select
+from sqlalchemy import func, or_, select
 from sqlalchemy.orm import Session
 
+from app.core.sql import LIKE_ESCAPE_CHAR, escape_like
+from app.modules.meetings.models import Meeting, MeetingParticipant
 from app.modules.participants.models import Participant
+
+MAX_SEARCH_RESULTS = 100
 
 
 def get_by_email(db: Session, email: str) -> Participant | None:
@@ -24,3 +28,42 @@ def create(db: Session, name: str, email: str | None, avatar_color: str) -> Part
     db.add(participant)
     db.flush()
     return participant
+
+
+def search_for_owner(db: Session, owner_id: int, q: str | None) -> list[Participant]:
+    """Participants who attend at least one of the owner's meetings, filtered by name/email."""
+    # EXISTS rather than JOIN: a person in many meetings must appear once.
+    attends_owned_meeting = (
+        select(MeetingParticipant.participant_id)
+        .join(Meeting, Meeting.id == MeetingParticipant.meeting_id)
+        .where(MeetingParticipant.participant_id == Participant.id, Meeting.owner_id == owner_id)
+        .exists()
+    )
+    statement = select(Participant).where(attends_owned_meeting)
+    if q:
+        pattern = f"%{escape_like(q)}%"
+        statement = statement.where(
+            or_(
+                Participant.name.ilike(pattern, escape=LIKE_ESCAPE_CHAR),
+                Participant.email.ilike(pattern, escape=LIKE_ESCAPE_CHAR),
+            )
+        )
+    return list(
+        db.scalars(
+            statement.order_by(func.lower(Participant.name), Participant.id).limit(
+                MAX_SEARCH_RESULTS
+            )
+        )
+    )
+
+
+def is_in_meeting(db: Session, meeting_id: int, participant_id: int) -> bool:
+    return (
+        db.scalar(
+            select(MeetingParticipant.meeting_id).where(
+                MeetingParticipant.meeting_id == meeting_id,
+                MeetingParticipant.participant_id == participant_id,
+            )
+        )
+        is not None
+    )

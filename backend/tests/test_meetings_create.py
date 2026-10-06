@@ -5,6 +5,7 @@ from fastapi.testclient import TestClient
 from sqlalchemy import func, select
 from sqlalchemy.orm import Session
 
+from app.core.config import settings
 from app.core.enums import GeneratedBy
 from app.models import (
     ActionItem,
@@ -16,6 +17,7 @@ from app.models import (
     TranscriptSegment,
 )
 from app.modules.meetings import service
+from app.modules.summaries import builder
 
 URL = "/api/v1/meetings"
 UPLOAD_URL = f"{URL}/upload"
@@ -46,7 +48,7 @@ PRIYA = {"name": "Priya Shah", "email": "priya@acme.com"}
 @pytest.fixture(autouse=True)
 def mock_generator(monkeypatch: pytest.MonkeyPatch) -> None:
     """A developer's .env may hold a real LLM key; tests must always use the mock."""
-    monkeypatch.setattr(service.settings, "LLM_API_KEY", None)
+    monkeypatch.setattr(settings, "LLM_API_KEY", None)
 
 
 def create_payload(**overrides: object) -> dict:
@@ -159,7 +161,7 @@ def test_summary_generator_failure_does_not_fail_creation(
         def generate(self, _segments: object) -> None:
             raise RuntimeError("model unavailable")
 
-    monkeypatch.setattr(service, "get_summary_generator", lambda _settings: Broken())
+    monkeypatch.setattr(builder, "get_summary_generator", lambda _settings: Broken())
 
     response = api.post(URL, json=create_payload(transcript_text=TXT, generate_summary=True))
 

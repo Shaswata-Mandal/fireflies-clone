@@ -3,6 +3,7 @@ from fastapi.testclient import TestClient
 from sqlalchemy import func, select
 from sqlalchemy.orm import Session
 
+from app.core.config import settings
 from app.models import (
     ActionItem,
     Chapter,
@@ -12,7 +13,6 @@ from app.models import (
     Summary,
     TranscriptSegment,
 )
-from app.modules.meetings import service
 from tests.helpers import OTHER_USER_ID, MakeMeeting
 
 URL = "/api/v1/meetings"
@@ -25,7 +25,7 @@ TXT = (
 
 @pytest.fixture(autouse=True)
 def mock_generator(monkeypatch: pytest.MonkeyPatch) -> None:
-    monkeypatch.setattr(service.settings, "LLM_API_KEY", None)
+    monkeypatch.setattr(settings, "LLM_API_KEY", None)
 
 
 def count(db: Session, model: type) -> int:
