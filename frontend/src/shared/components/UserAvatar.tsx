@@ -4,11 +4,13 @@ import { cn } from "@/shared/utils/cn";
 interface UserAvatarProps {
   name: string | null | undefined;
   avatarUrl?: string | null;
+  /** Per-person color from the API (`avatar_color`); falls back to the user token. */
+  color?: string | null;
   className?: string;
 }
 
 /** Square avatar with initials on the user color (colors.md §1.8); an image when the user has one. */
-export function UserAvatar({ name, avatarUrl, className }: UserAvatarProps) {
+export function UserAvatar({ name, avatarUrl, color, className }: UserAvatarProps) {
   const base = cn("size-6 shrink-0 rounded-sm", className);
 
   if (avatarUrl) {
@@ -19,6 +21,8 @@ export function UserAvatar({ name, avatarUrl, className }: UserAvatarProps) {
   return (
     <span
       aria-hidden="true"
+      // The color is data (each participant has their own), so it can't be a Tailwind class.
+      style={color ? { backgroundColor: color } : undefined}
       className={cn(
         base,
         "flex items-center justify-center bg-avatar-user text-xs font-medium text-on-primary",

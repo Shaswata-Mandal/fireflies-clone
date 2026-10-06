@@ -182,3 +182,32 @@ Format: **Decision** — why — alternatives considered.
 61. **AskFred is UI only** — dock on Home (07), panel anywhere (06/15). `AppShell` owns a `hasAskedFred` flag
     shared by both, so asking from the dock opens the panel and shows the "coming soon" note there.
     The collapsed rail gets an avatar-only account trigger (02 has none, which would make the menu unreachable).
+62. **Library view state lives in the URL** (`?view=&q=&participant_id=&date_from=&date_to=&sort=&page=`) — reload,
+    Back and shared links restore the exact view; no Context/useState copy that can drift. Parsing/serializing is one
+    pure file (`modules/meetings/url-state.ts`): malformed values fall back to defaults (never a 422 from a hand-edited
+    URL) and defaults are omitted, so the plain view is just `/meetings`. Any change but `page` resets to page 1.
+63. **push for discrete changes, replace for typing** — filter/sort/tab/page push a history entry so Back undoes them;
+    the debounced search replaces it, otherwise Back would step through "r", "ro", "roa"…
+64. **`keepPreviousData` + dimmed list** — changing a filter keeps the old page on screen (opacity 60%, `aria-busy`)
+    until the new one arrives, instead of flashing a skeleton. The skeleton only shows on the very first load.
+65. **Numbered pages, not infinite scroll** — screenshot 09 implies infinite scroll ("You've reached the end…"), but
+    `?page=` must mean something on reload. The end-of-list caption is kept on the last page.
+66. **Stretched link for rows** — the title `<Link>` gets an `::after` overlay covering the card, so the whole card is
+    a real link (Tab, Enter, middle-click, "open in new tab") while ⋯/Details sit above it (`z-10`). Wrapping the card
+    in `<a>` would nest buttons inside a link, which is invalid HTML and breaks keyboard behaviour.
+67. **My / All Meetings both query the same endpoint** — there's no sharing model (out of scope), so the tabs mirror
+    09/13 visually (All hides "Hosted by me | Shared with me", which toast "Coming soon"). `view` is in the URL so the
+    tab survives reload; it isn't sent to the API.
+68. **Filter popover shows only API-backed filters** — Participants (single-select: the API takes one
+    `participant_id`) and Date Range (native `<input type="date">`, no date-picker dependency). Hosted by, Duration,
+    Captured From and Privacy from screenshot 10 have no API parameter, so they're omitted rather than faked. The
+    participant search filters the cached list client-side (≤ 100 rows). Date bounds are whole UTC days (decision 42).
+69. **Details popup fetches `GET /meetings/{id}` lazily** — list items carry no email/role, which screenshot 12 shows.
+    `useMeeting(id, enabled=open)` only runs while the dialog is open and seeds the cache the detail page will use.
+70. **Locale dates without hydration mismatches** — dates use `Intl` with the viewer's locale/time zone. The list is
+    fetched on the client, so the server only ever renders the skeleton; no server-formatted date can disagree with
+    the browser's. Day headings group by *local* calendar day.
+71. **Shadcn Dialog vendored, no new dependency** — built on the `radix-ui` package already installed; gives Esc,
+    focus trap and focus return for the details popup.
+72. **No frontend test runner yet** — `formatDuration`, `url-state.ts` and `groupMeetingsByDay` are pure functions
+    written to be unit-tested; adding Vitest is a separate decision.

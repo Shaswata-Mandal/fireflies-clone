@@ -36,9 +36,10 @@ Tick boxes as you go — this file is also Claude's progress tracker.
 ## Phase 3 — Frontend shell + library (4h)
 - [x] App layout: Sidebar, Navbar (search, Upload button, bell, avatar menu), mobile drawer
       (+ notifications popover with mock data, AskFred panel/dock UI placeholder)
-- [ ] `api-client.ts` with error interceptor → toast, `query-client.ts`, query keys
-- [ ] Meetings page: list/cards with title, date, duration, participant avatars, summary preview;
+- [x] `api-client.ts` with error interceptor → toast, `query-client.ts`, query keys
+- [x] Meetings page: list/cards with title, date, duration, participant avatars, summary preview;
       search (debounced), participant filter, date-range filter, sort; skeleton/empty/error states
+      (+ URL-synced state, channel tabs, row ⋯ menu, details dialog; Rename/Delete = Coming soon)
 - [ ] Create meeting modal: tabs Upload file / Paste transcript / Manual form; react-hook-form + zod
 - [x] Placeholder pages: Integrations, Analytics, Team, Settings (Coming Soon cards styled like Fireflies)
       (also Home, Meetings, Tasks, Uploads until their slices land)

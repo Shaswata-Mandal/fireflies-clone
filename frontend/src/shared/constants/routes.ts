@@ -13,6 +13,11 @@ export const ROUTES = {
 
 export type AppRoute = (typeof ROUTES)[keyof typeof ROUTES];
 
+/** `/meetings/12` */
+export function meetingDetailRoute(id: number): string {
+  return `${ROUTES.MEETINGS}/${id}`;
+}
+
 /** Navbar breadcrumb text per top-level route. */
 export const ROUTE_TITLES: Record<AppRoute, string> = {
   [ROUTES.HOME]: "Home",
