@@ -105,3 +105,35 @@ Format: **Decision** — why — alternatives considered.
 37. **Idempotent by "no meetings" check; default user ensured separately** — `get_current_user` needs
     user id=1 even if meetings exist, so the user is created first, then seeding is skipped if any
     meeting exists. Runs on startup via FastAPI `lifespan` when `SEED_ON_STARTUP`; tests set it false.
+38. **Meeting create has one code path** — `POST /meetings` and `POST /meetings/upload` both end in
+    `service._create`; the upload route only adds file checks (extension → size → UTF-8 → parse). The whole graph
+    (meeting, participants, segments, summary, chapters, action items) is built in memory, flushed, then committed
+    once; any exception rolls back, so no orphan participants either. Helpers `flush`, only the public service
+    functions `commit`.
+39. **Oversize upload = 413 `FILE_TOO_LARGE`** (added to `docs/api.md`), not 400 — it's a different client fix
+    than a wrong file type. The route reads `MAX_UPLOAD_BYTES + 1` bytes: one extra byte proves oversize without
+    buffering an unbounded body.
+40. **List query: EXISTS for participant/tag filters, scalar subquery for `action_items_open`** — a JOIN could
+    return a meeting twice and inflate `total`; the correlated subquery computes open counts inside the page query.
+    With `selectinload` the list costs a constant number of queries (count + page + participants + participant rows +
+    tags + summary), asserted by a test that compares 6 vs 12 meetings. `id DESC` tiebreaker keeps pagination stable.
+41. **Sort is a whitelist enum, LIKE input is escaped** — `sort` is a `StrEnum` (FastAPI answers 422 for anything
+    else) mapped to prebuilt ORDER BY expressions; `q` escapes `\`, `%`, `_` and uses `ILIKE ... ESCAPE`.
+    Title sort is `lower(title)` so it's not case-sensitive.
+42. **Date filters are whole UTC days** — `date_from` → `>= 00:00Z`, `date_to` → `< next day 00:00Z`, so a meeting at
+    23:59:59 on `date_to` is included. Request datetimes must be timezone-aware and are normalised to UTC in the
+    schema, so responses never echo a client offset.
+43. **Other users' meetings are 404** — every read goes through `get_owned(owner_id, id)`, so "not yours" and
+    "doesn't exist" are indistinguishable (no id probing).
+44. **Participants are global, matched by email else by name** — the schema has no owner on `participants`, so
+    find-or-create is email-first (emails are unique), falling back to a case-insensitive name match for
+    email-less speakers. The first supplied participant is `host`; transcript-only speakers are `attendee`; the
+    `Unknown` speaker gets no participant (the label is kept on the segment). Avatar colour = crc32(name) % palette,
+    stable across processes (unlike `hash()`).
+45. **PATCH participants = diff, not delete-all/insert-all** — links for people who stay are reused (keeps roles,
+    avoids a delete+insert of the same composite PK in one flush); removed ones are dropped by `delete-orphan`.
+    `updated_at` is bumped by hand since link-only edits don't touch the meetings row.
+46. **Summary failure is non-fatal; `generated_by` is by config** — the generator call is wrapped so a failure logs and
+    the meeting is created without a summary. `generated_by` is `llm` when `LLM_API_KEY` is set, else `mock`; the
+    LLM generator's internal fallback to the mock is not reported by the util, so it is still labelled `llm`.
+

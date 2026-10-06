@@ -21,8 +21,9 @@ All bodies are JSON, snake_case. Datetimes are ISO 8601 UTC. In-meeting times ar
 | Status | code examples |
 |---|---|
 | 400 | `UNSUPPORTED_FILE`, `EMPTY_TRANSCRIPT`, `TRANSCRIPT_PARSE_ERROR` |
-| 404 | `MEETING_NOT_FOUND`, `ACTION_ITEM_NOT_FOUND` |
+| 404 | `MEETING_NOT_FOUND`, `ACTION_ITEM_NOT_FOUND` (another user's meeting is also 404, never 403) |
 | 409 | `CONFLICT` |
+| 413 | `FILE_TOO_LARGE` (upload > 2 MB) |
 | 422 | `VALIDATION_ERROR` (details = list of field errors) |
 | 500 | `INTERNAL_ERROR` |
 
@@ -45,11 +46,11 @@ Query params (all optional):
 
 | param | type | notes |
 |---|---|---|
-| q | string | case-insensitive match on title |
+| q | string | case-insensitive substring match on title (`%` and `_` are literal) |
 | participant_id | int | meetings this participant attended |
-| date_from / date_to | date (YYYY-MM-DD) | inclusive range on `meeting_date` |
+| date_from / date_to | date (YYYY-MM-DD) | inclusive range on `meeting_date`; whole days in UTC |
 | tag_id | int | bonus |
-| sort | `-meeting_date` (default) \| `meeting_date` \| `title` \| `-duration_ms` | leading `-` = descending |
+| sort | `-meeting_date` (default) \| `meeting_date` \| `title` \| `-duration_ms` | leading `-` = descending; any other value → 422 |
 | page | int ≥ 1 (default 1) | |
 | limit | int 1–100 (default 20) | |
 
@@ -79,9 +80,13 @@ Two forms:
 `transcript_text` optional (metadata-only meeting allowed). `transcript_format`: `txt` | `vtt` | `json`.
 
 2. **multipart/form-data** at `POST /meetings/upload`: fields `title`, `meeting_date`,
-`participants` (JSON string), `generate_summary`, and `file` (`.txt` | `.vtt` | `.json`, ≤ 2 MB).
+`participants` (JSON string, default `[]`), `generate_summary` (default false), and `file`
+(`.txt` | `.vtt` | `.json`, ≤ 2 MB; other extension → 400 `UNSUPPORTED_FILE`, larger → 413 `FILE_TOO_LARGE`).
 
-Speakers found in the transcript that aren't in `participants` are created as participants automatically.
+Speakers found in the transcript that aren't in `participants` (matched case-insensitively by name) are created as
+participants automatically. `duration_ms` (optional, JSON only) defaults to the end of the last segment.
+`generate_summary` failures never fail the request: the meeting is created with `summary: null`.
+Datetimes must carry a timezone; they are returned in UTC.
 Returns 201 `MeetingDetail`.
 
 ### `GET /meetings/{id}` → `MeetingDetail`

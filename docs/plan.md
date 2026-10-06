@@ -26,7 +26,7 @@ Tick boxes as you go — this file is also Claude's progress tracker.
       also run on startup if DB empty (free hosts reset disk)
 
 ## Phase 2 — Backend API (3h)
-- [ ] Meetings: list (filters, sort, pagination), read, create (JSON + upload), patch, delete
+- [x] Meetings: list (filters, sort, pagination), read, create (JSON + upload), patch, delete
 - [ ] Transcript: get, patch segment
 - [ ] Action items: list, create, patch (complete toggle), delete; cross-meeting list
 - [ ] Summary: generate, patch

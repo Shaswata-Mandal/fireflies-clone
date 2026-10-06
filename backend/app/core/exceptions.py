@@ -59,6 +59,11 @@ class UnsupportedFileError(AppException):
         super().__init__(code, message, status.HTTP_400_BAD_REQUEST, details)
 
 
+class FileTooLargeError(AppException):
+    def __init__(self, message: str, code: str = "FILE_TOO_LARGE", details: Any = None) -> None:
+        super().__init__(code, message, status.HTTP_413_CONTENT_TOO_LARGE, details)
+
+
 class TranscriptParseError(AppException):
     """Transcript content is malformed; `details` says where (`line` or `segment`)."""
 

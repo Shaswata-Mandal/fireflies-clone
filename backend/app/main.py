@@ -8,10 +8,11 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from app import models  # noqa: F401  (registers all models so cross-module relationships resolve)
-from app.core.config import settings
+from app.core.config import API_V1_PREFIX, settings
 from app.core.database import SessionLocal
 from app.core.exceptions import register_exception_handlers
 from app.core.logging import setup_logging
+from app.modules.meetings.router import router as meetings_router
 from app.seed.seed import seed_if_empty
 
 logger = logging.getLogger(__name__)
@@ -47,6 +48,7 @@ def create_app() -> FastAPI:
         return {"status": "ok"}
 
     # Feature routers are included here under API_V1_PREFIX as modules are built.
+    app.include_router(meetings_router, prefix=API_V1_PREFIX)
 
     return app
 
