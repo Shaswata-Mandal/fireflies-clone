@@ -1,0 +1,295 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
+
+/* Dark mode is driven by a `.dark` class on <html>, not the OS setting (CLAUDE.md §5). */
+@custom-variant dark (&:is(.dark *));
+
+/*
+ * Token sources: docs/reference/colors.md. Every captured screenshot is dark mode, so:
+ *   - `.dark` values are MEASURED from the screenshots (or ESTIMATED where colors.md says so).
+ *   - the light theme block is entirely GUESSED; it is fenced off below so it can be replaced wholesale.
+ *
+ * Layers in this file:
+ *   1. Raw tokens (plain CSS variables that change per theme)
+ *   2. shadcn aliases (map shadcn's variable names onto our tokens so its primitives match)
+ *   3. @theme inline (exposes tokens as Tailwind utilities: bg-page, text-secondary, border-default…)
+ */
+
+/* ========================================================================== */
+/* 1a. Theme-independent tokens (same in light and dark)                       */
+/* ========================================================================== */
+
+:root {
+  /* Primary scale. 600 is MEASURED (every primary button); the rest follows the Untitled UI
+     "Purple" scale that 500/600 match (ESTIMATED, see colors.md §1.4). */
+  --primary-50: #f4f3ff;
+  --primary-100: #ebe9fe;
+  --primary-200: #d9d6fe;
+  --primary-300: #bdb4fe;
+  --primary-400: #9b8afb;
+  --primary-500: #7a5af8;
+  --primary-600: #6938ef;
+  --primary-700: #5925dc;
+  --primary-800: #4a1fb8;
+  --primary-900: #3e1c96;
+
+  --danger: #f04438;
+  --avatar-user: #0288d1;
+
+  --radius: 0.625rem; /* 10px: card radius measured in colors.md §5 */
+}
+
+/* ========================================================================== */
+/* 1b. LIGHT THEME — ALL VALUES ARE GUESSES                                    */
+/*     No light-mode screenshots exist (colors.md §2). Replace this whole      */
+/*     block once light references are captured. Every variable here must      */
+/*     also exist in the `.dark` block below.                                  */
+/* ========================================================================== */
+
+:root {
+  /* surfaces */
+  --bg-page: #f7f7f8;
+  --bg-card: #ffffff;
+  --bg-surface: #ffffff;
+  --bg-hover: #f2f2f4;
+  --bg-active: #ececef;
+  --bg-segment-active: #ffffff;
+  --bg-overlay: rgb(0 0 0 / 0.4);
+
+  /* borders */
+  --border-default: #e6e6ea;
+  --border-strong: #d4d4da;
+  --border-focus: #6938ef;
+
+  /* text */
+  --text-primary: #18181b;
+  --text-default: #27272a;
+  --text-body: #3f3f46;
+  --text-secondary: #52525b;
+  --text-tertiary: #63636b;
+  --text-muted: #71717a;
+  --text-disabled: #a1a1aa;
+  --text-on-primary: #ffffff;
+  --text-link: #6938ef;
+
+  /* primary tints */
+  --primary-fg: #6938ef;
+  --primary-subtle: #f4f3ff;
+  --primary-subtle-2: #ebe9fe;
+  --primary-muted: #d9d6fe;
+
+  /* status */
+  --success-bg: #ecfdf3;
+  --success-fg: #067647;
+  --success-solid: #17b26a;
+  --info-bg: #ecfdff;
+  --info-fg: #0e7090;
+  --info-icon: #2e90fa;
+  --danger-fg: #d92d20;
+  --warning: #f79009;
+
+  /* player */
+  --seek-track: #e4e4e7;
+  --seek-fill: #6938ef;
+  --seek-thumb: #7a5af8;
+
+  /* loading */
+  --skeleton-base: #e9e9ec;
+}
+/* ======================= END LIGHT THEME GUESSES ========================== */
+
+/* ========================================================================== */
+/* 1c. Dark theme — from docs/reference/colors.md §3                           */
+/* ========================================================================== */
+
+.dark {
+  /* surfaces */
+  --bg-page: #131314;
+  --bg-card: #19191a;
+  --bg-surface: #1e1e1f;
+  --bg-hover: #232323;
+  --bg-active: #292929;
+  --bg-segment-active: #48494c;
+  --bg-overlay: rgb(0 0 0 / 0.35); /* ESTIMATED */
+
+  /* borders */
+  --border-default: #292929;
+  --border-strong: #323235;
+  --border-focus: #8173f0;
+
+  /* text */
+  --text-primary: #fafafb;
+  --text-default: #d1d1d6;
+  --text-body: #cbced6;
+  --text-secondary: #aeaead;
+  --text-tertiary: #a3a3a6;
+  --text-muted: #868686;
+  --text-disabled: #5d5d62;
+  --text-on-primary: #ffffff;
+  --text-link: #8173f0;
+
+  /* primary tints */
+  --primary-fg: #8173f0;
+  --primary-subtle: #1f1b3f;
+  --primary-subtle-2: #17152e;
+  --primary-muted: #27224b;
+
+  /* status */
+  --success-bg: #10291b;
+  --success-fg: #72e39c;
+  --success-solid: #2e6746;
+  --info-bg: #0d2630;
+  --info-fg: #5ee0f3;
+  --info-icon: #4d91e1;
+  --danger-fg: #cc2d3a;
+  --warning: #f38744; /* role ESTIMATED */
+
+  /* player */
+  --seek-track: #292929;
+  --seek-fill: #6e59e2;
+  --seek-thumb: #9e99f7;
+
+  /* loading */
+  --skeleton-base: #2e3033;
+}
+
+/* ========================================================================== */
+/* 2. shadcn aliases — shadcn primitives read these names                      */
+/* ========================================================================== */
+
+/* Defined once on :root; each var() resolves against whichever theme block is active. */
+:root {
+  --background: var(--bg-page);
+  --foreground: var(--text-default);
+  --card: var(--bg-card);
+  --card-foreground: var(--text-default);
+  --popover: var(--bg-surface);
+  --popover-foreground: var(--text-default);
+  --primary: var(--primary-600);
+  --primary-foreground: var(--text-on-primary);
+  --secondary: var(--bg-active);
+  --secondary-foreground: var(--text-default);
+  --muted: var(--bg-hover);
+  --muted-foreground: var(--text-muted);
+  --accent: var(--bg-hover);
+  --accent-foreground: var(--text-primary);
+  --destructive: var(--danger-fg);
+  --border: var(--border-default);
+  --input: var(--border-strong);
+  --ring: var(--border-focus);
+}
+
+/* ========================================================================== */
+/* 3. Tailwind utilities                                                       */
+/* ========================================================================== */
+
+/*
+ * Tailwind v4 looks up `bg-*` in --background-color-* before --color-*, `text-*` in --text-color-*
+ * before --color-*, and `border-*` in --border-color-* before --color-*. Using those namespaces gives
+ * the exact class names CLAUDE.md uses (bg-page, text-secondary, border-default) without colliding
+ * with shadcn's own `secondary`/`muted` colors.
+ */
+@theme inline {
+  --font-sans: var(--font-inter);
+  --font-heading: var(--font-sans);
+
+  /* shadcn semantic colors (bg-background, text-foreground, bg-popover, ring-ring…) */
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+
+  /* primary scale + tints (any utility: bg-primary-600, text-primary-fg, border-primary-600…) */
+  --color-primary-50: var(--primary-50);
+  --color-primary-100: var(--primary-100);
+  --color-primary-200: var(--primary-200);
+  --color-primary-300: var(--primary-300);
+  --color-primary-400: var(--primary-400);
+  --color-primary-500: var(--primary-500);
+  --color-primary-600: var(--primary-600);
+  --color-primary-700: var(--primary-700);
+  --color-primary-800: var(--primary-800);
+  --color-primary-900: var(--primary-900);
+  --color-primary-fg: var(--primary-fg);
+  --color-primary-subtle: var(--primary-subtle);
+  --color-primary-subtle-2: var(--primary-subtle-2);
+  --color-primary-muted: var(--primary-muted);
+
+  /* surfaces → bg-page, bg-card, bg-surface, bg-hover, bg-active, bg-segment-active, bg-overlay */
+  --background-color-page: var(--bg-page);
+  --background-color-card: var(--bg-card);
+  --background-color-surface: var(--bg-surface);
+  --background-color-hover: var(--bg-hover);
+  --background-color-active: var(--bg-active);
+  --background-color-segment-active: var(--bg-segment-active);
+  --background-color-overlay: var(--bg-overlay);
+  --background-color-skeleton: var(--skeleton-base);
+
+  /* borders → border-default, border-strong, border-focus */
+  --border-color-default: var(--border-default);
+  --border-color-strong: var(--border-strong);
+  --border-color-focus: var(--border-focus);
+
+  /* text → text-primary, text-default, text-body, text-secondary, … */
+  --text-color-primary: var(--text-primary);
+  --text-color-default: var(--text-default);
+  --text-color-body: var(--text-body);
+  --text-color-secondary: var(--text-secondary);
+  --text-color-tertiary: var(--text-tertiary);
+  --text-color-muted: var(--text-muted);
+  --text-color-disabled: var(--text-disabled);
+  --text-color-on-primary: var(--text-on-primary);
+  --text-color-link: var(--text-link);
+
+  /* status → bg-success-subtle text-success, bg-info-subtle text-info, text-danger… */
+  --color-success: var(--success-fg);
+  --color-success-subtle: var(--success-bg);
+  --color-success-solid: var(--success-solid);
+  --color-info: var(--info-fg);
+  --color-info-subtle: var(--info-bg);
+  --color-info-icon: var(--info-icon);
+  --color-danger: var(--danger);
+  --color-danger-fg: var(--danger-fg);
+  --color-warning: var(--warning);
+
+  /* player + misc */
+  --color-seek-track: var(--seek-track);
+  --color-seek-fill: var(--seek-fill);
+  --color-seek-thumb: var(--seek-thumb);
+  --color-avatar-user: var(--avatar-user);
+
+  --radius-sm: calc(var(--radius) * 0.6);
+  --radius-md: calc(var(--radius) * 0.8);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) * 1.4);
+  --radius-2xl: calc(var(--radius) * 1.8);
+  --radius-3xl: calc(var(--radius) * 2.2);
+  --radius-4xl: calc(var(--radius) * 2.6);
+}
+
+@layer base {
+  * {
+    @apply border-default outline-ring/50;
+  }
+  html {
+    @apply font-sans;
+  }
+  body {
+    @apply bg-page text-default;
+  }
+}

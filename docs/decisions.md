@@ -28,3 +28,14 @@ Format: **Decision** — why — alternatives considered.
 13. **Sync SQLAlchemy, session per request, `check_same_thread=False`** — FastAPI runs sync deps in a
     threadpool, so a connection may cross threads; safe because sessions are never shared between
     requests. Alt: async SQLAlchemy + aiosqlite — more moving parts, no real gain on SQLite.
+14. **Theme tokens via Tailwind v4 per-utility namespaces** — raw CSS variables per theme (`:root` /
+    `.dark`), exposed as `--background-color-page`, `--text-color-secondary`, `--border-color-default`.
+    Tailwind checks those before `--color-*`, so classes read `bg-page`, `text-secondary`,
+    `border-default` (as CLAUDE.md specifies) without clashing with shadcn's `secondary`/`muted`.
+    shadcn's own variables are aliased onto our tokens, so its primitives match the theme for free.
+    Dark values are measured from screenshots; the light block is guessed and fenced off for replacement.
+    Alt: one flat `--color-*` namespace — forces names like `text-text-secondary` or collides with shadcn.
+15. **Interceptor normalises, MutationCache toasts** — the axios interceptor turns every failure into
+    one `ApiError` (`status`, `code`, `message`, `details`) but shows nothing. Mutation errors are toasted
+    once in `MutationCache.onError` (opt-out via `meta.suppressErrorToast`); queries show inline error
+    states instead. Alt: toast in the interceptor — double toasts and toasts for background refetches.
