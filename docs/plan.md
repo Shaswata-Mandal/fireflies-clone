@@ -46,18 +46,22 @@ Tick boxes as you go — this file is also Claude's progress tracker.
 
 ## Phase 4 — Meeting detail (6h) ← highest weight
 - [ ] Header: title (inline edit), date, duration, avatars, actions menu (Edit, Export, Delete w/ confirm)
-- [ ] `PlayerProvider` + `PlayerBar` (play/pause, seek bar, time, ±15s, speed); simulated clock fallback
-- [ ] Transcript panel: grouped speaker blocks, timestamps, active-line highlight + auto-scroll,
-      click-to-seek
-- [ ] Transcript search: highlight, n of m, prev/next
+      (partial: title, date, duration, avatars, ⋯ menu with Copy Link + Export md/txt done;
+      inline edit, Edit and Delete-with-confirm pending → "Coming soon" toasts)
+- [x] `PlayerProvider` + `PlayerBar` (play/pause, seek bar, time, ±15s, speed); simulated clock fallback
+      (+ real <audio>/<video> engine, Space hotkey, ←/→ 5 s on seek bar, hover time bubble, video panel)
+- [x] Transcript panel: grouped speaker blocks, timestamps, active-line highlight + auto-scroll,
+      click-to-seek (+ "Jump to current", empty/loading/error states)
+- [x] Transcript search: highlight, n of m, prev/next
+- [x] Vitest for pure frontend logic (`npm run test`)
 - [ ] Left panel tabs: Summary (overview, keywords chips, bullets), Action Items (add/edit/complete/
       delete, optimistic toggle, "jump to" timestamp), Outline/Chapters (click → seek)
 - [ ] Edit meeting modal (title, participants)
-- [ ] `?t=ms` deep link seeks on load
+- [x] `?t=ms` deep link seeks on load
 
 ## Phase 5 — Bonus (2.5h, pick in order)
 - [ ] Dark mode toggle
-- [ ] Export TXT / Markdown (backend endpoint done; UI pending)
+- [x] Export TXT / Markdown (meeting ⋯ menu → Download)
 - [ ] Global search (FTS5) in navbar dropdown → deep link
 - [ ] Home dashboard: recent meetings + open action items across meetings
 - [ ] Ask about this meeting (LLM) — only if time remains

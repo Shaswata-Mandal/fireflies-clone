@@ -1,0 +1,48 @@
+"use client";
+
+import { useState } from "react";
+import { MeetingHeader } from "@/modules/meetings/components/MeetingHeader";
+import { NotesPlaceholder } from "@/modules/meetings/components/NotesPlaceholder";
+import type { MeetingDetail } from "@/modules/meetings/types";
+import { MediaSurface } from "@/modules/player/components/MediaSurface";
+import { PlayerBar } from "@/modules/player/components/PlayerBar";
+import { useDeepLinkSeek } from "@/modules/player/use-deep-link-seek";
+import { TranscriptPanel } from "@/modules/transcript/components/TranscriptPanel";
+import { useTranscript } from "@/modules/transcript/hooks";
+
+interface MeetingDetailLayoutProps {
+  meeting: MeetingDetail;
+}
+
+/**
+ * Page shell from 17/21, inside the PlayerProvider:
+ *   [centre: video (toggle) + header + notes] | [transcript ≈430px]
+ *   [player bar, full width]
+ * Centre and transcript scroll independently; the player stays at the bottom.
+ */
+export function MeetingDetailLayout({ meeting }: MeetingDetailLayoutProps) {
+  const [isVideoVisible, setVideoVisible] = useState(false);
+  // Same query as the panel (deduped by TanStack Query); only used to know when data is in.
+  const transcript = useTranscript(meeting.id);
+  useDeepLinkSeek(!transcript.isPending);
+
+  return (
+    <div className="flex h-full flex-col">
+      <div className="flex min-h-0 flex-1 flex-col overflow-y-auto lg:flex-row lg:overflow-hidden">
+        <div className="min-w-0 flex-1 lg:overflow-y-auto">
+          <div className="mx-auto flex max-w-4xl flex-col gap-8 px-4 py-8 sm:px-6 lg:px-10">
+            <MediaSurface isVisible={isVideoVisible} />
+            <MeetingHeader
+              meeting={meeting}
+              isVideoVisible={isVideoVisible}
+              onToggleVideo={() => setVideoVisible((visible) => !visible)}
+            />
+            <NotesPlaceholder />
+          </div>
+        </div>
+        <TranscriptPanel meetingId={meeting.id} participants={meeting.participants} />
+      </div>
+      <PlayerBar />
+    </div>
+  );
+}

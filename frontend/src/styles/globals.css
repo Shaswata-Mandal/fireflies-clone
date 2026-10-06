@@ -96,9 +96,14 @@
   --seek-track: #e4e4e7;
   --seek-fill: #6938ef;
   --seek-thumb: #7a5af8;
+  --scrub-tooltip-bg: #18181b;
+  --scrub-tooltip-fg: #ffffff;
+  --player-icon-disabled: #c4c4cc;
 
   /* loading */
   --skeleton-base: #e9e9ec;
+  --skeleton-speaker-a: #6fc2b0;
+  --skeleton-speaker-b: #e0a37a;
 }
 /* ======================= END LIGHT THEME GUESSES ========================== */
 
@@ -155,9 +160,14 @@
   --seek-track: #292929;
   --seek-fill: #6e59e2;
   --seek-thumb: #9e99f7;
+  --scrub-tooltip-bg: #f2f2f7; /* hover time bubble, colors.md §1.7 */
+  --scrub-tooltip-fg: #1c1618;
+  --player-icon-disabled: #434346; /* controls with nothing to play, 17.1 */
 
   /* loading */
   --skeleton-base: #2e3033;
+  --skeleton-speaker-a: #206156; /* empty-transcript speaker squares, colors.md §1.8 */
+  --skeleton-speaker-b: #87502b;
 }
 
 /* ========================================================================== */
@@ -280,6 +290,11 @@
   --color-seek-track: var(--seek-track);
   --color-seek-fill: var(--seek-fill);
   --color-seek-thumb: var(--seek-thumb);
+  --color-scrub-tooltip: var(--scrub-tooltip-bg);
+  --color-scrub-tooltip-fg: var(--scrub-tooltip-fg);
+  --color-player-icon-disabled: var(--player-icon-disabled);
+  --color-skeleton-speaker-a: var(--skeleton-speaker-a);
+  --color-skeleton-speaker-b: var(--skeleton-speaker-b);
   --color-avatar-user: var(--avatar-user);
 
   --radius-sm: calc(var(--radius) * 0.6);
@@ -300,5 +315,72 @@
   }
   body {
     @apply bg-page text-default;
+  }
+}
+
+/* ========================================================================== */
+/* 4. Seek bar — a native <input type="range"> restyled with player tokens      */
+/* ========================================================================== */
+
+/*
+ * Native range keeps role="slider", focus and pointer dragging for free. Thumb pseudo-elements
+ * can't be reached with utilities, so they live here. The played portion is a gradient whose stop
+ * comes from `--seek-progress` (set inline by SeekBar as a percentage).
+ */
+@layer components {
+  .seek-range {
+    appearance: none;
+    height: 16px; /* hit area; the visible track is 2px (colors.md §5) */
+    background: transparent;
+    cursor: pointer;
+  }
+  .seek-range:disabled {
+    cursor: default;
+  }
+  .seek-range::-webkit-slider-runnable-track {
+    height: 2px;
+    background: linear-gradient(
+      to right,
+      var(--seek-fill) var(--seek-progress, 0%),
+      var(--seek-track) var(--seek-progress, 0%)
+    );
+  }
+  .seek-range::-moz-range-track {
+    height: 2px;
+    background: var(--seek-track);
+  }
+  .seek-range::-moz-range-progress {
+    height: 2px;
+    background: var(--seek-fill);
+  }
+  .seek-range::-webkit-slider-thumb {
+    appearance: none;
+    width: 16px;
+    height: 16px;
+    margin-top: -7px; /* centre the 16px thumb on the 2px track */
+    border-radius: 9999px;
+    background: var(--seek-thumb);
+  }
+  .seek-range::-moz-range-thumb {
+    width: 16px;
+    height: 16px;
+    border: 0;
+    border-radius: 9999px;
+    background: var(--seek-thumb);
+  }
+  .seek-range:disabled::-webkit-slider-thumb {
+    background: var(--player-icon-disabled);
+  }
+  .seek-range:disabled::-moz-range-thumb {
+    background: var(--player-icon-disabled);
+  }
+  .seek-range:focus-visible {
+    outline: none;
+  }
+  .seek-range:focus-visible::-webkit-slider-thumb {
+    box-shadow: 0 0 0 3px var(--border-focus);
+  }
+  .seek-range:focus-visible::-moz-range-thumb {
+    box-shadow: 0 0 0 3px var(--border-focus);
   }
 }

@@ -29,6 +29,13 @@ export function formatMeetingDateTime(iso: string): string {
   return `${day} · ${formatMeetingTime(iso)}`;
 }
 
+/** "Oct 06 2026, 8:27 PM" — meeting detail header (17). */
+export function formatMeetingHeaderDate(iso: string): string {
+  const date = new Date(iso);
+  const day = date.toLocaleDateString(undefined, { month: "short", day: "2-digit" });
+  return `${day} ${date.getFullYear()}, ${formatMeetingTime(iso)}`;
+}
+
 /** Local calendar-day key ("2026-10-06") used to group meetings by the viewer's day, not UTC's. */
 export function localDayKey(iso: string): string {
   const date = new Date(iso);

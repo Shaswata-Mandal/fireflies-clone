@@ -1,9 +1,11 @@
 "use client";
 
-import { keepPreviousData, useQuery } from "@tanstack/react-query";
-import { getMeeting, listMeetings, listParticipants } from "@/modules/meetings/api";
-import type { MeetingsQuery } from "@/modules/meetings/types";
+import { keepPreviousData, useMutation, useQuery } from "@tanstack/react-query";
+import toast from "react-hot-toast";
+import { exportMeeting, getMeeting, listMeetings, listParticipants } from "@/modules/meetings/api";
+import type { ExportFormat, MeetingsQuery } from "@/modules/meetings/types";
 import { queryKeys } from "@/shared/constants/query-keys";
+import { downloadBlob } from "@/shared/utils/download";
 
 const PARTICIPANTS_STALE_TIME_MS = 5 * 60_000;
 
@@ -32,5 +34,19 @@ export function useParticipants() {
     queryKey: queryKeys.participants.all,
     queryFn: ({ signal }) => listParticipants(signal),
     staleTime: PARTICIPANTS_STALE_TIME_MS,
+  });
+}
+
+/**
+ * Downloads a meeting as Markdown or plain text. A mutation (not a query): it's a user-triggered
+ * action with nothing to cache. Errors are toasted by the global MutationCache.
+ */
+export function useExportMeeting() {
+  return useMutation({
+    mutationFn: ({ id, format }: { id: number; format: ExportFormat }) => exportMeeting(id, format),
+    onSuccess: ({ blob, filename }) => {
+      downloadBlob(blob, filename);
+      toast.success(`Downloaded ${filename}`);
+    },
   });
 }

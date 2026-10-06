@@ -18,6 +18,13 @@ export function meetingDetailRoute(id: number): string {
   return `${ROUTES.MEETINGS}/${id}`;
 }
 
+/** The `[id]` route segment → a positive integer id, or null for "abc", "0", "1.5"… */
+export function parseMeetingIdParam(value: string): number | null {
+  if (!/^\d+$/.test(value)) return null;
+  const id = Number(value);
+  return Number.isSafeInteger(id) && id > 0 ? id : null;
+}
+
 /** Navbar breadcrumb text per top-level route. */
 export const ROUTE_TITLES: Record<AppRoute, string> = {
   [ROUTES.HOME]: "Home",

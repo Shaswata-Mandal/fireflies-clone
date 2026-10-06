@@ -45,6 +45,9 @@ def create_app() -> FastAPI:
         allow_credentials=True,
         allow_methods=["*"],
         allow_headers=["*"],
+        # Browsers hide non-safelisted response headers cross-origin; the frontend needs the
+        # export filename from Content-Disposition.
+        expose_headers=["Content-Disposition"],
     )
     register_exception_handlers(app)
 

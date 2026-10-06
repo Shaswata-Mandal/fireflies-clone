@@ -8,6 +8,8 @@ export const queryKeys = {
     lists: () => [...queryKeys.meetings.all, "list"] as const,
     list: (params: object) => [...queryKeys.meetings.lists(), params] as const,
     detail: (id: number) => [...queryKeys.meetings.all, "detail", id] as const,
+    // Nested under the detail key: invalidating a meeting also refreshes its transcript.
+    transcript: (id: number) => [...queryKeys.meetings.detail(id), "transcript"] as const,
   },
   participants: {
     all: ["participants"] as const,

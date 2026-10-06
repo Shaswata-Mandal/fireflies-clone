@@ -82,6 +82,14 @@ export interface MeetingDetail {
   tags: Tag[];
 }
 
+/** `GET /meetings/{id}/export?format=` */
+export type ExportFormat = "md" | "txt";
+
+export interface ExportedFile {
+  blob: Blob;
+  filename: string;
+}
+
 /** Query params of `GET /meetings`; undefined = not sent. Dates are `YYYY-MM-DD`. */
 export interface MeetingsQuery {
   q?: string;

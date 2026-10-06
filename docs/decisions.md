@@ -210,4 +210,39 @@ Format: **Decision** — why — alternatives considered.
 71. **Shadcn Dialog vendored, no new dependency** — built on the `radix-ui` package already installed; gives Esc,
     focus trap and focus return for the details popup.
 72. **No frontend test runner yet** — `formatDuration`, `url-state.ts` and `groupMeetingsByDay` are pure functions
-    written to be unit-tested; adding Vitest is a separate decision.
+    written to be unit-tested; adding Vitest is a separate decision. *(Superseded by 73.)*
+73. **Vitest for pure frontend logic** — the player/transcript slice put its riskiest code (binary search, regex
+    escaping, highlight splitting, grouping, time formatting) in pure functions; Vitest runs TS/ESM with no Babel or
+    ts-jest setup, Node environment (no jsdom, no component tests). Pinned to v4 with `"overrides": {"vite": "^7"}`:
+    Vitest 5 needs `@types/node` ≥ 22, and Vite 8's optional `@vitejs/devtools` peer (which itself peers `vitest@*`)
+    crashes npm 10's peer resolver. Alt: Jest — needs a TS/ESM transform setup.
+74. **Playback time lives in an external store, not React state** — the clock writes `TimeStore` every animation frame;
+    readers use `useSyncExternalStore` with a *derived* snapshot: time rounded down to 100 ms (time label, seek bar →
+    ≤ 10 renders/s) or `findActiveSegmentIndex` (transcript → renders only when the line changes). React skips the
+    render when the snapshot is unchanged. `PlayerContext` (controls + isPlaying/rate/duration) and
+    `PlayerTimeContext` (the store, never changes identity) are separate so time never re-renders control consumers.
+    Blocks/lines are `React.memo` with primitive props; only the blocks containing the old/new active line (or the
+    current match) get different props. Alt: a second context for time — every consumer re-renders on every publish.
+75. **One `PlayerEngine` interface, two clocks** — `useSimulatedClock` (rAF; advances by real elapsed time × rate, so
+    speed is exact and a throttled tab catches up; `play()` at the end restarts like `<video>`) and
+    `useMediaElementClock` (element is the source of truth via play/pause events; an rAF loop copies `currentTime`
+    because `timeupdate` is only ~4 Hz). Both hooks always run (hooks can't be conditional); the provider drives one.
+    The provider is mounted by the page, so navigating away unmounts it and the cleanups pause playback.
+76. **Active line in silences** — `findActiveSegmentIndex` = last segment with `start_ms ≤ t`: before the first segment
+    nothing is active; in gaps and after the last segment the previous line stays highlighted (no flicker).
+77. **Manual-scroll detection by intent events** — wheel, touchmove, scroll keys and scrollbar pointerdown suspend
+    auto-follow for `AUTO_SCROLL_PAUSE_MS` (3 s). `scroll` itself can't be used: our own smooth scrolling fires it.
+    Scrolling uses `container.scrollTo` (not `scrollIntoView`, which also scrolls the page) and honours
+    `prefers-reduced-motion`. Jumping to a search match counts as manual so auto-follow doesn't undo it.
+78. **Search cursor resets without an effect** — the cursor stores `{ matches, index }`; a new match list means index 0
+    (derived during render), avoiding setState-in-effect. Clearing applies immediately; typing waits 200 ms.
+    Matches are non-overlapping (regex `g` semantics) and highlighting is built from text parts, never innerHTML.
+79. **Media element always mounted** — hiding the video panel only hides it (CSS), so toggling "Video" never pauses or
+    resets playback. No native controls: the PlayerBar is the single control surface.
+80. **Detail layout deviations from 17/18/22** — the Smart Search filter column and AskFred tab are omitted (out of
+    scope); the ⋯ menu sits next to the title rather than in the navbar breadcrumb (keeps the global navbar free of page
+    data); screenshot 22 shows the seek hover bubble, not a speed menu, so the speed menu is designed to match the
+    other dropdowns. Active-line/`<mark>` colours have no reference (colors.md §1.10) and use existing primary tints.
+81. **CORS `expose_headers=["Content-Disposition"]`** — cross-origin JS can't read non-safelisted headers, so the
+    export filename (slugified on the server) would be invisible; the client falls back to `meeting-<id>.<format>`.
+    Export is a mutation (user action, nothing to cache); the file is saved via a temporary object URL.

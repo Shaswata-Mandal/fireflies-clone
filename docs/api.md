@@ -195,6 +195,7 @@ Frontend links to `/meetings/3?t=655000` which seeks the player on load.
 
 ### `GET /meetings/{id}/export?format=txt|md` → file download (`Content-Disposition: attachment`)
 `Content-Disposition: attachment; filename="<slugified-title>.<format>"`. `format` is required; anything else → 422.
+CORS exposes `Content-Disposition` (`expose_headers`) so a cross-origin frontend can read the filename.
 `md`: title, date, participants, summary, chapters, action items (`- [ ]` / `- [x]`), transcript as
 `[HH:MM:SS] Speaker: text`. `txt`: title, date, participants, transcript. Empty sections are omitted.
 
