@@ -59,6 +59,18 @@ class UnsupportedFileError(AppException):
         super().__init__(code, message, status.HTTP_400_BAD_REQUEST, details)
 
 
+class TranscriptParseError(AppException):
+    """Transcript content is malformed; `details` says where (`line` or `segment`)."""
+
+    def __init__(self, message: str, details: Any = None) -> None:
+        super().__init__("TRANSCRIPT_PARSE_ERROR", message, status.HTTP_400_BAD_REQUEST, details)
+
+
+class EmptyTranscriptError(AppException):
+    def __init__(self, message: str = "Transcript contains no segments") -> None:
+        super().__init__("EMPTY_TRANSCRIPT", message, status.HTTP_400_BAD_REQUEST)
+
+
 # ---------------------------------------------------------------------------
 # Handlers
 # ---------------------------------------------------------------------------

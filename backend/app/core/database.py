@@ -32,7 +32,7 @@ engine = create_engine(settings.DATABASE_URL, connect_args=_connect_args)
 
 
 @event.listens_for(engine, "connect")
-def _set_sqlite_pragmas(dbapi_connection: Any, _connection_record: Any) -> None:
+def set_sqlite_pragmas(dbapi_connection: Any, _connection_record: Any) -> None:
     """SQLite ignores foreign keys unless enabled per connection; WAL allows concurrent reads."""
     if not isinstance(dbapi_connection, SQLiteConnection):
         return
