@@ -1,0 +1,575 @@
+{
+  "title": "Q4 Product Roadmap Sync",
+  "meeting_date": "2026-08-19T15:00:00Z",
+  "duration_ms": 934300,
+  "platform": "google_meet",
+  "source": "seed",
+  "media_url": null,
+  "tags": [
+    "Roadmap",
+    "Product"
+  ],
+  "participants": [
+    {
+      "key": "priya",
+      "name": "Priya Raman",
+      "email": "priya.raman@northwind.example",
+      "avatar_color": "#7c3aed",
+      "role": "host"
+    },
+    {
+      "key": "marcus",
+      "name": "Marcus Chen",
+      "email": "marcus.chen@northwind.example",
+      "avatar_color": "#2563eb",
+      "role": "attendee"
+    },
+    {
+      "key": "elena",
+      "name": "Elena Vasquez",
+      "email": "elena.vasquez@northwind.example",
+      "avatar_color": "#db2777",
+      "role": "attendee"
+    },
+    {
+      "key": "tom",
+      "name": "Tom Okafor",
+      "email": "tom.okafor@northwind.example",
+      "avatar_color": "#059669",
+      "role": "attendee"
+    },
+    {
+      "key": "sam",
+      "name": "Sam Whitaker",
+      "email": "sam.whitaker@northwind.example",
+      "avatar_color": "#d97706",
+      "role": "attendee"
+    }
+  ],
+  "segments": [
+    {
+      "speaker": "priya",
+      "start_ms": 2000,
+      "end_ms": 26500,
+      "text": "Okay, I think we're all here. Thanks for jumping on, everyone. The goal for the next half hour is to lock the Q4 roadmap for Beacon so engineering can start sprint planning on Monday the twenty-fourth. I've got four candidates on the board and we can only fit three."
+    },
+    {
+      "speaker": "marcus",
+      "start_ms": 27300,
+      "end_ms": 40300,
+      "text": "Only three, yeah. And I want to say up front, we're down to seven engineers until the contractor starts on September ninth, so three is generous."
+    },
+    {
+      "speaker": "priya",
+      "start_ms": 41700,
+      "end_ms": 53200,
+      "text": "Noted. Before we get into it, Sam, can you give us the quick numbers? I want everyone anchored on where Q3 actually landed."
+    },
+    {
+      "speaker": "sam",
+      "start_ms": 55300,
+      "end_ms": 84300,
+      "text": "Sure. Weekly active workspaces are at eighteen hundred and forty, which is up fourteen percent from the end of Q2. Activation, meaning a workspace that connects a data source and builds one dashboard in the first seven days, is sitting at thirty-eight percent. That's up from thirty-one, but it's still well under the forty-five we promised the board."
+    },
+    {
+      "speaker": "tom",
+      "start_ms": 84900,
+      "end_ms": 94900,
+      "text": "And forty-five is the number I keep hearing from prospects too. They love the demo, then they stall at setup."
+    },
+    {
+      "speaker": "sam",
+      "start_ms": 96700,
+      "end_ms": 109200,
+      "text": "Right, and that's the part I'd flag. Median time to first dashboard is fifty-two minutes. Anything over about thirty and we see people drop off."
+    },
+    {
+      "speaker": "elena",
+      "start_ms": 110000,
+      "end_ms": 115000,
+      "text": "Fifty-two minutes is brutal. Is that mostly the connector step?"
+    },
+    {
+      "speaker": "sam",
+      "start_ms": 116400,
+      "end_ms": 130900,
+      "text": "Mostly. About thirty-one of those minutes are people waiting on an admin to hand over API credentials. So it's not really our UI, it's the human in the loop."
+    },
+    {
+      "speaker": "elena",
+      "start_ms": 133000,
+      "end_ms": 142500,
+      "text": "Okay, that's actually useful, because that points at an invite-your-admin flow rather than a redesign of the whole onboarding."
+    },
+    {
+      "speaker": "priya",
+      "start_ms": 143100,
+      "end_ms": 166100,
+      "text": "Hold that thought, Elena, because I want to put it on the board as candidate number four, and I want us to see all four before we start arguing. So: SAML single sign-on, dashboard performance, the public API rate limit increase, and that onboarding admin-invite flow."
+    },
+    {
+      "speaker": "marcus",
+      "start_ms": 167900,
+      "end_ms": 178900,
+      "text": "Can I add that the pricing change is a fifth thing, even if it's not engineering-heavy? The billing code touches three services."
+    },
+    {
+      "speaker": "priya",
+      "start_ms": 179700,
+      "end_ms": 188700,
+      "text": "Fair, pricing gets its own slot at the end. Let's start with SSO since it's got dates attached."
+    },
+    {
+      "speaker": "tom",
+      "start_ms": 190100,
+      "end_ms": 211600,
+      "text": "So SSO is the one with money on it. I've got three enterprise deals, Halvorsen Logistics, Brightpath Health and Kestrel Financial, that all have SAML as a hard requirement in procurement. Combined that's roughly four hundred and twenty thousand in annual contract value."
+    },
+    {
+      "speaker": "priya",
+      "start_ms": 213700,
+      "end_ms": 218700,
+      "text": "And what's the timing on those?"
+    },
+    {
+      "speaker": "tom",
+      "start_ms": 219300,
+      "end_ms": 236300,
+      "text": "Halvorsen wants it live by October thirty-first, that's in their draft contract. Brightpath is more flexible, they said end of November. Kestrel said they'd sign without it but they want a date in writing."
+    },
+    {
+      "speaker": "marcus",
+      "start_ms": 238100,
+      "end_ms": 253100,
+      "text": "October thirty-first is tight. Depending on scope, SAML is three to four weeks for one engineer if we use a library and only support Okta and Azure AD at launch."
+    },
+    {
+      "speaker": "elena",
+      "start_ms": 253900,
+      "end_ms": 259400,
+      "text": "Wait, only those two? Because Brightpath uses Ping, I'm pretty sure."
+    },
+    {
+      "speaker": "tom",
+      "start_ms": 260800,
+      "end_ms": 273300,
+      "text": "They do use Ping. Let me double check with their IT lead, but I think they said they'd accept Okta federation in front of it."
+    },
+    {
+      "speaker": "marcus",
+      "start_ms": 275400,
+      "end_ms": 286400,
+      "text": "If it's generic SAML 2.0 it should just work with Ping. Okta and Azure AD is just what we'd test and document."
+    },
+    {
+      "speaker": "priya",
+      "start_ms": 287000,
+      "end_ms": 299500,
+      "text": "Okay, so scope is generic SAML 2.0, tested against Okta and Azure AD, with a Ping setup guide as a stretch. What about SCIM provisioning?"
+    },
+    {
+      "speaker": "tom",
+      "start_ms": 301300,
+      "end_ms": 308800,
+      "text": "They'll ask for it eventually, but nobody has made it a requirement. I'd park it."
+    },
+    {
+      "speaker": "marcus",
+      "start_ms": 309600,
+      "end_ms": 314600,
+      "text": "Yeah, right, please park it. SCIM is its own month."
+    },
+    {
+      "speaker": "priya",
+      "start_ms": 316000,
+      "end_ms": 333000,
+      "text": "Parked. Marcus, can you own the SAML estimate and get me a written plan with milestones by next Wednesday? I need to confirm the October thirty-first date with Tom before he calls Halvorsen back."
+    },
+    {
+      "speaker": "marcus",
+      "start_ms": 335100,
+      "end_ms": 345100,
+      "text": "Yep, I'll write it up. I'll include the security review, because that always eats a week and nobody remembers it."
+    },
+    {
+      "speaker": "tom",
+      "start_ms": 345700,
+      "end_ms": 354200,
+      "text": "That would be great, thank you. I'll hold off on promising Halvorsen anything until I see it."
+    },
+    {
+      "speaker": "priya",
+      "start_ms": 356000,
+      "end_ms": 361500,
+      "text": "Next one. Dashboard performance. Sam, you had the data on this."
+    },
+    {
+      "speaker": "sam",
+      "start_ms": 362300,
+      "end_ms": 381800,
+      "text": "So p95 load time for a dashboard with ten or more widgets is four-point-two seconds right now. Support tickets mentioning slow dashboards doubled between June and August, forty-one tickets last month. Marcus's team already found the culprit, I think?"
+    },
+    {
+      "speaker": "marcus",
+      "start_ms": 383200,
+      "end_ms": 403700,
+      "text": "Mostly. Every widget fires its own query, so a twelve-widget dashboard is twelve round trips, and none of them are cached. If we batch them and add a sixty-second cache on the aggregates, I'd expect p95 to land under one-point-five seconds."
+    },
+    {
+      "speaker": "elena",
+      "start_ms": 405800,
+      "end_ms": 416300,
+      "text": "Can I ask a design question? If we cache for sixty seconds, do users see stale numbers and think it's broken?"
+    },
+    {
+      "speaker": "marcus",
+      "start_ms": 416900,
+      "end_ms": 425900,
+      "text": "Good question. We'd show a small 'updated forty seconds ago' label with a refresh button. That's pretty standard."
+    },
+    {
+      "speaker": "elena",
+      "start_ms": 427700,
+      "end_ms": 435200,
+      "text": "Okay, I can mock that up before Friday. It's a half day, not a project."
+    },
+    {
+      "speaker": "priya",
+      "start_ms": 436000,
+      "end_ms": 441000,
+      "text": "Great. Rough size, Marcus?"
+    },
+    {
+      "speaker": "marcus",
+      "start_ms": 442400,
+      "end_ms": 450900,
+      "text": "Two engineers, about three weeks. It's the cheapest of the four, honestly, and it helps everything else."
+    },
+    {
+      "speaker": "tom",
+      "start_ms": 453000,
+      "end_ms": 465500,
+      "text": "Can I jump in on the API side? Because performance and rate limits are kind of the same conversation for the customers I'm talking to."
+    },
+    {
+      "speaker": "priya",
+      "start_ms": 466100,
+      "end_ms": 471100,
+      "text": "Go ahead."
+    },
+    {
+      "speaker": "tom",
+      "start_ms": 472900,
+      "end_ms": 495400,
+      "text": "Our Growth tier is capped at six hundred requests a minute. Two customers, Lumen Retail and Orbit Fitness, hit that cap every Monday morning when they run their weekly exports, and they get 429 errors. Lumen's CSM told me they're threatening to build around us."
+    },
+    {
+      "speaker": "marcus",
+      "start_ms": 496200,
+      "end_ms": 515700,
+      "text": "Raising it is just a config change plus a billing flag. Twelve hundred a minute for Growth is no problem. The real fix is letting the exports run as background jobs, but that's a much bigger piece of work."
+    },
+    {
+      "speaker": "sam",
+      "start_ms": 517100,
+      "end_ms": 527100,
+      "text": "Do we know how many customers are actually near the cap? Because if it's two, we shouldn't re-architect for two."
+    },
+    {
+      "speaker": "tom",
+      "start_ms": 529200,
+      "end_ms": 536200,
+      "text": "From the logs, it's two over the cap and six more above eighty percent."
+    },
+    {
+      "speaker": "priya",
+      "start_ms": 536800,
+      "end_ms": 549300,
+      "text": "Then let's do the config change now, twelve hundred for Growth, and put background exports in the backlog. Marcus, can you ship that this sprint?"
+    },
+    {
+      "speaker": "marcus",
+      "start_ms": 551100,
+      "end_ms": 559100,
+      "text": "Yeah, it's maybe two days. I'll get it into the sprint that starts on the twenty-fourth."
+    },
+    {
+      "speaker": "priya",
+      "start_ms": 559900,
+      "end_ms": 567400,
+      "text": "Okay, the onboarding flow, which is where we started. Elena, you were onto something earlier."
+    },
+    {
+      "speaker": "elena",
+      "start_ms": 568800,
+      "end_ms": 597800,
+      "text": "Yeah. Sam's data says thirty-one of the fifty-two minutes is waiting on a credential handoff. So what if the person who signs up can send a pre-filled request to their admin, with a link that only asks for read-only credentials and explains exactly what we access? Then the signup flow keeps going with sample data while they wait."
+    },
+    {
+      "speaker": "sam",
+      "start_ms": 599900,
+      "end_ms": 610900,
+      "text": "Sample data is key. If they can poke around a populated dashboard during the wait, I'd bet the drop-off falls a lot."
+    },
+    {
+      "speaker": "tom",
+      "start_ms": 611500,
+      "end_ms": 621000,
+      "text": "That would honestly help me in demos too. I could send that same link to a prospect's IT person."
+    },
+    {
+      "speaker": "marcus",
+      "start_ms": 622800,
+      "end_ms": 633800,
+      "text": "Engineering-wise it's a new token type, an email template, and a sandbox workspace. I'd say two weeks, one engineer plus Elena's time."
+    },
+    {
+      "speaker": "elena",
+      "start_ms": 634600,
+      "end_ms": 643600,
+      "text": "I can do the flows and the email in a week if I start after the freshness label."
+    },
+    {
+      "speaker": "priya",
+      "start_ms": 645000,
+      "end_ms": 655000,
+      "text": "What would you expect it to do to activation, Sam? Be a bit hand-wavy, I won't hold you to it."
+    },
+    {
+      "speaker": "sam",
+      "start_ms": 657100,
+      "end_ms": 673600,
+      "text": "If we cut that wait in half, based on the cohort I looked at, activation goes from thirty-eight to somewhere around forty-four, forty-five. So it gets us to the board number, just about."
+    },
+    {
+      "speaker": "priya",
+      "start_ms": 674200,
+      "end_ms": 686700,
+      "text": "Just about is good enough for me. Sam, can you turn that into a one-page projection I can bring to the investor update? Nothing fancy."
+    },
+    {
+      "speaker": "sam",
+      "start_ms": 688500,
+      "end_ms": 693500,
+      "text": "Sure, I'll have it by end of next week."
+    },
+    {
+      "speaker": "priya",
+      "start_ms": 694300,
+      "end_ms": 699300,
+      "text": "Okay, pricing. Tom, where are we?"
+    },
+    {
+      "speaker": "tom",
+      "start_ms": 700700,
+      "end_ms": 723200,
+      "text": "So today it's twenty-nine dollars per seat on Team and forty-nine on Growth. The proposal is Growth goes to fifty-nine, but we add SSO and the higher rate limit to it, and we introduce a twenty percent discount for annual billing. Team stays at twenty-nine."
+    },
+    {
+      "speaker": "elena",
+      "start_ms": 725300,
+      "end_ms": 731800,
+      "text": "Hmm, that's a twenty percent increase on Growth. How do existing customers react?"
+    },
+    {
+      "speaker": "tom",
+      "start_ms": 732400,
+      "end_ms": 744900,
+      "text": "We'd grandfather everyone until their renewal, and honestly the SSO inclusion is what makes it defensible. Competitors charge extra for it, we'd be bundling it."
+    },
+    {
+      "speaker": "sam",
+      "start_ms": 746700,
+      "end_ms": 760200,
+      "text": "I ran the numbers. If twenty-five percent of Growth customers take annual, the net effect on revenue is still about plus eleven percent in the first year."
+    },
+    {
+      "speaker": "marcus",
+      "start_ms": 761000,
+      "end_ms": 780000,
+      "text": "And the engineering side is that billing change touching three services, like I said. Plans, entitlements, and the invoicing job. Realistically a week and a half, but it can't start until SAML ships, since SSO becomes an entitlement."
+    },
+    {
+      "speaker": "priya",
+      "start_ms": 781400,
+      "end_ms": 788400,
+      "text": "That sequencing makes sense. So pricing goes live right after SSO, around early November."
+    },
+    {
+      "speaker": "tom",
+      "start_ms": 790500,
+      "end_ms": 796500,
+      "text": "That works for me. I'd rather announce it as one package anyway."
+    },
+    {
+      "speaker": "priya",
+      "start_ms": 797100,
+      "end_ms": 820100,
+      "text": "Alright, let me play it back. Q4 is SAML SSO, dashboard performance with the freshness label, the onboarding admin-invite flow, and pricing right behind SSO. Background exports and SCIM go to the backlog. The rate limit config change goes in this coming sprint. Does anyone object?"
+    },
+    {
+      "speaker": "marcus",
+      "start_ms": 821900,
+      "end_ms": 841400,
+      "text": "Capacity is the only worry. SSO is one engineer, performance is two, onboarding is one. That's four of seven, plus pricing later, plus the usual bug load. It's fine as long as the contractor shows up on the ninth."
+    },
+    {
+      "speaker": "priya",
+      "start_ms": 842200,
+      "end_ms": 848200,
+      "text": "The contractor is confirmed for the ninth, I signed the paperwork Friday."
+    },
+    {
+      "speaker": "marcus",
+      "start_ms": 849600,
+      "end_ms": 860600,
+      "text": "Then I'm comfortable. And just to be clear, the custom report builder, which Elena had on the board earlier, is definitely Q1?"
+    },
+    {
+      "speaker": "elena",
+      "start_ms": 862700,
+      "end_ms": 872700,
+      "text": "Yeah, I knew that was coming. I'd rather do the freshness label and onboarding well than do custom reports badly."
+    },
+    {
+      "speaker": "priya",
+      "start_ms": 873300,
+      "end_ms": 885800,
+      "text": "Thanks for being gracious about it, Elena. I'll send out the written roadmap tomorrow morning, and I'll add a one-line rationale for everything we cut."
+    },
+    {
+      "speaker": "tom",
+      "start_ms": 887600,
+      "end_ms": 894600,
+      "text": "Can you also add the Halvorsen date? I want something I can link to."
+    },
+    {
+      "speaker": "priya",
+      "start_ms": 895400,
+      "end_ms": 901400,
+      "text": "Yes, it'll have the October thirty-first target, marked as pending Marcus's plan."
+    },
+    {
+      "speaker": "sam",
+      "start_ms": 902800,
+      "end_ms": 912800,
+      "text": "Last thing, can someone remind me which Slack channel the roadmap lives in? I keep posting in the wrong one."
+    },
+    {
+      "speaker": "priya",
+      "start_ms": 914900,
+      "end_ms": 920400,
+      "text": "Ha, it's product-roadmap, with a dash. I'll pin the doc there."
+    },
+    {
+      "speaker": "marcus",
+      "start_ms": 921000,
+      "end_ms": 927500,
+      "text": "Alright, I've got a one-on-one in two minutes, so I'll drop. Thanks, everyone."
+    },
+    {
+      "speaker": "priya",
+      "start_ms": 929300,
+      "end_ms": 934300,
+      "text": "Thanks all. Great discussion. Talk Monday."
+    }
+  ],
+  "summary": {
+    "overview": "The product team locked the Q4 roadmap for Beacon. With seven engineers until a contractor starts on September 9, they committed to SAML SSO (driven by $420K of enterprise pipeline, with Halvorsen Logistics needing it by October 31), dashboard performance work to cut p95 load from 4.2s to under 1.5s, and an onboarding admin-invite flow aimed at lifting activation from 38% toward the board's 45% target. Growth-tier pricing moves to $59 per seat once SSO ships. SCIM, background exports and the custom report builder were pushed out, and the API rate limit for Growth goes to 1,200 requests per minute this coming sprint.",
+    "bullet_points": [
+      "Q3 landed at 1,840 weekly active workspaces (+14%); activation is 38% against a 45% board target, mostly because 31 of 52 minutes to first dashboard is spent waiting on an admin's API credentials.",
+      "SAML 2.0 SSO is scoped to Okta and Azure AD testing with a Ping guide as a stretch; SCIM is parked. Marcus owns a written plan by August 26 before Tom commits to Halvorsen's October 31 date.",
+      "Dashboard performance: batch widget queries and add a 60-second aggregate cache, plus a 'last updated' label from design. Estimated at two engineers for three weeks.",
+      "Growth API rate limit goes from 600 to 1,200 requests per minute in the sprint starting August 24; background exports go to the backlog since only two customers exceed the cap.",
+      "Growth tier rises from $49 to $59 per seat with SSO, the higher rate limit and a 20% annual discount; existing customers are grandfathered until renewal. Sam projects roughly +11% first-year revenue."
+    ],
+    "keywords": [
+      "Q4 roadmap",
+      "SAML SSO",
+      "Activation",
+      "Dashboard performance",
+      "Rate limits",
+      "Pricing",
+      "Onboarding",
+      "Capacity planning"
+    ],
+    "generated_by": "seed"
+  },
+  "chapters": [
+    {
+      "title": "Kickoff and Q3 recap",
+      "start_ms": 2000
+    },
+    {
+      "title": "SAML single sign-on for enterprise",
+      "start_ms": 190100
+    },
+    {
+      "title": "Dashboard performance and API rate limits",
+      "start_ms": 356000
+    },
+    {
+      "title": "Onboarding admin-invite flow",
+      "start_ms": 559900
+    },
+    {
+      "title": "Pricing and packaging",
+      "start_ms": 694300
+    },
+    {
+      "title": "Decisions and wrap-up",
+      "start_ms": 797100
+    }
+  ],
+  "action_items": [
+    {
+      "text": "Write the SAML 2.0 SSO plan with milestones, including the security review, and share it with Tom",
+      "assignee": "marcus",
+      "due_date": "2026-08-26",
+      "is_completed": false,
+      "source_segment": 22
+    },
+    {
+      "text": "Mock up the 'updated x seconds ago' freshness label and refresh button for cached dashboards",
+      "assignee": "elena",
+      "due_date": "2026-08-21",
+      "is_completed": true,
+      "source_segment": 30
+    },
+    {
+      "text": "Raise the Growth tier API rate limit from 600 to 1,200 requests per minute",
+      "assignee": "marcus",
+      "due_date": "2026-09-04",
+      "is_completed": false,
+      "source_segment": 40
+    },
+    {
+      "text": "Write a one-page activation projection (38% to ~45%) for the investor update",
+      "assignee": "sam",
+      "due_date": "2026-08-28",
+      "is_completed": false,
+      "source_segment": 49
+    },
+    {
+      "text": "Publish the written Q4 roadmap with rationale for cut items and pin it in #product-roadmap",
+      "assignee": "priya",
+      "due_date": "2026-08-20",
+      "is_completed": true,
+      "source_segment": 64
+    },
+    {
+      "text": "Confirm with Brightpath Health's IT lead whether generic SAML works with their Ping setup",
+      "assignee": "tom",
+      "due_date": "2026-08-25",
+      "is_completed": false,
+      "source_segment": 17
+    },
+    {
+      "text": "Decide whether background exports get a Q1 slot or stay in the backlog",
+      "assignee": null,
+      "due_date": null,
+      "is_completed": false,
+      "source_segment": 39
+    }
+  ]
+}

@@ -1,18 +1,36 @@
 """App factory: logging, CORS, error handlers, routers."""
 
+import logging
+from collections.abc import AsyncIterator
+from contextlib import asynccontextmanager
+
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from app import models  # noqa: F401  (registers all models so cross-module relationships resolve)
 from app.core.config import settings
+from app.core.database import SessionLocal
 from app.core.exceptions import register_exception_handlers
 from app.core.logging import setup_logging
+from app.seed.seed import seed_if_empty
+
+logger = logging.getLogger(__name__)
+
+
+@asynccontextmanager
+async def lifespan(_app: FastAPI) -> AsyncIterator[None]:
+    """Free hosts wipe the disk on redeploy, so seed on boot when enabled and the DB is empty."""
+    if settings.SEED_ON_STARTUP:
+        with SessionLocal() as db:
+            if seed_if_empty(db):
+                logger.info("Seeded empty database")
+    yield
 
 
 def create_app() -> FastAPI:
     setup_logging(settings.LOG_LEVEL)
 
-    app = FastAPI(title="Fireflies Clone API", version="0.1.0")
+    app = FastAPI(title="Fireflies Clone API", version="0.1.0", lifespan=lifespan)
 
     app.add_middleware(
         CORSMiddleware,

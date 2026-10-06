@@ -93,3 +93,15 @@ Format: **Decision** — why — alternatives considered.
 34. **Mock is deterministic by construction** — ties in word frequency break alphabetically, chapters are
     equal *time* windows (empty windows skipped, so short transcripts get fewer chapters instead of fake ones),
     and each chapter bullet quotes the window's longest sentence (first sentences are often just "Yes.").
+35. **Seed = validated JSON files + a loader that talks to the session directly** — the seed is a script,
+    not an HTTP module, so it skips router→service→repository (a deliberate, documented exception). Files
+    are parsed by Pydantic models (`seed/schemas.py`) so the file format is its own spec; *every* file is
+    validated before the first insert, so a typo fails fast with the filename and nothing is half-seeded.
+    Alt: Python dict fixtures — no validation, harder to review as data.
+36. **Participants identified by email across seed files** — the same person repeated in several files
+    becomes one `participants` row + several `meeting_participants` rows (what makes the participant
+    filter meaningful). A mismatching name/colour for one email is a validation error.
+    `source_segment` in a file is a segment *index*; SQLAlchemy relationships resolve it to a DB id.
+37. **Idempotent by "no meetings" check; default user ensured separately** — `get_current_user` needs
+    user id=1 even if meetings exist, so the user is created first, then seeding is skipped if any
+    meeting exists. Runs on startup via FastAPI `lifespan` when `SEED_ON_STARTUP`; tests set it false.
