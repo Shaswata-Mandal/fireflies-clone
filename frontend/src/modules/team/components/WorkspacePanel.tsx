@@ -1,3 +1,12 @@
+/**
+ * Team > Workspace tab.
+ *
+ * WHAT: A team card plus Leave team and Delete account actions (both "Coming soon").
+ * LAYER: Module component (client).
+ * CALLED BY: `TeamView`.
+ * CALLS: `useCurrentUser`, `SettingsCard`, `showComingSoon`.
+ */
+
 "use client";
 
 import { Building2 } from "lucide-react";

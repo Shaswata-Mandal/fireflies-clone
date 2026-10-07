@@ -1,3 +1,12 @@
+/**
+ * Decorative "no results" picture.
+ *
+ * WHAT: Three stacked placeholder cards made of styled divs (no image file).
+ * LAYER: Module component (server-safe).
+ * CALLED BY: `MeetingsEmptyState`.
+ * CALLS: `cn`.
+ */
+
 import { cn } from "@/shared/utils/cn";
 
 // The three placeholder cards from screenshot 14; the middle one is wider and sticks out.

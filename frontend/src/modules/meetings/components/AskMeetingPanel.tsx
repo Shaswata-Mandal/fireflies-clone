@@ -1,3 +1,12 @@
+/**
+ * AskFred tab on the meeting page.
+ *
+ * WHAT: Creates a chat bound to this meeting and wires citation clicks to the player's `seek`.
+ * LAYER: Module component (client).
+ * CALLED BY: the meeting detail layout.
+ * CALLS: `useAskChat`, `AskChatBody`, `usePlayer`.
+ */
+
 "use client";
 
 import { AskChatBody } from "@/modules/meetings/components/AskChatBody";

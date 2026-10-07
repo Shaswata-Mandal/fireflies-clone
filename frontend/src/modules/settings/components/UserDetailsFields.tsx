@@ -1,3 +1,13 @@
+/**
+ * Read-only user fields.
+ *
+ * WHAT: Name/email inputs filled from `GET /me`, with loading and error states; Save only shows
+ *   "Coming soon".
+ * LAYER: Module component (client).
+ * CALLED BY: `ProfilePanel`, `AccountPanel`.
+ * CALLS: `useCurrentUser`, `FormField`, `ErrorState`.
+ */
+
 "use client";
 
 import { useCurrentUser } from "@/modules/settings/hooks";
@@ -22,6 +32,7 @@ const READ_ONLY_INPUT =
 export function UserDetailsFields({ idPrefix, showName, saveFeature }: UserDetailsFieldsProps) {
   const { data: user, isPending, isError, error, refetch, isRefetching } = useCurrentUser();
 
+  // Loading, then error, then the form: after these two early returns `user` is defined.
   if (isPending) {
     return (
       <div role="status" aria-label="Loading account" className="flex flex-col gap-4">
@@ -45,6 +56,7 @@ export function UserDetailsFields({ idPrefix, showName, saveFeature }: UserDetai
   return (
     <form
       className="flex flex-col gap-4"
+      // `preventDefault` stops the browser's own form submit (a page reload).
       onSubmit={(event) => {
         event.preventDefault();
         showComingSoon(saveFeature);

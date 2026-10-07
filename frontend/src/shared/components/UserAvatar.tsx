@@ -1,3 +1,13 @@
+/**
+ * User/participant avatar.
+ *
+ * WHAT: A small square showing an image or coloured initials.
+ * LAYER: Shared component (server-safe).
+ * CALLED BY: navbar avatar, participant stacks, assignee chips.
+ * CALLS: `utils/initials.ts`, `cn`.
+ * MERN EQUIVALENT: MUI's `<Avatar>`.
+ */
+
 import { getInitials } from "@/shared/utils/initials";
 import { cn } from "@/shared/utils/cn";
 
@@ -10,6 +20,7 @@ interface UserAvatarProps {
 }
 
 /** Square avatar with initials on the user color (colors.md §1.8); an image when the user has one. */
+// @param name used for the initials; @param avatarUrl optional image; @param color optional bg
 export function UserAvatar({ name, avatarUrl, color, className }: UserAvatarProps) {
   const base = cn("size-6 shrink-0 rounded-sm", className);
 

@@ -1,9 +1,21 @@
+/**
+ * AskFred icon.
+ *
+ * WHAT: A custom SVG robot-head glyph.
+ * LAYER: Shared component (server-safe).
+ * CALLED BY: sidebar nav, AskFred panel and dock.
+ * CALLS: nothing.
+ * MERN EQUIVALENT: an inline SVG icon component.
+ */
+
 import type { SVGProps } from "react";
 
 /**
  * AskFred glyph: a simple original robot head drawn in `currentColor`, so callers color it with a
  * text-* class. Deliberately not the Fireflies asset.
  */
+// `{...props}` below lets callers pass className/size; `currentColor` makes the drawing follow
+// the text colour (so `text-primary-fg` colours the icon).
 export function FredMark(props: SVGProps<SVGSVGElement>) {
   return (
     <svg

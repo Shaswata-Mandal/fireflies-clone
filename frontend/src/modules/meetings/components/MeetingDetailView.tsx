@@ -1,3 +1,16 @@
+/**
+ * Data-aware entry point of the meeting page.
+ *
+ * WHAT: Fetches the meeting and shows skeleton, 404, error, or the full page inside a
+ *   `PlayerProvider`.
+ * LAYER: Module component (client).
+ * CALLED BY: `app/meetings/[id]/page.tsx` (with `key={meetingId}`).
+ * CALLS: `useMeeting`, `MeetingDetailLayout`, `PlayerProvider`, `ErrorState`.
+ * MERN EQUIVALENT: a route component that does `const { data, isLoading, error } = useQuery(...)`.
+ * INTERVIEW: the `PlayerProvider` is mounted here, so the player (clock, play state) lives and
+ * dies with ONE meeting page; navigating to another meeting remounts it from scratch.
+ */
+
 "use client";
 
 import { MeetingDetailLayout } from "@/modules/meetings/components/MeetingDetailLayout";
@@ -19,6 +32,8 @@ interface MeetingDetailViewProps {
 export function MeetingDetailView({ meetingId }: MeetingDetailViewProps) {
   const { data: meeting, error, isPending, isError, refetch, isRefetching } = useMeeting(meetingId);
 
+  // The three early returns are the loading, error and success states, in that order. After them,
+  // TypeScript knows `meeting` is defined.
   if (isPending) {
     return (
       <>
@@ -29,6 +44,7 @@ export function MeetingDetailView({ meetingId }: MeetingDetailViewProps) {
   }
 
   if (isError) {
+    // A 404 gets a friendly page; any other error gets a Retry card.
     const isNotFound = isApiError(error) && error.status === HTTP_NOT_FOUND;
     return (
       <>

@@ -1,3 +1,13 @@
+/**
+ * Participant filter list inside the filter popover.
+ *
+ * WHAT: A searchable, single-select list of people with loading, error and empty states.
+ * LAYER: Module component (client).
+ * CALLED BY: `MeetingsFilterPopover`.
+ * CALLS: `useParticipants`, `UserAvatar`.
+ * MERN EQUIVALENT: a searchable dropdown list fed by `GET /participants`.
+ */
+
 "use client";
 
 import { Check, Search } from "lucide-react";
@@ -12,6 +22,8 @@ interface FilterParticipantsPaneProps {
   onSelect: (id: number | null) => void;
 }
 
+// Number of placeholder rows while loading (`Array.from({ length })` below builds them, and the
+// index is a safe React key because these rows never reorder).
 const SKELETON_ROWS = 3;
 
 /**
@@ -20,8 +32,10 @@ const SKELETON_ROWS = 3;
  */
 export function FilterParticipantsPane({ selectedId, onSelect }: FilterParticipantsPaneProps) {
   const { data: participants, isPending, isError, refetch } = useParticipants();
+  // Local UI state: what the user typed in the search box (not server state).
   const [query, setQuery] = useState("");
 
+  // Derived on each render (no extra state): the filtered list.
   const needle = query.trim().toLowerCase();
   const visible = (participants ?? []).filter(
     (person) =>

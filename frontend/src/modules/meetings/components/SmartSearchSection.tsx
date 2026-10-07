@@ -1,3 +1,14 @@
+/**
+ * One collapsible section of the Smart Search panel.
+ *
+ * WHAT: A heading button that shows or hides its content.
+ * LAYER: Module component (client: open/closed state).
+ * CALLED BY: `SmartSearchPanel`.
+ * CALLS: `cn`.
+ * Accessibility: `aria-expanded` and `aria-controls` link the button to the region it toggles;
+ * `hidden` removes the closed content from view and from the accessibility tree.
+ */
+
 "use client";
 
 import { ChevronUp } from "lucide-react";

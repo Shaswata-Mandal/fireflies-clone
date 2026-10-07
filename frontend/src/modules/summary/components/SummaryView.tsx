@@ -1,3 +1,12 @@
+/**
+ * Read-only summary.
+ *
+ * WHAT: Overview paragraph, keyword chips and bullet notes (sections hidden when empty).
+ * LAYER: Module component (server-safe).
+ * CALLED BY: `SummaryPanel`.
+ * CALLS: `SummarySection`, `KeywordChips`.
+ */
+
 import type { MeetingSummary } from "@/modules/meetings/types";
 import { KeywordChips } from "@/modules/summary/components/KeywordChips";
 import { SummarySection } from "@/modules/summary/components/SummarySection";

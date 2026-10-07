@@ -1,4 +1,13 @@
-"""Request/response models for /meetings. Field names mirror docs/api.md (snake_case)."""
+"""Request/response models for /meetings. Field names mirror docs/api.md (snake_case).
+
+WHAT: Pydantic models that define the JSON going into and out of the meetings endpoints.
+LAYER: Schema (DTOs). No DB access and no business rules beyond field validation.
+CALLED BY: meetings/router.py (request and response types), meetings/service.py (builds the
+    response models), and other modules that embed these (participant, tag, summary shapes).
+CALLS: Pydantic, core/enums, the transcript parser's `TranscriptFormat`.
+MERN EQUIVALENT: zod/Joi schemas for request bodies plus the TypeScript interfaces of your API
+    responses, in one place and checked at runtime.
+"""
 
 from datetime import UTC, datetime
 from enum import StrEnum
@@ -23,11 +32,14 @@ EMAIL_MAX_LENGTH = 255
 DEFAULT_PAGE_SIZE = 20
 MAX_PAGE_SIZE = 100
 
+# `Annotated[str, StringConstraints(...)]` = a reusable "string type with rules" (like a zod
+# `z.string().trim().min(1).max(200)` stored in a variable).
 Title = Annotated[
     str, StringConstraints(strip_whitespace=True, min_length=1, max_length=TITLE_MAX_LENGTH)
 ]
 
 # Normalised at the boundary so the response echoes UTC even when the client sent an offset.
+# `AwareDatetime` rejects datetimes without a timezone; `AfterValidator` then converts to UTC.
 UTCDatetime = Annotated[AwareDatetime, AfterValidator(lambda value: value.astimezone(UTC))]
 
 
@@ -44,6 +56,8 @@ class MeetingSort(StrEnum):
 
 
 class ParticipantInput(BaseModel):
+    """A participant as typed in the create/edit form (no id yet)."""
+
     name: Annotated[
         str,
         StringConstraints(
@@ -56,9 +70,13 @@ class ParticipantInput(BaseModel):
 
 
 class MeetingCreate(BaseModel):
+    """Body of POST /meetings. Optional pasted transcript and optional AI summary."""
+
     title: Title
     meeting_date: UTCDatetime
+    # `default_factory=list` gives each instance its own new list (never share a mutable default).
     participants: list[ParticipantInput] = Field(default_factory=list)
+    # `ge=0` = "greater than or equal to 0".
     duration_ms: int | None = Field(default=None, ge=0)
     transcript_text: str | None = None
     # Omitted -> the parser sniffs the format from the content (pasted text has no filename).
@@ -73,8 +91,12 @@ class MeetingUpdate(BaseModel):
     meeting_date: UTCDatetime | None = None
     participants: list[ParticipantInput] | None = None
 
+    # INTERVIEW: PATCH semantics. "Absent" means "leave unchanged" but an explicit `null` would be
+    # ambiguous for required columns, so it is rejected. `model_fields_set` holds only the field
+    # names the client actually sent. `mode="after"` runs once all fields are validated.
     @model_validator(mode="after")
     def _reject_explicit_null(self) -> Self:
+        """Raise (which becomes a 422) if the client sent `"title": null` and the like."""
         for name in self.model_fields_set:
             if getattr(self, name) is None:
                 raise ValueError(f"{name} cannot be null")
@@ -83,8 +105,13 @@ class MeetingUpdate(BaseModel):
 
 # ── Responses ───────────────────────────────────────────────────────────────────────────────────
 
+# `from_attributes=True` lets `X.model_validate(orm_object)` read attributes off an ORM object
+# (by default Pydantic only accepts dicts).
+
 
 class ParticipantBrief(BaseModel):
+    """Minimal participant info for avatar stacks on the library cards."""
+
     model_config = ConfigDict(from_attributes=True)
 
     id: int
@@ -93,11 +120,15 @@ class ParticipantBrief(BaseModel):
 
 
 class ParticipantRead(ParticipantBrief):
+    """Participant with email and the role they had in this meeting."""
+
     email: str | None
     role: ParticipantRole
 
 
 class TagRead(BaseModel):
+    """A tag chip."""
+
     model_config = ConfigDict(from_attributes=True)
 
     id: int
@@ -106,6 +137,8 @@ class TagRead(BaseModel):
 
 
 class SummaryRead(BaseModel):
+    """The AI (or seed/mock) summary embedded in a meeting."""
+
     model_config = ConfigDict(from_attributes=True)
 
     overview: str
@@ -115,6 +148,8 @@ class SummaryRead(BaseModel):
 
 
 class ChapterRead(BaseModel):
+    """One outline entry: a title and the time it starts."""
+
     model_config = ConfigDict(from_attributes=True)
 
     id: int
@@ -124,6 +159,8 @@ class ChapterRead(BaseModel):
 
 
 class MeetingListItem(BaseModel):
+    """One card in the meetings library (lighter than the full detail)."""
+
     id: int
     title: str
     meeting_date: datetime
@@ -136,6 +173,8 @@ class MeetingListItem(BaseModel):
 
 
 class MeetingList(BaseModel):
+    """Paginated list envelope: {items, total, page, limit} per docs/api.md."""
+
     items: list[MeetingListItem]
     total: int
     page: int
@@ -143,6 +182,8 @@ class MeetingList(BaseModel):
 
 
 class MeetingDetail(BaseModel):
+    """Everything the meeting page header and side panels need (transcript is fetched apart)."""
+
     id: int
     title: str
     meeting_date: datetime

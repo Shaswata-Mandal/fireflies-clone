@@ -1,3 +1,16 @@
+/**
+ * The meetings library screen.
+ *
+ * WHAT: Reads view state from the URL, fetches one page with `useMeetings`, and chooses what to
+ *   show: skeleton, error, empty state, "page out of range" or the list with pagination.
+ * LAYER: Module component (client) - the "container" that owns data and state.
+ * CALLED BY: `app/meetings/page.tsx` (wrapped in `<Suspense>`).
+ * CALLS: `useMeetingsUrlState`, `useMeetings`, and the presentational components next to it.
+ * MERN EQUIVALENT: a page component with `useQuery` and conditional rendering by status.
+ * INTERVIEW: one `renderBody()` maps (query status) -> exactly one body; every data view must
+ * have loading, empty and error states (CLAUDE.md rule).
+ */
+
 "use client";
 
 import { useMemo } from "react";
@@ -19,7 +32,11 @@ import { clearFilters, hasActiveFilters, toMeetingsQuery } from "@/modules/meeti
  */
 export function MeetingsView() {
   const { state, update, setState } = useMeetingsUrlState();
+  // useMemo keeps the query object's identity stable, so the query key only changes when `state`
+  // really changes (an unstable object would look like a new key on every render).
   const query = useMemo(() => toMeetingsQuery(state), [state]);
+  // Status flags: isPending = no data yet; isError = failed; isFetching = a request is running;
+  // isPlaceholderData = showing the previous page while the next one loads.
   const { data, error, isPending, isError, isFetching, isPlaceholderData, refetch } =
     useMeetings(query);
 
@@ -27,6 +44,7 @@ export function MeetingsView() {
   const onlySearchActive =
     state.q !== "" && state.participantId === null && !state.dateFrom && !state.dateTo;
 
+  // Early returns, in priority order: loading, error, empty, page out of range, then the list.
   function renderBody() {
     if (isPending) return <MeetingsSkeleton />;
     if (isError) {

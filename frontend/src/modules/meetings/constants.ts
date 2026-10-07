@@ -1,3 +1,13 @@
+/**
+ * Meetings module constants.
+ *
+ * WHAT: Page size, sort options, tab ids, form limits and all fixed UI copy for this module.
+ * LAYER: Module constants.
+ * CALLED BY: meetings components, hooks, schemas and url-state.
+ * CALLS: types only.
+ * MERN EQUIVALENT: a `constants.js` (no magic numbers or strings in components, per CLAUDE.md).
+ */
+
 import type { MeetingSort, TranscriptFormat } from "@/modules/meetings/types";
 
 export const MEETINGS_PAGE_SIZE = 20;
@@ -18,6 +28,7 @@ export const SORT_OPTIONS: ReadonlyArray<{ value: MeetingSort; label: string }> 
 export const DATE_SORTS: ReadonlySet<MeetingSort> = new Set(["-meeting_date", "meeting_date"]);
 
 /** The two channels from screenshots 09/13. Both list the same meetings: there is no sharing model. */
+// `as const` + the derived type below = a string-literal "enum" without TypeScript's `enum`.
 export const MEETING_VIEWS = {
   MINE: "mine",
   ALL: "all",
@@ -51,6 +62,7 @@ export const TITLE_MAX_LENGTH = 200;
 export const PARTICIPANT_NAME_MAX_LENGTH = 100;
 export const EMAIL_MAX_LENGTH = 255;
 /** Backend `MAX_UPLOAD_BYTES`: bigger files are rejected with 413 FILE_TOO_LARGE. */
+// Keep in sync with the backend (checked there too: never trust the client alone).
 export const MAX_UPLOAD_BYTES = 2 * 1024 * 1024;
 export const BYTES_PER_KB = 1024;
 

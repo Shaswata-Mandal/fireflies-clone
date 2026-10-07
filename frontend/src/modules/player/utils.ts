@@ -1,3 +1,12 @@
+/**
+ * Pure player helpers.
+ *
+ * WHAT: Clamp a seek time, parse the `?t=` URL value, decide video vs audio from a URL.
+ * LAYER: Module util (pure; unit-tested in utils.test.ts).
+ * CALLED BY: `PlayerProvider`, `useDeepLinkSeek`, `MediaSurface`.
+ * CALLS: constants.
+ */
+
 // Pure player helpers, unit-tested in utils.test.ts.
 
 import { VIDEO_EXTENSIONS } from "@/modules/player/constants";

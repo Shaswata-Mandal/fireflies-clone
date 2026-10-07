@@ -1,3 +1,13 @@
+/**
+ * Route constants and path helpers.
+ *
+ * WHAT: Every in-app URL as a constant, plus small pure functions to build and test paths.
+ * LAYER: Shared constants / utils.
+ * CALLED BY: Sidebar, Navbar, links in modules, `useRouteTitle`, pages (id parsing).
+ * CALLS: nothing.
+ * MERN EQUIVALENT: a `routes.js` of path strings shared by `<Link to=...>` and `<Route path=...>`.
+ */
+
 // Every in-app URL lives here so links and the navbar title can't drift apart.
 
 export const ROUTES = {
@@ -11,6 +21,8 @@ export const ROUTES = {
   SETTINGS: "/settings",
 } as const;
 
+// Builds the union of all route strings ("/" | "/meetings" | ...) from the object above, so the
+// compiler flags a typo or a route missing from `ROUTE_TITLES`.
 export type AppRoute = (typeof ROUTES)[keyof typeof ROUTES];
 
 /** `/meetings/12` */
@@ -40,12 +52,15 @@ export function isMeetingDetailRoute(pathname: string): boolean {
 
 /** The `[id]` route segment → a positive integer id, or null for "abc", "0", "1.5"… */
 export function parseMeetingIdParam(value: string): number | null {
+  // Digits only: rejects "abc", "-1", "1.5" and "1e3" before `Number()` can accept them.
   if (!/^\d+$/.test(value)) return null;
   const id = Number(value);
   return Number.isSafeInteger(id) && id > 0 ? id : null;
 }
 
 /** Navbar breadcrumb text per top-level route. */
+// `Record<AppRoute, string>` forces an entry for every route, so adding a route without a title
+// is a compile error.
 export const ROUTE_TITLES: Record<AppRoute, string> = {
   [ROUTES.HOME]: "Home",
   [ROUTES.MEETINGS]: "Meetings",

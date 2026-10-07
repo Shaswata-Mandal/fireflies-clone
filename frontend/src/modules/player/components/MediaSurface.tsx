@@ -1,3 +1,15 @@
+/**
+ * Renders the <audio> or <video> element (or a placeholder).
+ *
+ * WHAT: Picks the element by file type and hands it to the player through a callback ref.
+ * LAYER: Module component (client).
+ * CALLED BY: `MeetingDetailLayout`.
+ * CALLS: `usePlayer` (`registerMediaElement`), `isVideoUrl`.
+ * INTERVIEW: `ref={registerMediaElement}` is a CALLBACK ref: React calls it with the DOM node when
+ * it mounts (and with null when it unmounts). The provider stores that node in state, which
+ * starts the media clock's effect.
+ */
+
 "use client";
 
 import { VideoOff } from "lucide-react";

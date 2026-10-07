@@ -1,3 +1,12 @@
+"""User business rules.
+
+WHAT: Load a user or fail with a clear error.
+LAYER: Service.
+CALLED BY: core/deps.py (`get_current_user` -> `get_user(db, DEFAULT_USER_ID)`).
+CALLS: users/repository.py.
+MERN EQUIVALENT: the lookup inside an auth middleware that 401s when the user is missing.
+"""
+
 from sqlalchemy.orm import Session
 
 from app.core.exceptions import NotFoundError

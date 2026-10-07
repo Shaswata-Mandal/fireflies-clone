@@ -1,3 +1,12 @@
+/**
+ * Open and completed action-item lists.
+ *
+ * WHAT: Groups items and renders each group under a heading.
+ * LAYER: Module component (client).
+ * CALLED BY: `ActionItemsPanel`.
+ * CALLS: `groupActionItems`, `ActionItemSection`, `ActionItemRow`.
+ */
+
 "use client";
 
 import { ActionItemRow } from "@/modules/action-items/components/ActionItemRow";
@@ -18,6 +27,7 @@ interface ActionItemListProps {
 export function ActionItemList({ items, participants, now }: ActionItemListProps) {
   const { open, completed } = groupActionItems(items);
 
+  // A small local render helper (an arrow function returning JSX), used for both groups.
   const renderRows = (rows: ReadonlyArray<ActionItem>) => (
     <ul className="flex flex-col">
       {rows.map((item) => (

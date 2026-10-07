@@ -1,3 +1,12 @@
+/**
+ * One integration card.
+ *
+ * WHAT: Icon, name, description, a disabled "Connect" button and a "Coming soon" badge.
+ * LAYER: Module component (server-safe).
+ * CALLED BY: `IntegrationsView`.
+ * CALLS: `COMING_SOON`.
+ */
+
 import type { Integration } from "@/modules/integrations/constants";
 import { COMING_SOON } from "@/shared/constants/messages";
 
@@ -6,6 +15,7 @@ interface IntegrationCardProps {
 }
 
 export function IntegrationCard({ integration }: IntegrationCardProps) {
+  // `icon: Icon` renames the field to a capitalised variable so it can be used as <Icon />.
   const { name, description, icon: Icon } = integration;
 
   return (

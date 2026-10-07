@@ -1,3 +1,12 @@
+/**
+ * Form-level error banner.
+ *
+ * WHAT: A red alert box for errors that belong to the whole form, not one field.
+ * LAYER: Module component (server-safe).
+ * CALLED BY: `CreateMeetingForm`.
+ * CALLS: nothing. `role="alert"` makes screen readers announce it immediately.
+ */
+
 import { AlertCircle } from "lucide-react";
 
 interface FormErrorBannerProps {

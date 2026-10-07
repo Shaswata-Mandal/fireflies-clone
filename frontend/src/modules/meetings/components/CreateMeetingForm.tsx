@@ -1,3 +1,16 @@
+/**
+ * The create-meeting form (upload / paste / manual).
+ *
+ * WHAT: One react-hook-form instance for all three tabs; validates with zod, submits through
+ *   `useCreateMeetingSubmit`, maps server errors to fields, then navigates to the new meeting.
+ * LAYER: Module component (client).
+ * CALLED BY: `CreateMeetingModal` (variant "modal") and the `/uploads` page (variant "page").
+ * CALLS: `useForm` + `zodResolver`, `schemas.ts`, `useCreateMeetingSubmit`, field components.
+ * MERN EQUIVALENT: a Formik form with a Yup schema and an axios POST in onSubmit.
+ * INTERVIEW: react-hook-form uses uncontrolled inputs (`register`), so typing does not re-render
+ * the form on every keystroke; `useWatch` subscribes only to the fields we need.
+ */
+
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -38,10 +51,14 @@ interface CreateMeetingFormProps {
  * instance holds all three tabs, so switching tabs keeps the title, date and participants.
  */
 export function CreateMeetingForm({ variant, onCreated, onPendingChange }: CreateMeetingFormProps) {
+  // `useId` gives a stable unique id, so label/aria links stay valid if two forms ever coexist.
   const idPrefix = useId();
   const router = useRouter();
   const [bannerError, setBannerError] = useState<string | null>(null);
   const { submit, isPending } = useCreateMeetingSubmit();
+  // The three generics are: the values the form holds, the validation context (unused), and the
+  // values `handleSubmit` receives after zod has run.
+  // `register("name")` wires an input to the form; `control` is for custom inputs (Controller).
   const {
     register,
     handleSubmit,
@@ -54,9 +71,11 @@ export function CreateMeetingForm({ variant, onCreated, onPendingChange }: Creat
     resolver: zodResolver(createMeetingSchema),
     defaultValues: emptyCreateMeetingValues(),
   });
+  // `useWatch` re-renders this component only when these two fields change.
   const tab = useWatch({ control, name: "tab" });
   const file = useWatch({ control, name: "file" });
 
+  // Tell the parent modal when a request starts/stops so it can block closing mid-upload.
   useEffect(() => onPendingChange?.(isPending), [isPending, onPendingChange]);
 
   function handleFileChange(next: File | null) {
@@ -67,6 +86,7 @@ export function CreateMeetingForm({ variant, onCreated, onPendingChange }: Creat
     }
   }
 
+  // Runs only after zod validation passes. `setError` places a server message under a field.
   async function onSubmit(values: CreateMeetingFormOutput) {
     setBannerError(null);
     const outcome = await submit(values);
@@ -84,6 +104,10 @@ export function CreateMeetingForm({ variant, onCreated, onPendingChange }: Creat
     open();
   }
 
+  // `noValidate` turns off the browser's own validation bubbles (zod messages replace them).
+  // `<fieldset disabled>` disables every control inside while the request is running.
+  // The Controller wraps the participants input because it is a custom component, not a plain
+  // <input>, so it cannot use `register` directly.
   return (
     <form onSubmit={handleSubmit(onSubmit)} noValidate aria-label="Create meeting">
       <fieldset disabled={isPending} className="flex min-w-0 flex-col gap-5">

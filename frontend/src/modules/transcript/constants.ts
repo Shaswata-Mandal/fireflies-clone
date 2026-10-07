@@ -1,3 +1,12 @@
+/**
+ * Transcript constants.
+ *
+ * WHAT: Timing values (auto-scroll pause, search debounce), scroll keys and fixed UI text.
+ * LAYER: Module constants.
+ * CALLED BY: `use-auto-scroll.ts`, `use-transcript-search.ts`, transcript components.
+ * CALLS: nothing.
+ */
+
 /** After the user scrolls the transcript by hand, auto-follow stays off for this long. */
 export const AUTO_SCROLL_PAUSE_MS = 3_000;
 

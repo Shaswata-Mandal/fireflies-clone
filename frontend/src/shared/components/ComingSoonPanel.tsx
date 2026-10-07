@@ -1,3 +1,13 @@
+/**
+ * "Coming soon" placeholder inside a panel.
+ *
+ * WHAT: A smaller empty state for unbuilt tabs on the meeting page.
+ * LAYER: Shared component.
+ * CALLED BY: meeting-detail panels (Soundbites, Analytics, AI Skills...).
+ * CALLS: `constants/messages.ts`.
+ * MERN EQUIVALENT: a presentational "empty state" component.
+ */
+
 import type { ComponentType } from "react";
 import { COMING_SOON } from "@/shared/constants/messages";
 
@@ -10,6 +20,7 @@ interface ComingSoonPanelProps {
 }
 
 /** In-panel "Coming soon" empty state for tabs that exist in Fireflies but not here (24, 25, 26, 20). */
+// @param icon the feature icon; @param title the feature name; @param description what it will do
 export function ComingSoonPanel({ icon: Icon, title, description }: ComingSoonPanelProps) {
   return (
     <div className="flex flex-col items-center gap-3 px-6 py-16 text-center">

@@ -1,3 +1,12 @@
+/**
+ * The list of meeting cards.
+ *
+ * WHAT: Groups meetings under day headings (for date sorts) and renders a `MeetingRow` for each.
+ * LAYER: Module component (client: it attaches an onClick).
+ * CALLED BY: `MeetingsView`.
+ * CALLS: `groupMeetingsByDay`, `MeetingRow`.
+ */
+
 "use client";
 
 import { MessageSquare } from "lucide-react";
@@ -18,11 +27,13 @@ interface MeetingsListProps {
 
 /** Meetings under "Today / Yesterday / …" headings when sorted by date; a flat list otherwise. */
 export function MeetingsList({ items, sort, isLastPage, isStale }: MeetingsListProps) {
+  // Day headings only make sense for date sorts; otherwise one flat group without a heading.
   const groups: MeetingDayGroup[] = DATE_SORTS.has(sort)
     ? groupMeetingsByDay(items)
     : [{ key: "all", heading: null, items }];
 
   return (
+    // While the next page loads, the previous results stay (`keepPreviousData`) but dimmed.
     <div
       aria-busy={isStale}
       className={cn("flex flex-col gap-6 transition-opacity", isStale && "opacity-60")}

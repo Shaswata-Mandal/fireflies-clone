@@ -1,3 +1,14 @@
+/**
+ * Overlapping avatar row.
+ *
+ * WHAT: Shows the first few participants as initials avatars and a "+N" bubble for the rest.
+ * LAYER: Module component (server-safe).
+ * CALLED BY: `MeetingRow`, `MeetingHeader`.
+ * CALLS: `UserAvatar`.
+ * Tailwind: `-space-x-1.5` pulls siblings together so they overlap; `ring-2 ring-card` draws a
+ * border in the card colour to separate each avatar.
+ */
+
 import { MAX_VISIBLE_AVATARS } from "@/modules/meetings/constants";
 import type { ParticipantBrief } from "@/modules/meetings/types";
 import { UserAvatar } from "@/shared/components/UserAvatar";

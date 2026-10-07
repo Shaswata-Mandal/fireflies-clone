@@ -1,3 +1,13 @@
+/**
+ * Notes-column tab definitions for the meeting page.
+ *
+ * WHAT: Tab ids, labels and the parser for the `?tab=` URL value.
+ * LAYER: Module constants + tiny util.
+ * CALLED BY: `use-notes-tab.ts`, `MeetingNotes`, `NotesTabPanel`.
+ * CALLS: nothing.
+ * MERN EQUIVALENT: a tab config array plus query-param validation.
+ */
+
 // Tabs of the notes column on the meeting page, and the `?tab=` value that remembers the choice.
 // Soundbites / Discussion / Bookmarks live in the left tool rail (MeetingRail), not here.
 
@@ -29,8 +39,10 @@ export const NOTES_TAB_CONFIG: ReadonlyArray<NotesTabConfig> = [
   },
 ];
 
+// A Set gives fast "is this a known tab?" checks.
 const VALID_TABS = new Set<string>(Object.values(NOTES_TABS));
 
+// Type guard: narrows a plain string to `NotesTabId` when it returns true.
 function isNotesTabId(value: string): value is NotesTabId {
   return VALID_TABS.has(value);
 }

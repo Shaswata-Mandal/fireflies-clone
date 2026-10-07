@@ -1,3 +1,13 @@
+/**
+ * The seek slider with a hover time bubble.
+ *
+ * WHAT: A native range input bound to the playhead; hover shows the time under the pointer.
+ * LAYER: Module component (client).
+ * CALLED BY: `PlayerBar`.
+ * CALLS: `usePlayer`, `usePlayerTimeMs`, `formatTimestamp`.
+ * MERN EQUIVALENT: a controlled `<input type="range">`.
+ */
+
 "use client";
 
 import { useState } from "react";
@@ -21,6 +31,7 @@ const PERCENT = 100;
 export function SeekBar() {
   const { durationMs, seek, skip } = usePlayer();
   const timeMs = usePlayerTimeMs();
+  // Hover state is local UI state: where the pointer is on the bar, or null when it is outside.
   const [hover, setHover] = useState<HoverPosition | null>(null);
 
   const isDisabled = durationMs <= 0;
@@ -34,6 +45,7 @@ export function SeekBar() {
 
   function handlePointerMove(event: PointerEvent<HTMLInputElement>) {
     if (isDisabled) return;
+    // Position of the pointer along the bar as a fraction 0..1 (clamped), then scaled to a time.
     const rect = event.currentTarget.getBoundingClientRect();
     const ratio = Math.min(Math.max((event.clientX - rect.left) / rect.width, 0), 1);
     setHover({ ms: ratio * durationMs, percent: ratio * PERCENT });

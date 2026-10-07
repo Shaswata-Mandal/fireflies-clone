@@ -1,3 +1,12 @@
+/**
+ * Filters popover (participants and date range).
+ *
+ * WHAT: A two-pane popover: category list on the left, the chosen filter's controls on the right.
+ * LAYER: Module component (client: open pane state, Radix popover).
+ * CALLED BY: `MeetingsToolbar`.
+ * CALLS: `FilterParticipantsPane`, `FilterDateRangePane`.
+ */
+
 "use client";
 
 import { CalendarDays, ListFilter, Users } from "lucide-react";
@@ -10,6 +19,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/shared/components/ui/
 import { cn } from "@/shared/utils/cn";
 
 type FilterSection = "participants" | "dates";
+// `Pick<Partial<T>, keys>` = an object that may contain only these optional fields of the URL state.
 type FilterPatch = Pick<Partial<MeetingsUrlState>, "participantId" | "dateFrom" | "dateTo">;
 
 interface MeetingsFilterPopoverProps {
@@ -27,6 +37,7 @@ const SECTIONS: ReadonlyArray<{ id: FilterSection; label: string; icon: LucideIc
 /** Two-pane filter popover from screenshot 10. Radix handles Esc, outside click and focus return. */
 export function MeetingsFilterPopover({ state, onChange }: MeetingsFilterPopoverProps) {
   const [section, setSection] = useState<FilterSection>("participants");
+  // `Number(boolean)` is 1 or 0, so this counts how many filter groups are active (badge number).
   const activeCount =
     Number(state.participantId !== null) + Number(Boolean(state.dateFrom || state.dateTo));
 

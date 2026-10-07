@@ -1,3 +1,15 @@
+/**
+ * Transcript data hook.
+ *
+ * WHAT: One `useQuery` that loads a meeting's whole transcript.
+ * LAYER: Module hooks layer.
+ * CALLED BY: `TranscriptPanel`, `MeetingDetailLayout`, `SmartSearchPanel`, `SummaryPanel`.
+ * CALLS: `transcript/api.ts`, `queryKeys`.
+ * INTERVIEW: many components call this hook with the same key, so TanStack Query makes ONE
+ * request and shares the cached result. The key is nested under the meeting's detail key, so
+ * invalidating the meeting also refreshes its transcript.
+ */
+
 "use client";
 
 import { useQuery } from "@tanstack/react-query";

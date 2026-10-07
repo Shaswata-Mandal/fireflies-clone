@@ -1,3 +1,13 @@
+/**
+ * Navbar search box (visual placeholder with a Ctrl/Cmd+K shortcut).
+ *
+ * WHAT: A search input that can be focused with the keyboard; submitting does nothing yet.
+ * LAYER: Shared layout component (client: DOM listener).
+ * CALLED BY: `Navbar`.
+ * CALLS: browser DOM APIs.
+ * MERN EQUIVALENT: a header search input with a global hotkey.
+ */
+
 "use client";
 
 import { Search } from "lucide-react";
@@ -11,8 +21,11 @@ const SHORTCUT_KEY = "k";
  * submitting does nothing yet.
  */
 export function NavbarSearch() {
+  // useRef gives direct access to the <input> DOM node (to call `.focus()`) without re-rendering.
   const inputRef = useRef<HTMLInputElement>(null);
 
+  // Effect with `[]`: add the global key listener once on mount; the returned function removes
+  // it on unmount (otherwise listeners would pile up).
   useEffect(() => {
     function handleKeyDown(event: KeyboardEvent) {
       if (event.key.toLowerCase() !== SHORTCUT_KEY || !(event.ctrlKey || event.metaKey)) return;
@@ -23,6 +36,7 @@ export function NavbarSearch() {
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, []);
 
+  // Prevents the default form submit (page reload); real search arrives in a later phase.
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
   }

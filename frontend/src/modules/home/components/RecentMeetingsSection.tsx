@@ -1,3 +1,12 @@
+/**
+ * Recent meetings list on Home.
+ *
+ * WHAT: The newest few meetings with loading, error and empty states, and a "View all" link.
+ * LAYER: Module component (client).
+ * CALLED BY: `HomeFeed` (the "Recent" tab).
+ * CALLS: `useMeetings`, `MeetingRow`, `MeetingsSkeleton`.
+ */
+
 "use client";
 
 import Link from "next/link";

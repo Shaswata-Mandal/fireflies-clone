@@ -1,3 +1,15 @@
+/**
+ * The "..." menu in the meeting page breadcrumb.
+ *
+ * WHAT: Copy link, Rename, Edit, Download (Markdown / text) and Delete for the open meeting.
+ * LAYER: Module component (client: menu and dialog state).
+ * CALLED BY: `MeetingNavbar`.
+ * CALLS: `useExportMeeting`, `EditMeetingModal`, `DeleteMeetingDialog`, `usePlayer`, the router.
+ * MERN EQUIVALENT: an action dropdown whose items open modals or call the API.
+ * INTERVIEW: the dialogs are rendered NEXT to the menu, not inside it, so they stay mounted after
+ * the menu closes (a closed Radix menu unmounts its content).
+ */
+
 "use client";
 
 import { Copy, Download, FileText, MoreHorizontal, Pencil, Trash2, Type } from "lucide-react";
@@ -28,6 +40,7 @@ interface MeetingActionsMenuProps {
   title: string;
 }
 
+// Shared Tailwind classes: every menu row, and the menu panel (bordered surface, no ring).
 const ITEM_CLASS = "h-9 gap-3 px-3 text-sm text-default";
 const MENU_CLASS = "border border-default bg-surface p-1.5 ring-0";
 
@@ -44,8 +57,10 @@ export function MeetingActionsMenu({ meetingId, title }: MeetingActionsMenuProps
   const exportMutation = useExportMeeting();
   const router = useRouter();
   const { pause } = usePlayer();
+  // One state value drives the edit dialog: null = closed, otherwise which entry opened it.
   const [editMode, setEditMode] = useState<"edit" | "rename" | null>(null);
   const [isDeleteOpen, setDeleteOpen] = useState(false);
+  // Ref to the menu button, so focus can return to it after a dialog closes (keyboard users).
   const triggerRef = useRef<HTMLButtonElement>(null);
 
   async function handleCopyLink() {

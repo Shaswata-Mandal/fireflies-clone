@@ -1,3 +1,14 @@
+/**
+ * AskFred message box.
+ *
+ * WHAT: A form with a textarea, tool icons and a send button, in a compact "dock" or a roomier
+ *   "panel" variant.
+ * LAYER: Shared layout component (client: controlled input state).
+ * CALLED BY: `AskFredDock` and the AskFred chat body.
+ * CALLS: `IconButton`, `showComingSoon`, `askfred` constants.
+ * MERN EQUIVALENT: a controlled chat input component.
+ */
+
 "use client";
 
 import { ArrowUp, Hash, Layers, Mic, Plus } from "lucide-react";
@@ -21,6 +32,7 @@ interface AskFredComposerProps {
 }
 
 /** Message box shared by the dock and the panel. Enter sends, Shift+Enter adds a line. */
+// @param variant look; @param onSend called with the trimmed text; @param disabled blocks sending
 export function AskFredComposer({
   variant,
   onSend,
@@ -28,10 +40,12 @@ export function AskFredComposer({
   disabled = false,
   maxLength,
 }: AskFredComposerProps) {
+  // Controlled input: React state is the single source of truth for the textarea's text.
   const [message, setMessage] = useState("");
   const isPanel = variant === "panel";
   const canSend = !disabled && message.trim().length > 0;
 
+  // Shared by the form submit (button) and the Enter key.
   function send() {
     if (!canSend) return;
     onSend(message.trim());
@@ -39,16 +53,20 @@ export function AskFredComposer({
   }
 
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
+    // Stops the browser's default form submit (a full page reload).
     event.preventDefault();
     send();
   }
 
   function handleKeyDown(event: KeyboardEvent<HTMLTextAreaElement>) {
+    // Enter sends; Shift+Enter falls through so the textarea inserts a new line.
     if (event.key !== "Enter" || event.shiftKey) return;
     event.preventDefault();
     send();
   }
 
+  // Tailwind: `focus-within:border-focus` highlights the whole box while the textarea has focus;
+  // the panel variant stacks (`flex-col`), the dock variant is one row (`items-center`).
   return (
     <form
       onSubmit={handleSubmit}

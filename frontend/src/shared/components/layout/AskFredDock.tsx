@@ -1,3 +1,13 @@
+/**
+ * Floating AskFred bar on the Home page.
+ *
+ * WHAT: A frosted composer pinned to the bottom of Home that reveals prompt chips on focus.
+ * LAYER: Shared layout component (client: focus handling).
+ * CALLED BY: `AppShell` (only on Home while the panel is closed).
+ * CALLS: `AskFredComposer`, `IconButton`, `DOCK_PROMPTS`.
+ * MERN EQUIVALENT: a floating chat-input component.
+ */
+
 "use client";
 
 import { History, PanelRight } from "lucide-react";
@@ -18,6 +28,7 @@ export function AskFredDock({ onAsk, onOpenPanel }: AskFredDockProps) {
   // The prompt row only shows once the user clicks/focuses inside the dock, to keep Home uncluttered.
   const [isActive, setIsActive] = useState(false);
 
+  // `onBlur` bubbles in React, so it also fires when focus moves between children of the dock.
   function handleBlur(event: FocusEvent<HTMLElement>) {
     // Moving focus between children (e.g. textarea → a prompt button) must not collapse the row.
     if (!event.currentTarget.contains(event.relatedTarget)) setIsActive(false);

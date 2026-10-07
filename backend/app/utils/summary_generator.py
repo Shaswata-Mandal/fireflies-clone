@@ -4,6 +4,13 @@ Pure module: no DB, no FastAPI. Callers pass plain `SegmentInput`s and get a `Ge
 back; `source_segment_index` is the position in the input list, so the service layer can map it to
 a real `transcript_segments.id`. The LLM generator never raises: on any failure it logs a warning
 and returns the mock's result, so the app works the same with or without an API key.
+
+WHAT: Produces an overview, bullet points, keywords, chapters and action items from a transcript,
+    either with simple word-count heuristics (mock) or by asking the Groq LLM (with mock fallback).
+LAYER: Utility (pure; the only outside call is `generate_text`).
+CALLED BY: modules/summaries/builder.py through `get_summary_generator(settings)`.
+CALLS: utils/llm_client.generate_text for the LLM path.
+MERN EQUIVALENT: a `summarize.js` helper that calls OpenAI and falls back to a local stub.
 """
 
 import logging
@@ -17,6 +24,7 @@ from pydantic import BaseModel, Field, ValidationError
 
 from app.utils.llm_client import generate_text
 
+# `TYPE_CHECKING` is False at runtime, so the import below exists only for editors/type checkers.
 if TYPE_CHECKING:
     # Type-only: importing app.core.config would build Settings (and require env vars) on import.
     from app.core.config import Settings
@@ -64,10 +72,14 @@ STOPWORDS = frozenset("""
     make
     """.split())  # noqa: SIM905
 
+# Regex notes: `(?<=[.!?])\s+` = split on whitespace that FOLLOWS sentence punctuation (lookbehind,
+# so the punctuation stays attached); `_CODE_FENCE` strips a ```json fence an LLM may wrap around
+# its answer, at the start or the end of the text.
 _WORD = re.compile(r"[a-z][a-z']*")
 _SENTENCE_SPLIT = re.compile(r"(?<=[.!?])\s+")
 _CODE_FENCE = re.compile(r"^```(?:json)?\s*|\s*```$", re.IGNORECASE)
 _WEEKDAYS = "monday|tuesday|wednesday|thursday|friday|saturday|sunday"
+# Phrases that usually signal a commitment ("I'll send...", "can you...", "by Friday").
 _ACTION_PATTERNS = tuple(
     re.compile(pattern, re.IGNORECASE)
     for pattern in (
@@ -89,6 +101,8 @@ _ACTION_PATTERNS = tuple(
 
 @dataclass(frozen=True)
 class SegmentInput:
+    """One transcript line as the generator sees it (no ORM, no database ids)."""
+
     speaker_label: str
     start_ms: int
     end_ms: int
@@ -97,12 +111,16 @@ class SegmentInput:
 
 @dataclass(frozen=True)
 class GeneratedChapter:
+    """A chapter title and the time it starts."""
+
     title: str
     start_ms: int
 
 
 @dataclass(frozen=True)
 class GeneratedActionItem:
+    """An extracted task, linked to a speaker and a segment by label/index (not by id)."""
+
     text: str
     assignee_label: str | None  # a speaker_label from the input, or None if unknown
     source_segment_index: int | None  # index into the input list; None if the model gave none
@@ -110,6 +128,8 @@ class GeneratedActionItem:
 
 @dataclass(frozen=True)
 class GeneratedSummary:
+    """The full result both generators return."""
+
     overview: str
     bullet_points: list[str] = field(default_factory=list)
     keywords: list[str] = field(default_factory=list)
@@ -117,7 +137,11 @@ class GeneratedSummary:
     action_items: list[GeneratedActionItem] = field(default_factory=list)
 
 
+# INTERVIEW: a `Protocol` is structural typing (like a TS interface): any class with a matching
+# `generate` method counts, with no inheritance needed. That lets mock and LLM be swapped freely.
 class SummaryGenerator(Protocol):
+    """The interface both generators satisfy."""
+
     def generate(self, segments: Sequence[SegmentInput]) -> GeneratedSummary: ...
 
 
@@ -127,6 +151,7 @@ class SummaryGenerator(Protocol):
 
 
 def _truncate(text: str, max_chars: int) -> str:
+    """Trim `text` to at most `max_chars`, ending with an ellipsis when it was cut."""
     text = text.strip()
     if len(text) <= max_chars:
         return text
@@ -134,10 +159,12 @@ def _truncate(text: str, max_chars: int) -> str:
 
 
 def _first_sentence(text: str) -> str:
+    """The text up to the first sentence end (or all of it if there is none)."""
     return _SENTENCE_SPLIT.split(text.strip(), maxsplit=1)[0]
 
 
 def _format_clock(ms: int) -> str:
+    """Milliseconds -> `MM:SS`, used inside LLM prompts."""
     total_seconds = ms // MS_PER_SECOND
     return f"{total_seconds // SECONDS_PER_MINUTE:02d}:{total_seconds % SECONDS_PER_MINUTE:02d}"
 
@@ -156,7 +183,12 @@ class _Window:
 
 
 def _ranked_words(texts: Sequence[str]) -> list[str]:
-    """Words ordered by frequency; ties break alphabetically so the output is stable."""
+    """Words ordered by frequency; ties break alphabetically so the output is stable.
+
+    INTERVIEW: determinism matters for the mock: same transcript, same summary, so tests and
+    demos are repeatable. Sorting by (-count, word) gives most frequent first, then A-Z.
+    """
+    # `Counter` is a dict that counts: `counts[word] += 1` works even for a new key.
     counts: Counter[str] = Counter()
     for text in texts:
         for word in _WORD.findall(text.lower().replace("’", "'")):
@@ -167,7 +199,11 @@ def _ranked_words(texts: Sequence[str]) -> list[str]:
 
 
 def _split_into_windows(segments: Sequence[SegmentInput]) -> list[_Window]:
-    """Cut the meeting into equal time windows (4–6), dropping any that contain no segment."""
+    """Cut the meeting into equal time windows (4–6), dropping any that contain no segment.
+
+    Each window later becomes one chapter. The window count scales with transcript length but is
+    clamped to MIN_CHAPTERS..MAX_CHAPTERS (and never exceeds the number of segments).
+    """
     window_count = min(
         len(segments), max(MIN_CHAPTERS, min(MAX_CHAPTERS, len(segments) // SEGMENTS_PER_CHAPTER))
     )
@@ -175,6 +211,7 @@ def _split_into_windows(segments: Sequence[SegmentInput]) -> list[_Window]:
     span = max(1, segments[-1].end_ms - start)
     windows: dict[int, _Window] = {}
     for index, segment in enumerate(segments):
+        # Proportional position in the meeting (0..1) scaled to a slot number, clamped to range.
         slot = min(window_count - 1, max(0, (segment.start_ms - start) * window_count // span))
         window = windows.setdefault(slot, _Window(first_index=index, segments=[]))
         window.segments.append(segment)
@@ -182,9 +219,20 @@ def _split_into_windows(segments: Sequence[SegmentInput]) -> list[_Window]:
 
 
 class MockSummaryGenerator:
-    """Heuristic summary: word frequency, time-window chapters and regex action items."""
+    """Heuristic summary: word frequency, time-window chapters and regex action items.
+
+    Why it exists: the app must work with no API key and no network, and tests need a
+    deterministic generator.
+    """
 
     def generate(self, segments: Sequence[SegmentInput]) -> GeneratedSummary:
+        """Build a summary without any network call.
+
+        Args:
+            segments: the transcript lines in order.
+        Returns:
+            A GeneratedSummary (a placeholder overview when there are no segments).
+        """
         if not segments:
             return GeneratedSummary(overview=EMPTY_OVERVIEW)
 
@@ -203,6 +251,7 @@ class MockSummaryGenerator:
     def _build_chapters(
         self, segments: Sequence[SegmentInput], global_top: list[str]
     ) -> tuple[list[GeneratedChapter], list[str]]:
+        """One chapter and one bullet point per time window; returns (chapters, bullets)."""
         chapters: list[GeneratedChapter] = []
         bullets: list[str] = []
         for number, window in enumerate(_split_into_windows(segments), start=1):
@@ -221,6 +270,7 @@ class MockSummaryGenerator:
         return chapters, bullets
 
     def _extract_action_items(self, segments: Sequence[SegmentInput]) -> list[GeneratedActionItem]:
+        """Find commitment-like sentences (up to MAX_ACTION_ITEMS); the speaker is the assignee."""
         items: list[GeneratedActionItem] = []
         for index, segment in enumerate(segments):
             sentence = self._matching_sentence(segment.text)
@@ -237,8 +287,10 @@ class MockSummaryGenerator:
                 break
         return items
 
+    # `@staticmethod` = a method that doesn't use `self` (like a plain function namespaced here).
     @staticmethod
     def _matching_sentence(text: str) -> str | None:
+        """First sentence of `text` matching any action pattern, or None."""
         for sentence in _SENTENCE_SPLIT.split(text.replace("’", "'").strip()):
             if any(pattern.search(sentence) for pattern in _ACTION_PATTERNS):
                 return sentence.strip()
@@ -248,6 +300,7 @@ class MockSummaryGenerator:
     def _build_overview(
         segments: Sequence[SegmentInput], keywords: list[str], action_count: int
     ) -> str:
+        """A short templated overview: speaker count, top topics, opening quote, action count."""
         speakers = {segment.speaker_label for segment in segments}
         speaker_word = "speaker" if len(speakers) == 1 else "speakers"
         topics = ", ".join(keywords[:3]) if keywords else "general discussion"
@@ -266,6 +319,7 @@ class MockSummaryGenerator:
 # LLM generator (Groq) with mock fallback
 # ---------------------------------------------------------------------------
 
+# The "system" message tells the model its job and the exact JSON shape we will parse below.
 _SYSTEM_PROMPT = (
     "You summarize meeting transcripts. Reply with a single strict JSON object and nothing else "
     "(no prose, no code fences), using "
@@ -277,18 +331,26 @@ _SYSTEM_PROMPT = (
 )
 
 
+# INTERVIEW: never trust LLM output. These Pydantic models validate the JSON the model returns, so
+# a malformed or incomplete reply raises an error and we fall back to the mock.
 class _LLMChapter(BaseModel):
+    """A chapter as the model returns it."""
+
     title: str = Field(min_length=1)
     start_ms: int = Field(ge=0)
 
 
 class _LLMActionItem(BaseModel):
+    """An action item as the model returns it (`assignee` is a speaker name)."""
+
     text: str = Field(min_length=1)
     assignee: str | None = None
     source_segment_index: int | None = None
 
 
 class _LLMResponse(BaseModel):
+    """The whole JSON object we ask the model to produce."""
+
     overview: str = Field(min_length=1)
     bullet_points: list[str] = Field(default_factory=list)
     keywords: list[str] = Field(default_factory=list)
@@ -301,6 +363,12 @@ def build_transcript_prompt(segments: Sequence[SegmentInput]) -> str:
 
     Head and tail are kept because meetings open with context and close with decisions/next steps.
     Original indices are preserved so action-item links still point at the right segment.
+
+    Args:
+        segments: the transcript lines.
+    Returns:
+        The prompt text; at most about MAX_PROMPT_CHARS long.
+    Why it exists: models have a context-window limit, so very long meetings must be trimmed.
     """
     lines = [
         f"[{index}] [{_format_clock(s.start_ms)}] {s.speaker_label}: {s.text.strip()}"
@@ -309,6 +377,7 @@ def build_transcript_prompt(segments: Sequence[SegmentInput]) -> str:
     if sum(len(line) + 1 for line in lines) <= MAX_PROMPT_CHARS:
         return "\n".join(lines)
 
+    # Too long: keep the first half-budget from the start and the second half-budget from the end.
     half_budget = MAX_PROMPT_CHARS // 2
     head: list[str] = []
     used = 0
@@ -333,11 +402,15 @@ class LLMSummaryGenerator:
     """Asks the model for strict JSON, validates it, and falls back to `fallback` on any failure."""
 
     def __init__(self, fallback: SummaryGenerator) -> None:
+        """Store the generator to use when the LLM fails (dependency injection: easy to test)."""
         self._fallback = fallback
 
     def generate(self, segments: Sequence[SegmentInput]) -> GeneratedSummary:
+        """Summarise with the LLM, or with the fallback when empty input or any error occurs."""
         if not segments:
             return self._fallback.generate(segments)
+        # INTERVIEW: graceful degradation. Timeouts, 429s, bad JSON: every failure ends in a
+        # usable (mock) summary instead of a broken "create meeting" request.
         try:
             return self._generate_with_llm(segments)
         except Exception as exc:  # noqa: BLE001 - every failure mode must degrade to the mock
@@ -347,6 +420,7 @@ class LLMSummaryGenerator:
             return self._fallback.generate(segments)
 
     def _generate_with_llm(self, segments: Sequence[SegmentInput]) -> GeneratedSummary:
+        """Call the model, strip any code fence, validate the JSON, then map it to our types."""
         content = generate_text(
             build_transcript_prompt(segments), system_instruction=_SYSTEM_PROMPT
         )
@@ -358,6 +432,7 @@ class LLMSummaryGenerator:
 
     @staticmethod
     def _to_generated(parsed: _LLMResponse, segments: Sequence[SegmentInput]) -> GeneratedSummary:
+        """Convert validated model output to our types, discarding unknown speakers/bad indices."""
         known_speakers = {segment.speaker_label for segment in segments}
         action_items = [
             GeneratedActionItem(
@@ -387,7 +462,13 @@ class LLMSummaryGenerator:
 
 
 def get_summary_generator(settings: "Settings") -> SummaryGenerator:
-    """LLM generator when an API key is configured, otherwise the deterministic mock."""
+    """LLM generator when an API key is configured, otherwise the deterministic mock.
+
+    Args:
+        settings: app settings (the string annotation avoids a runtime import, see TYPE_CHECKING).
+    Returns:
+        An object with a `generate(segments)` method (factory pattern).
+    """
     mock = MockSummaryGenerator()
     if not settings.GROQ_API_KEY:
         return mock

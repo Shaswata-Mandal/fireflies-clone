@@ -1,3 +1,13 @@
+/**
+ * Integrations page body.
+ *
+ * WHAT: "Discover" cards and an empty "Connected" tab, switched by `?tab=`.
+ * LAYER: Module component (client: URL-backed tab).
+ * CALLED BY: `app/integrations/page.tsx`.
+ * CALLS: `useTabParam`, `TabList`, `IntegrationCard`.
+ * Out of scope per CLAUDE.md (Zoom/Meet/Calendar/CRM), so everything says "Coming soon".
+ */
+
 "use client";
 
 import { IntegrationCard } from "@/modules/integrations/components/IntegrationCard";
@@ -15,6 +25,7 @@ const ID_PREFIX = "integrations";
 
 /** Integrations page body: Discover (cards, all "Coming soon") and Connected (always empty). */
 export function IntegrationsView() {
+  // Same shape as `useState`, but the value lives in the URL (`?tab=connected`).
   const [tab, setTab] = useTabParam(INTEGRATION_TAB_IDS, DEFAULT_INTEGRATION_TAB);
   const EmptyIcon = CONNECTED_EMPTY.icon;
 

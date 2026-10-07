@@ -1,3 +1,12 @@
+/**
+ * Action-item constants and UI copy.
+ *
+ * WHAT: Text length limit, the "unassigned" select value and all fixed messages.
+ * LAYER: Module constants.
+ * CALLED BY: components, hooks and the zod schema of this module.
+ * CALLS: nothing.
+ */
+
 /** Same limit as the backend (`ACTION_TEXT_MAX_LENGTH` in action_items/schemas.py). */
 export const ACTION_ITEM_TEXT_MAX_LENGTH = 500;
 

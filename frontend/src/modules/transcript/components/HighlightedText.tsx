@@ -1,3 +1,12 @@
+/**
+ * Text with search hits highlighted.
+ *
+ * WHAT: Renders plain text and wraps each match in a <mark>; the current match is darker.
+ * LAYER: Module component (server-safe).
+ * CALLED BY: `TranscriptLine`.
+ * CALLS: `splitHighlight`.
+ */
+
 import { Fragment } from "react";
 import type { TextRange } from "@/modules/transcript/types";
 import { splitHighlight } from "@/modules/transcript/utils";
@@ -12,6 +21,7 @@ interface HighlightedTextProps {
 /** Text with search hits wrapped in <mark>. Built from text parts, never innerHTML, so a
  * transcript containing "<script>" is just text. */
 export function HighlightedText({ text, ranges, currentStart }: HighlightedTextProps) {
+  // Fast path: most lines have no matches, so return the text untouched.
   if (ranges.length === 0) return <>{text}</>;
 
   return (

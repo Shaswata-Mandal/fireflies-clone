@@ -1,3 +1,13 @@
+/**
+ * "My Meetings / All Meetings" channel switch.
+ *
+ * WHAT: A left channel panel on large screens (with a channel search) and a segmented bar on
+ *   small screens. Both change `view` in the URL state.
+ * LAYER: Module component (client).
+ * CALLED BY: `MeetingsView`.
+ * CALLS: `showComingSoon` for out-of-scope entries.
+ */
+
 "use client";
 
 import { Bot, Hash, LibraryBig, Plus, Search, Upload } from "lucide-react";
@@ -30,6 +40,7 @@ const ITEM_CLASS =
 export function MeetingsTabs({ view, onChange, variant }: MeetingsTabsProps) {
   const [channelQuery, setChannelQuery] = useState("");
 
+  // Two layouts from one component: the `variant` prop picks which one is returned.
   if (variant === "bar") {
     return (
       <nav aria-label="Meeting channels" className="flex gap-1 border-b px-4 py-2 lg:hidden">

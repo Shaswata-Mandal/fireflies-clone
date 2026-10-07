@@ -1,3 +1,15 @@
+/**
+ * One speaker's group of lines.
+ *
+ * WHAT: Avatar, name and start time, then that speaker's consecutive lines.
+ * LAYER: Module component (server-safe, wrapped in `memo`).
+ * CALLED BY: `TranscriptList`.
+ * CALLS: `TranscriptLine`, `UserAvatar`.
+ * INTERVIEW: `memo` + props designed to stay EQUAL for blocks that did not change. `activeIndex`
+ * is -1 unless the active line is inside this block, and `currentMatch` is null unless the
+ * current search hit is inside it, so when playback moves only two blocks get new props.
+ */
+
 import { memo } from "react";
 import { TranscriptLine } from "@/modules/transcript/components/TranscriptLine";
 import type {
@@ -9,6 +21,7 @@ import type {
 import { UserAvatar } from "@/shared/components/UserAvatar";
 import { formatTimestamp } from "@/shared/utils/format-time";
 
+// One shared empty array: a fresh `[]` per render would be a "new" prop and defeat `memo`.
 const NO_RANGES: TextRange[] = [];
 
 interface SpeakerBlockProps {

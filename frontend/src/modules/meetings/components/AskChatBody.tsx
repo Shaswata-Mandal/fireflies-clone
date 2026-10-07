@@ -1,3 +1,14 @@
+/**
+ * Body of an AskFred conversation (greeting, suggestions, messages, composer).
+ *
+ * WHAT: Shared layout for the global panel and the per-meeting panel; the chat state comes in
+ *   as a prop so each caller decides its scope.
+ * LAYER: Module component (client).
+ * CALLED BY: `AskMeetingPanel` and `shared/.../AskFredPanel`.
+ * CALLS: `AskMessageList`, `AskFredComposer`, `useCurrentUser`.
+ * MERN EQUIVALENT: a `<ChatWindow messages onSend />` component.
+ */
+
 "use client";
 
 import { Sparkles, Trash2 } from "lucide-react";
@@ -8,6 +19,7 @@ import { useCurrentUser } from "@/modules/settings/hooks";
 import { AskFredComposer } from "@/shared/components/layout/AskFredComposer";
 
 interface AskChatBodyProps {
+  // `ReturnType<typeof useAskChat>` = "whatever the hook returns", so the type can't drift.
   chat: ReturnType<typeof useAskChat>;
   /** Second line of the greeting, e.g. "Ask anything about this meeting". */
   headline: string;
@@ -33,6 +45,9 @@ export function AskChatBody({
   const name = user?.name ?? ASK_COPY.GREETING_FALLBACK_NAME;
   const isEmpty = messages.length === 0;
 
+  // Layout: an outer flex column; the middle area scrolls (`flex-1 overflow-y-auto`) while the
+  // composer stays pinned below (`shrink-0`). `min-h-0` lets a flex child shrink and scroll.
+  // The greeting and suggestion chips only show while the chat is empty.
   return (
     <div className="flex min-h-0 flex-1 flex-col">
       <div className="min-h-0 flex-1 overflow-y-auto">

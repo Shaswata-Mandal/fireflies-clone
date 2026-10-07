@@ -1,3 +1,14 @@
+/**
+ * zod validation schemas for the create and edit meeting forms.
+ *
+ * WHAT: Describes valid form values and the error messages shown under each field.
+ * LAYER: Module schemas (client-side validation; the backend validates again).
+ * CALLED BY: `CreateMeetingForm` and `EditMeetingForm` through react-hook-form's `zodResolver`.
+ * CALLS: zod, `constants.ts`, `datetime.ts`, `upload-file.ts`.
+ * MERN EQUIVALENT: a Yup/Joi schema passed to Formik, or zod with react-hook-form.
+ * INTERVIEW: client validation is for fast feedback only; the server is the source of truth.
+ */
+
 import { z } from "zod";
 import { CREATE_TABS, TITLE_MAX_LENGTH, type CreateTab } from "@/modules/meetings/constants";
 import { localInputToIso, nowAsLocalInput } from "@/modules/meetings/datetime";
@@ -8,12 +19,14 @@ const participantSchema = z.object({
   email: z.string().nullable(),
 });
 
+// Schemas are small composable pieces: this one is reused by both the create and edit forms.
 const titleSchema = z
   .string()
   .trim()
   .min(1, "Enter a title")
   .max(TITLE_MAX_LENGTH, `Keep the title under ${TITLE_MAX_LENGTH} characters`);
 
+// `refine` adds a custom rule: the string must convert to a real date.
 const meetingDateSchema = z
   .string()
   .refine((value) => localInputToIso(value) !== null, "Enter a valid date and time");
@@ -51,9 +64,15 @@ export const createMeetingSchema = z
     }
   });
 
+// `z.input` = the shape the form holds while typing; `z.output` = the shape after validation
+// (they differ when a schema transforms values, such as `.trim()`).
 export type CreateMeetingFormValues = z.input<typeof createMeetingSchema>;
 export type CreateMeetingFormOutput = z.output<typeof createMeetingSchema>;
 
+/**
+ * Fresh default values for the create form.
+ * @param tab which tab starts selected (defaults to Upload)
+ */
 export function emptyCreateMeetingValues(
   tab: CreateTab = CREATE_TABS.UPLOAD,
 ): CreateMeetingFormValues {

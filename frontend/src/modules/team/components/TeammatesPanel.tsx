@@ -1,3 +1,13 @@
+/**
+ * Team > Teammates tab.
+ *
+ * WHAT: The member list (only the current user) and an Invite button that says "Coming soon".
+ * LAYER: Module component (client).
+ * CALLED BY: `TeamView`.
+ * CALLS: `useCurrentUser`, `UserAvatar`, `ErrorState`.
+ * There is a single user (no real auth), so "teammates" is a list of one.
+ */
+
 "use client";
 
 import { Plus } from "lucide-react";
@@ -12,6 +22,7 @@ import { showComingSoon } from "@/shared/utils/coming-soon";
 export function TeammatesPanel() {
   const { data: user, isPending, isError, error, refetch, isRefetching } = useCurrentUser();
 
+  // Maps the query status to one body: loading, error, or the member row.
   function renderMember() {
     if (isPending) {
       return (

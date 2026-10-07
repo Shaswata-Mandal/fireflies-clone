@@ -1,3 +1,13 @@
+/**
+ * Static text and prompt chips for the AskFred panel and dock.
+ *
+ * WHAT: Suggested prompts, placeholders, headline and context label.
+ * LAYER: Shared constants.
+ * CALLED BY: `AskFredPanel`, `AskFredDock`, `AskFredComposer`.
+ * CALLS: lucide icons only.
+ * MERN EQUIVALENT: a `constants.js` of UI strings.
+ */
+
 import { CircleHelp, FileText, Sparkles, SquareCheck, Target, type LucideIcon } from "lucide-react";
 
 // Prompt chips copied from the screenshots.
@@ -27,6 +37,7 @@ export const DOCK_PROMPTS: AskFredPrompt[] = [
   { label: "My last meeting", icon: FileText, iconClassName: "text-default" },
 ];
 
+// `as const` keeps the exact string literals (and makes the object read-only).
 export const ASKFRED_PLACEHOLDERS = {
   dock: "Type / to run AI skills",
   panel: "Ask anything. Type / to run AI skills.",

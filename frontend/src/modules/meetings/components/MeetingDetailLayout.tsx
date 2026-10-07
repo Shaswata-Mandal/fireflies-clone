@@ -1,3 +1,14 @@
+/**
+ * Layout of the meeting page.
+ *
+ * WHAT: Arranges navbar, tool rail, Smart Search, notes column, transcript panel and player bar.
+ * LAYER: Module component (client).
+ * CALLED BY: `MeetingDetailView` (inside the PlayerProvider).
+ * CALLS: `MeetingNavbar`, `MeetingRail`, `SmartSearchPanel`, `MeetingNotes`, `TranscriptPanel`,
+ *   `PlayerBar`, `useDeepLinkSeek`.
+ * MERN EQUIVALENT: a page-level layout component composing several panels.
+ */
+
 "use client";
 
 import { useState } from "react";
@@ -27,6 +38,7 @@ export function MeetingDetailLayout({ meeting }: MeetingDetailLayoutProps) {
   const [isVideoVisible, setVideoVisible] = useState(false);
   const [isSearchOpen, setSearchOpen] = useState(true);
   // Same query as the panel (deduped by TanStack Query); only used to know when data is in.
+  // INTERVIEW: two components calling the same hook with the same key share ONE request.
   const transcript = useTranscript(meeting.id);
   useDeepLinkSeek(!transcript.isPending);
 

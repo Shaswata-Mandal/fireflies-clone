@@ -1,3 +1,13 @@
+/**
+ * Sidebar, account-menu and capture-menu definitions as data.
+ *
+ * WHAT: Arrays of items (label, icon, link or action) that the layout components loop over.
+ * LAYER: Shared constants (configuration as data).
+ * CALLED BY: `Sidebar`, `SidebarItem`, `AvatarMenu`, `CaptureButton`.
+ * CALLS: `ROUTES`, lucide icons, `FredMark`.
+ * MERN EQUIVALENT: a `menuItems` array in a React sidebar component, kept in its own file.
+ */
+
 import {
   Bot,
   Calendar,
@@ -21,6 +31,8 @@ import { ROUTES } from "@/shared/constants/routes";
 
 export type NavAction = "toggle-askfred" | "open-create-meeting";
 
+// INTERVIEW: menus as data means the components stay generic: adding an item is a one-line change
+// here, not new JSX. Items without `href` or `action` render as "Coming soon" placeholders.
 export interface NavItem {
   label: string;
   /** Lucide icon or our own SVG mark; both accept className. */

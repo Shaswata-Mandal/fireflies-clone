@@ -1,3 +1,12 @@
+/**
+ * "My open action items" section on Home.
+ *
+ * WHAT: Loading, error, empty or list state for the user's open tasks across meetings.
+ * LAYER: Module component (client).
+ * CALLED BY: `HomeView`.
+ * CALLS: `useOpenActionItems`, `OpenActionItemRow`, `ErrorState`.
+ */
+
 "use client";
 
 import { CircleCheck } from "lucide-react";
@@ -12,6 +21,7 @@ export function OpenActionItemsSection() {
   const { data, isPending, isError, error, refetch, isRefetching } =
     useOpenActionItems(HOME_LIST_LIMIT);
 
+  // Same pattern as the other data views: one function maps the query status to ONE body.
   function renderBody() {
     if (isPending) return <ActionItemsSkeleton />;
     if (isError) {

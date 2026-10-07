@@ -1,3 +1,14 @@
+/**
+ * "Paste transcript" tab fields.
+ *
+ * WHAT: A format dropdown and a monospaced textarea, registered with react-hook-form.
+ * LAYER: Module component (client).
+ * CALLED BY: `CreateMeetingForm`.
+ * CALLS: `FormField`, `form-classes`.
+ * INTERVIEW: `{...formatField}` spreads the object from `register("transcript_format")` (name,
+ * ref, onChange, onBlur) onto the element, which is how react-hook-form tracks plain inputs.
+ */
+
 "use client";
 
 import type { UseFormRegisterReturn } from "react-hook-form";

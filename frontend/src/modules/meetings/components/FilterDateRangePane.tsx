@@ -1,3 +1,15 @@
+/**
+ * Date-range inputs inside the filter popover.
+ *
+ * WHAT: Two native date inputs ("From", "To") that keep the range valid.
+ * LAYER: Module component (client).
+ * CALLED BY: `MeetingsFilterPopover`.
+ * CALLS: nothing.
+ * INTERVIEW: native `<input type="date">` avoids a date-picker dependency (CLAUDE.md: no new
+ * dependencies without a reason). `dark:[color-scheme:dark]` makes the browser's own calendar
+ * popup use dark colours in dark mode.
+ */
+
 "use client";
 
 interface DateRange {

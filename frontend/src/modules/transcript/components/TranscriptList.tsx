@@ -1,3 +1,16 @@
+/**
+ * The transcript view: search bar plus the scrolling list.
+ *
+ * WHAT: Wires the active line, auto-scroll, search and click-to-seek together.
+ * LAYER: Module component (client) - the "conductor" of the transcript feature.
+ * CALLED BY: `TranscriptPanel`.
+ * CALLS: `useActiveSegmentIndex`, `useAutoScroll`, `useTranscriptSearch`, `SpeakerBlock`,
+ *   `usePlayer`.
+ * INTERVIEW: the data flow, in one sentence: the player clock writes into the time store ->
+ * `useActiveSegmentIndex` turns time into a line index -> `TranscriptList` re-renders only when
+ * that index changes -> `useAutoScroll` scrolls the new line into view.
+ */
+
 "use client";
 
 import { useCallback, useEffect, useMemo, useState } from "react";
@@ -18,6 +31,7 @@ interface TranscriptListProps {
   participants: ParticipantBrief[];
 }
 
+/** True when segment `index` belongs to `block` (blocks hold consecutive indexes). */
 function blockContains(block: SpeakerBlockData, index: number): boolean {
   const first = block.segmentIndexes[0];
   const last = block.segmentIndexes[block.segmentIndexes.length - 1];
@@ -30,23 +44,28 @@ function blockContains(block: SpeakerBlockData, index: number): boolean {
  * current match) receive different props, so only those re-render.
  */
 export function TranscriptList({ segments, participants }: TranscriptListProps) {
+  // `usePlayer()` only gives stable functions here, so playback ticks do not re-render this list.
   const { seek, play } = usePlayer();
   const activeIndex = useActiveSegmentIndex(segments);
   const search = useTranscriptSearch(segments);
   const { currentMatch, rangesBySegment } = search;
   // Callback ref as state: the effects in useAutoScroll re-run once the element exists.
+  // (`ref={setContainer}` below makes React call setContainer(element) when the div mounts.)
   const [container, setContainer] = useState<HTMLDivElement | null>(null);
   const { isActiveOffscreen, jumpToCurrent, suspendAutoScroll } = useAutoScroll(
     container,
     activeIndex,
   );
 
+  // useMemo: grouping 1,000 lines is only redone when the transcript itself changes.
   const blocks = useMemo(() => groupSegmentsBySpeaker(segments), [segments]);
   const avatarColors = useMemo(
     () => new Map(participants.map((person) => [person.id, person.avatar_color])),
     [participants],
   );
 
+  // Clicking a line: jump there and start playing. useCallback keeps it stable for the memoised
+  // lines (a new function each render would make every line re-render).
   const handleSelect = useCallback(
     (index: number) => {
       seek(segments[index].start_ms);
@@ -62,6 +81,8 @@ export function TranscriptList({ segments, participants }: TranscriptListProps) 
     scrollLineToCenter(container, currentMatch.segmentIndex);
   }, [container, currentMatch, suspendAutoScroll]);
 
+  // Layout: a column with the search bar on top and a `relative` wrapper below, so the floating
+  // "Jump to current" button can be positioned over the scrollable area (`absolute`).
   return (
     <div className="flex min-h-0 flex-1 flex-col">
       <div className="border-b px-4 py-3">

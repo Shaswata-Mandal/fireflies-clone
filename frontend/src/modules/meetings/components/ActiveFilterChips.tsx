@@ -1,3 +1,13 @@
+/**
+ * Removable chips for the active library filters.
+ *
+ * WHAT: Builds one chip per active filter (search, participant, dates) plus "Clear all".
+ * LAYER: Module component (client: uses a data hook).
+ * CALLED BY: `MeetingsView`.
+ * CALLS: `useParticipants` (to show a person's name instead of their id), `formatDateOnly`.
+ * MERN EQUIVALENT: a "filter pills" row driven by query-string state.
+ */
+
 "use client";
 
 import { X } from "lucide-react";
@@ -22,6 +32,7 @@ export function ActiveFilterChips({ state, onChange, onClearAll }: ActiveFilterC
   // Shares the filter popover's cache entry, so this is normally not a new request.
   const { data: participants } = useParticipants();
 
+  // Each chip carries the `patch` that undoes it, so removing a chip is just `onChange(patch)`.
   const chips: Chip[] = [];
   if (state.q) chips.push({ key: "q", label: `Search: “${state.q}”`, patch: { q: "" } });
   if (state.participantId !== null) {
@@ -43,6 +54,7 @@ export function ActiveFilterChips({ state, onChange, onClearAll }: ActiveFilterC
     chips.push({ key: "to", label: `To ${formatDateOnly(state.dateTo)}`, patch: { dateTo: null } });
   }
 
+  // Early return: nothing to render when no filter is active (returning null renders nothing).
   if (chips.length === 0) return null;
 
   return (

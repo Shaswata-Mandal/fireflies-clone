@@ -1,3 +1,13 @@
+/**
+ * Chat-history dropdown for the AskFred panel.
+ *
+ * WHAT: A popover with a search box and an empty "No history yet" message.
+ * LAYER: Shared layout component (client: Radix popover).
+ * CALLED BY: `AskFredPanel` header.
+ * CALLS: shadcn `Popover`, `IconButton`.
+ * MERN EQUIVALENT: a dropdown/popover from MUI or Headless UI.
+ */
+
 "use client";
 
 import { MessageSquare, Search } from "lucide-react";
@@ -6,6 +16,8 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/shared/components/ui/
 
 /** Chat history dropdown (docs/reference/15). No chats are stored yet, so it is always empty. */
 export function AskFredHistoryPopover() {
+  // `asChild` below makes Radix attach its trigger behaviour to our IconButton instead of
+  // rendering an extra wrapper <button>.
   return (
     <Popover>
       <PopoverTrigger asChild>

@@ -1,3 +1,14 @@
+/**
+ * Assignee dropdown.
+ *
+ * WHAT: A native <select> of this meeting's participants plus "Unassigned".
+ * LAYER: Module component (server-safe).
+ * CALLED BY: `ActionItemForm`.
+ * CALLS: `cn`.
+ * INTERVIEW: `extends ComponentProps<"select">` + `{...props}` lets react-hook-form's `register`
+ * output (name, ref, onChange) pass straight through to the real <select>.
+ */
+
 import type { ComponentProps } from "react";
 import { UNASSIGNED_VALUE } from "@/modules/action-items/constants";
 import type { ParticipantBrief } from "@/modules/meetings/types";

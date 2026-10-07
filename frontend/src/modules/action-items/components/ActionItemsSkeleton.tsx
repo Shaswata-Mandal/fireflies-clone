@@ -1,3 +1,11 @@
+/**
+ * Loading placeholder for the action-item list.
+ *
+ * WHAT: Four skeleton rows of different widths.
+ * LAYER: Module component (server-safe).
+ * CALLED BY: `ActionItemsPanel`.
+ */
+
 import { Skeleton } from "@/shared/components/ui/skeleton";
 
 const ROW_WIDTHS = ["w-3/4", "w-2/3", "w-5/6", "w-1/2"] as const;

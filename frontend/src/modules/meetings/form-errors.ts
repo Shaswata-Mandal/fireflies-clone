@@ -1,3 +1,13 @@
+/**
+ * Maps backend errors onto the create-meeting form.
+ *
+ * WHAT: Decides which field (file, transcript, title, date, or the top banner) shows an API error.
+ * LAYER: Module util (pure; unit-tested).
+ * CALLED BY: `use-create-meeting-submit.ts`.
+ * CALLS: `isApiError`, `CREATE_ERROR_CODES`.
+ * MERN EQUIVALENT: translating `err.response.data.errors` into Formik `setFieldError` calls.
+ */
+
 import { CREATE_ERROR_CODES } from "@/modules/meetings/constants";
 import { isApiError } from "@/shared/lib/api-error";
 
@@ -9,6 +19,7 @@ export interface CreateFormError {
   message: string;
 }
 
+// The only body fields the form can show a message under.
 const BODY_FIELDS = ["title", "meeting_date"] as const;
 
 /** Position text for TRANSCRIPT_PARSE_ERROR: `details` is `{line}` (txt/vtt) or `{segment}` (json). */
@@ -39,6 +50,8 @@ function firstFieldError(details: unknown): CreateFormError | null {
  * meaning (network down, 500): those only get the toast from the global MutationCache handler.
  * `isUpload` decides whether transcript problems belong to the file zone or the pasted text.
  */
+// INTERVIEW: a stable `code` from the backend (not the message text) is what the UI branches on,
+// so rewording a message never breaks the form.
 export function mapCreateError(error: unknown, isUpload: boolean): CreateFormError | null {
   if (!isApiError(error)) return null;
   const transcriptField: CreateErrorField = isUpload ? "file" : "transcript_text";

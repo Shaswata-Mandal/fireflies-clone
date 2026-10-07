@@ -1,3 +1,12 @@
+/**
+ * Title and meta line at the top of the meeting page.
+ *
+ * WHAT: Title, Video toggle, host, date, duration and the participant avatar stack.
+ * LAYER: Module component (server-safe: it only renders props).
+ * CALLED BY: `MeetingDetailLayout`.
+ * CALLS: `ParticipantAvatarStack`, format helpers.
+ */
+
 import { Video, VideoOff } from "lucide-react";
 import { ParticipantAvatarStack } from "@/modules/meetings/components/ParticipantAvatarStack";
 import type { MeetingDetail } from "@/modules/meetings/types";

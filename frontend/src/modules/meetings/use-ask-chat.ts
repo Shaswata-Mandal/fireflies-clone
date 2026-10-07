@@ -1,3 +1,14 @@
+/**
+ * Chat state for the AskFred assistant.
+ *
+ * WHAT: Keeps the message list in React state, sends questions through `useAskMeeting`, and
+ *   exposes send / retry / clear plus a ready-made error view.
+ * LAYER: Module hook (UI state built on a mutation; the messages are NOT server state).
+ * CALLED BY: `AppShell` (global chat) and `AskMeetingPanel` (one meeting).
+ * CALLS: `useAskMeeting`, `describeAskError`.
+ * MERN EQUIVALENT: a `useChat` custom hook with `messages`, `sendMessage`, `retry`.
+ */
+
 "use client";
 
 import { useCallback, useRef, useState } from "react";
@@ -20,6 +31,7 @@ export interface AskChatMessage {
 export function useAskChat(meetingId: number | null) {
   const mutation = useAskMeeting(meetingId);
   const [messages, setMessages] = useState<AskChatMessage[]>([]);
+  // useRef (not useState) for the id counter: it must survive renders but never trigger one.
   const nextId = useRef(0);
 
   const append = useCallback((role: AskRole, content: string, citations: AskCitation[] = []) => {
@@ -27,6 +39,7 @@ export function useAskChat(meetingId: number | null) {
     setMessages((previous) => [...previous, { id: nextId.current, role, content, citations }]);
   }, []);
 
+  // `mutate` has a stable identity, so destructuring it keeps `submit` stable for useCallback.
   const { mutate } = mutation;
   const submit = useCallback(
     (body: AskBody) => {
@@ -36,8 +49,10 @@ export function useAskChat(meetingId: number | null) {
     [mutate, append],
   );
 
+  // @param question the user's text. Ignored while an answer is still loading.
   function send(question: string) {
     if (mutation.isPending) return;
+    // Only the last few turns go to the server as context (the backend caps it as well).
     const history = messages
       .slice(-ASK_HISTORY_LIMIT)
       .map(({ role, content }) => ({ role, content }));
@@ -51,6 +66,7 @@ export function useAskChat(meetingId: number | null) {
     submit(mutation.variables);
   }
 
+  // Resets the mutation too, so an old error or pending result does not leak into the new chat.
   function clear() {
     mutation.reset();
     setMessages([]);

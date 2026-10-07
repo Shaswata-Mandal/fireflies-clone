@@ -1,3 +1,13 @@
+/**
+ * Notes-tab selection stored in `?tab=`.
+ *
+ * WHAT: Returns `[activeTab, setActiveTab]` like `useState`, but backed by the URL.
+ * LAYER: Module hook.
+ * CALLED BY: `MeetingNotes`.
+ * CALLS: `notes-tabs.ts`, Next.js router hooks.
+ * MERN EQUIVALENT: `useSearchParams` from React Router with a setter.
+ */
+
 "use client";
 
 import { usePathname, useRouter, useSearchParams } from "next/navigation";

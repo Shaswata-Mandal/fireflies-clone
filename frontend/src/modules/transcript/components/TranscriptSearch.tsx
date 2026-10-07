@@ -1,3 +1,13 @@
+/**
+ * Transcript search box.
+ *
+ * WHAT: Input with "n of m", previous/next buttons, Enter / Shift+Enter navigation and Esc to
+ *   clear.
+ * LAYER: Module component (client; purely presentational: the state comes from the hook).
+ * CALLED BY: `TranscriptList`.
+ * CALLS: nothing (receives the `useTranscriptSearch` result as a prop).
+ */
+
 "use client";
 
 import { ChevronDown, ChevronUp, Search, X } from "lucide-react";
@@ -14,6 +24,7 @@ const NAV_BUTTON_CLASS =
 
 /** Search field in the transcript header: "n of m", Enter / Shift+Enter, ↑ ↓ buttons, Esc clears. */
 export function TranscriptSearch({ search }: TranscriptSearchProps) {
+  // This component holds no state of its own: everything comes from `useTranscriptSearch`.
   const { query, setQuery, clear, isSearching, matches, currentIndex, next, previous } = search;
   const hasMatches = matches.length > 0;
 

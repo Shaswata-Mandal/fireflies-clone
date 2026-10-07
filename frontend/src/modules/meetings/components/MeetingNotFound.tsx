@@ -1,3 +1,12 @@
+/**
+ * "Meeting not found" page body.
+ *
+ * WHAT: Friendly 404 state with a link back to the library.
+ * LAYER: Module component (server-safe).
+ * CALLED BY: `MeetingDetailView`, and the meeting page for a non-numeric id.
+ * INTERVIEW: a meeting owned by someone else also returns 404, so ids cannot be probed.
+ */
+
 import { ArrowLeft, SearchX } from "lucide-react";
 import Link from "next/link";
 import { ROUTES } from "@/shared/constants/routes";

@@ -1,4 +1,12 @@
-"""HTTP layer for /meetings/{id}/summary."""
+"""HTTP layer for /meetings/{id}/summary.
+
+WHAT: Endpoints to (re)generate a meeting's summary and to edit it by hand.
+LAYER: Router.
+CALLED BY: main.py (under /api/v1); the frontend's summary module.
+CALLS: summaries/service.py.
+MERN EQUIVALENT: Express routes `POST /meetings/:id/summary/generate` and
+    `PATCH /meetings/:id/summary`.
+"""
 
 from fastapi import APIRouter
 
@@ -11,6 +19,7 @@ from app.modules.summaries.schemas import (
     SummaryUpdate,
 )
 
+# `{meeting_id}` in the router prefix applies to every route in this file.
 router = APIRouter(prefix="/meetings/{meeting_id}/summary", tags=["summaries"])
 
 
@@ -18,6 +27,8 @@ router = APIRouter(prefix="/meetings/{meeting_id}/summary", tags=["summaries"])
 def generate_summary(
     meeting_id: int, db: DbSession, user: CurrentUser, body: SummaryGenerateRequest | None = None
 ) -> SummaryGenerateResponse:
+    """POST .../summary/generate: regenerate summary + chapters (body is optional)."""
+    # `body or SummaryGenerateRequest()` supplies the defaults when the client sends no body.
     return service.generate_summary(db, user, meeting_id, body or SummaryGenerateRequest())
 
 
@@ -25,4 +36,5 @@ def generate_summary(
 def update_summary(
     meeting_id: int, body: SummaryUpdate, db: DbSession, user: CurrentUser
 ) -> SummaryRead:
+    """PATCH .../summary: manually edit overview, bullet points or keywords."""
     return service.update_summary(db, user, meeting_id, body)

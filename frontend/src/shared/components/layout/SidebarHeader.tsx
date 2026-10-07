@@ -1,3 +1,13 @@
+/**
+ * Top row of the sidebar.
+ *
+ * WHAT: Account menu plus the collapse/close toggle button.
+ * LAYER: Shared layout component (client).
+ * CALLED BY: `Sidebar`.
+ * CALLS: `AvatarMenu`, `IconButton`.
+ * MERN EQUIVALENT: a sidebar header with a hamburger toggle.
+ */
+
 "use client";
 
 import { PanelLeft, X } from "lucide-react";
@@ -14,6 +24,7 @@ interface SidebarHeaderProps {
 
 /** Top row, same height as the navbar: account menu + collapse toggle (01), toggle only (02). */
 export function SidebarHeader({ collapsed, inDrawer, onToggle }: SidebarHeaderProps) {
+  // The same button has a different accessible name depending on where it is shown.
   const toggleLabel = inDrawer
     ? "Close navigation"
     : collapsed

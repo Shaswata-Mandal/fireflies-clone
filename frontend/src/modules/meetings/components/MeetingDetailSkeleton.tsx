@@ -1,3 +1,12 @@
+/**
+ * Loading placeholder for the meeting page.
+ *
+ * WHAT: Grey animated blocks shaped like the real layout, so the page doesn't jump when data
+ *   arrives.
+ * LAYER: Module component (server-safe).
+ * CALLED BY: `MeetingDetailView` while the meeting loads.
+ */
+
 import { TranscriptSkeleton } from "@/modules/transcript/components/TranscriptSkeleton";
 import { Skeleton } from "@/shared/components/ui/skeleton";
 

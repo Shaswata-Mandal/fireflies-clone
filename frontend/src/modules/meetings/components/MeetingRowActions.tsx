@@ -1,3 +1,12 @@
+/**
+ * Per-row "..." menu and "Details" button in the library.
+ *
+ * WHAT: Open, Copy link, Rename, Edit and Delete work; Share/Download/Move say "Coming soon".
+ * LAYER: Module component (client: menu and dialog state).
+ * CALLED BY: `MeetingRow`.
+ * CALLS: `EditMeetingModal`, `DeleteMeetingDialog`, `MeetingDetailsDialog`, the router.
+ */
+
 "use client";
 
 import {
@@ -44,6 +53,7 @@ const ITEM_CLASS = "h-9 gap-3 px-3 text-sm text-default";
  */
 export function MeetingRowActions({ meeting }: MeetingRowActionsProps) {
   const router = useRouter();
+  // Each dialog has its own open flag; they are siblings of the menu so they survive its closing.
   const [isDetailsOpen, setDetailsOpen] = useState(false);
   const [editMode, setEditMode] = useState<"edit" | "rename" | null>(null);
   const [isDeleteOpen, setDeleteOpen] = useState(false);

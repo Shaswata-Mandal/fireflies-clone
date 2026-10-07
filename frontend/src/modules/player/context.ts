@@ -1,3 +1,16 @@
+/**
+ * The two React contexts of the player.
+ *
+ * WHAT: `PlayerContext` (controls + slow state) and `PlayerTimeContext` (the time store object).
+ * LAYER: Module context definitions (no logic; the provider fills them in).
+ * CALLED BY: `PlayerProvider` (provides), `hooks.ts` (reads).
+ * CALLS: types only.
+ * MERN EQUIVALENT: two `createContext` calls in a `PlayerContext.js`.
+ * INTERVIEW: why TWO contexts? A context change re-renders every consumer. Time changes ~60x a
+ * second, play/pause only now and then. Splitting them means a component that only needs the
+ * play button never re-renders because time moved.
+ */
+
 "use client";
 
 import { createContext } from "react";

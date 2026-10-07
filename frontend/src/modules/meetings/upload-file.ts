@@ -1,3 +1,13 @@
+/**
+ * Client-side checks for the transcript upload.
+ *
+ * WHAT: Extension, name, emptiness and size rules, plus small file-name/size formatters.
+ * LAYER: Module util (pure; unit-tested). The backend repeats these checks.
+ * CALLED BY: `schemas.ts`, `TranscriptFileDropzone`, the create form.
+ * CALLS: `constants.ts`.
+ * MERN EQUIVALENT: a `validateFile(file)` helper used with a dropzone.
+ */
+
 import {
   BYTES_PER_KB,
   MAX_UPLOAD_BYTES,
@@ -26,6 +36,7 @@ export function formatFileSize(bytes: number): string {
 }
 
 /** Returns an error message, or null when the file can be sent. Same rules as the backend. */
+// `Pick<File, "name" | "size">` = only those two properties, so tests can pass a plain object.
 export function validateTranscriptFile(file: Pick<File, "name" | "size">): string | null {
   if (!file.name.trim()) return "The file has no name";
   const extension = fileExtension(file.name);

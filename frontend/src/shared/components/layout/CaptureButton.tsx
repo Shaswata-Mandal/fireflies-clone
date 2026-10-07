@@ -1,3 +1,13 @@
+/**
+ * The purple "Upload" split button in the navbar.
+ *
+ * WHAT: Main click opens the create-meeting modal; the chevron opens a menu of other options.
+ * LAYER: Shared layout component (client).
+ * CALLED BY: `Navbar`.
+ * CALLS: `useCreateMeetingModal` (meetings module context), shadcn `DropdownMenu`.
+ * MERN EQUIVALENT: a split button / dropdown button component.
+ */
+
 "use client";
 
 import { ChevronDown, Upload } from "lucide-react";
@@ -20,8 +30,12 @@ const ITEM_CLASS = "text-default focus:bg-hover gap-3 px-3 py-2 text-sm";
  * options, which are out of scope and say "Coming soon".
  */
 export function CaptureButton() {
+  // The modal's open state lives in a context, so this button (in the navbar) can open a modal
+  // that is rendered elsewhere in the tree.
   const { open } = useCreateMeetingModal();
 
+  // `sr-only sm:not-sr-only`: the "Upload" text is screen-reader-only on phones and visible from
+  // the `sm` breakpoint up.
   return (
     <div className="flex h-8 shrink-0 overflow-hidden rounded-md bg-primary-600 text-on-primary">
       <button

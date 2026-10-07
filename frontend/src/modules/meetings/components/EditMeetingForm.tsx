@@ -1,3 +1,13 @@
+/**
+ * Edit form for an existing meeting.
+ *
+ * WHAT: Prefilled title/date/participants form that sends only the changed fields.
+ * LAYER: Module component (client).
+ * CALLED BY: `EditMeetingModal` (after the meeting has loaded).
+ * CALLS: react-hook-form, `editMeetingSchema`, `buildMeetingPatch`, `useUpdateMeeting`.
+ * MERN EQUIVALENT: an edit form that PATCHes a document.
+ */
+
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -33,6 +43,7 @@ export function EditMeetingForm({
   onPendingChange,
 }: EditMeetingFormProps) {
   const idPrefix = useId();
+  // The hook is bound to this meeting id, so it knows which cache entries to update afterwards.
   const updateMutation = useUpdateMeeting(meeting.id);
   const { isPending } = updateMutation;
   const {
@@ -43,6 +54,7 @@ export function EditMeetingForm({
     formState: { errors },
   } = useForm<EditMeetingFormValues, unknown, EditMeetingFormOutput>({
     resolver: zodResolver(editMeetingSchema),
+    // Prefill from the server data; dates are converted from UTC to the local input format.
     defaultValues: {
       title: meeting.title,
       meeting_date: isoToLocalInput(meeting.meeting_date),
@@ -50,11 +62,13 @@ export function EditMeetingForm({
     },
   });
 
+  // After mount, move the cursor into the title (and select its text when opened via "Rename").
   useEffect(() => setFocus("title", { shouldSelect: focusTitle }), [setFocus, focusTitle]);
   useEffect(() => onPendingChange(isPending), [isPending, onPendingChange]);
 
   async function onSubmit(values: EditMeetingFormOutput) {
     const meeting_date = localInputToIso(values.meeting_date) ?? meeting.meeting_date;
+    // `{ ...values, meeting_date }` spreads the form values, then overrides the date with its ISO form.
     const patch = buildMeetingPatch(meeting, { ...values, meeting_date });
     // Nothing changed: skip the request instead of sending an empty PATCH.
     if (Object.keys(patch).length === 0) return onDone();

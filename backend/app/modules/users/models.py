@@ -1,3 +1,13 @@
+"""User database model.
+
+WHAT: The `users` table: the account that owns meetings.
+LAYER: Model (ORM).
+CALLED BY: users/repository.py, core/deps.py (the "current user"), the seed script, and the
+    `owner_id` foreign key of meetings.
+CALLS: core/database.Base and the created_at mixin.
+MERN EQUIVALENT: a Mongoose `User` schema (minus the password hash, since there is no login).
+"""
+
 from sqlalchemy import String
 from sqlalchemy.orm import Mapped, mapped_column
 

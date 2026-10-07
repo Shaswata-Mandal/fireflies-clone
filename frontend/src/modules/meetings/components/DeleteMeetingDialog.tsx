@@ -1,3 +1,13 @@
+/**
+ * Delete-meeting confirmation.
+ *
+ * WHAT: Wraps the generic `ConfirmDialog` with the delete mutation and meeting-specific text.
+ * LAYER: Module component (client).
+ * CALLED BY: library row actions and the meeting-detail actions menu.
+ * CALLS: `useDeleteMeeting`, `ConfirmDialog`.
+ * MERN EQUIVALENT: a "Are you sure?" modal that calls `DELETE /meetings/:id`.
+ */
+
 "use client";
 
 import type { RefObject } from "react";
@@ -32,7 +42,9 @@ export function DeleteMeetingDialog({
   const deleteMutation = useDeleteMeeting();
 
   function handleConfirm() {
+    // `?.()` calls the optional callback only if it was provided.
     onBeforeDelete?.();
+    // The second argument holds per-call callbacks; the hook's own onSuccess still runs too.
     deleteMutation.mutate(meetingId, { onSuccess: onDeleted });
     // The row is already gone from the library; a failure rolls it back and the global handler
     // toasts. On the detail page we stay open so the user can see the dialog is still working.

@@ -1,3 +1,11 @@
+/**
+ * Settings card container.
+ *
+ * WHAT: A bordered box with a title, optional description and content.
+ * LAYER: Module component (server-safe).
+ * CALLED BY: the settings and team panels.
+ */
+
 import type { ReactNode } from "react";
 
 interface SettingsCardProps {

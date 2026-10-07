@@ -1,3 +1,13 @@
+/**
+ * Submit logic of the create-meeting form.
+ *
+ * WHAT: Picks the upload (multipart) or JSON endpoint by tab, and converts errors to form errors.
+ * LAYER: Module hook.
+ * CALLED BY: `CreateMeetingForm`.
+ * CALLS: `useCreateMeeting`, `useUploadMeeting`, `form-errors.ts`, `datetime.ts`.
+ * MERN EQUIVALENT: an `onSubmit` handler extracted into a hook.
+ */
+
 "use client";
 
 import { localInputToIso } from "@/modules/meetings/datetime";
@@ -7,6 +17,7 @@ import { useCreateMeeting, useUploadMeeting } from "@/modules/meetings/hooks";
 import type { CreateMeetingFormOutput } from "@/modules/meetings/schemas";
 import type { MeetingDetail } from "@/modules/meetings/types";
 
+// Another discriminated union: `ok` tells the caller which of the two shapes it has.
 export type CreateOutcome =
   | { ok: true; meeting: MeetingDetail }
   /** `error` is null when there's nothing to show in the form (the global toast already did). */
@@ -21,6 +32,7 @@ export function useCreateMeetingSubmit() {
   const createMutation = useCreateMeeting();
   const uploadMutation = useUploadMeeting();
 
+  // @param values the validated form values; @returns an outcome object (this function never throws)
   async function submit(values: CreateMeetingFormOutput): Promise<CreateOutcome> {
     const meeting_date = localInputToIso(values.meeting_date);
     if (!meeting_date) {
@@ -37,6 +49,8 @@ export function useCreateMeetingSubmit() {
     };
     const isUpload = values.tab === CREATE_TABS.UPLOAD;
 
+    // `mutateAsync` returns a Promise (unlike `mutate`), so we can `await` the created meeting
+    // and catch a rejection with try/catch.
     try {
       if (isUpload && values.file) {
         return {

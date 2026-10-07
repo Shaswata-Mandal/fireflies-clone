@@ -1,3 +1,14 @@
+/**
+ * One sidebar entry (link or button).
+ *
+ * WHAT: Renders an icon + label (or icon-only with a tooltip when collapsed), as a `<Link>` when
+ *   it has an `href`, otherwise as a `<button>`.
+ * LAYER: Shared layout component (client).
+ * CALLED BY: `Sidebar`.
+ * CALLS: `next/link`, shadcn `Tooltip`, `cn`.
+ * MERN EQUIVALENT: a React Router `<NavLink>` styled as a nav item.
+ */
+
 "use client";
 
 import Link from "next/link";
@@ -13,9 +24,12 @@ interface SidebarItemProps {
   onSelect: (item: NavItem) => void;
 }
 
+// @param item the nav definition; @param active highlights it; @param onSelect click callback
 export function SidebarItem({ item, collapsed, active, onSelect }: SidebarItemProps) {
   const { label, icon: Icon, iconClassName, href, badge } = item;
 
+  // `cn` joins class groups: base look, hover/focus states, collapsed vs expanded sizing, and the
+  // active highlight (the last `&&` adds classes only when `active` is true).
   const className = cn(
     "relative flex h-8 items-center gap-3 rounded-md text-sm text-default transition-colors",
     "hover:bg-hover focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none",
@@ -23,6 +37,7 @@ export function SidebarItem({ item, collapsed, active, onSelect }: SidebarItemPr
     active && "bg-active font-medium text-primary",
   );
 
+  // The inner content is built once and reused by both the link and the button variants.
   const content = (
     <>
       <Icon className={cn("size-4 shrink-0", iconClassName)} aria-hidden="true" />
@@ -70,6 +85,8 @@ export function SidebarItem({ item, collapsed, active, onSelect }: SidebarItemPr
     </button>
   );
 
+  // Collapsed rail shows only icons, so a tooltip supplies the label for sighted users
+  // (screen-reader text is already in the `sr-only` span above).
   if (!collapsed) return element;
 
   return (

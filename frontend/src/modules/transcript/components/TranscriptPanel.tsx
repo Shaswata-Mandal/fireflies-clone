@@ -1,3 +1,15 @@
+/**
+ * Right-hand panel of the meeting page.
+ *
+ * WHAT: Tabs for AskFred and Transcript; the transcript tab shows skeleton, error, empty state
+ *   or the list.
+ * LAYER: Module component (client).
+ * CALLED BY: `MeetingDetailLayout`.
+ * CALLS: `useTranscript`, `TranscriptList`, `AskMeetingPanel`, `TabList`, `useUI`.
+ * INTERVIEW: both tab panels stay MOUNTED and are only hidden (`hidden` attribute), so switching
+ * tabs does not lose the chat history or the transcript's scroll position and search.
+ */
+
 "use client";
 
 import { AskMeetingPanel } from "@/modules/meetings/components/AskMeetingPanel";
@@ -24,6 +36,7 @@ interface TranscriptPanelProps {
 
 const ID_PREFIX = "right-panel";
 
+// Defined outside the component so the array is created once, not on every render.
 const TABS: ReadonlyArray<TabItem<MeetingPanelTab>> = [
   { id: "askfred", label: "AskFred", icon: <FredMark className="size-4" /> },
   { id: "transcript", label: "Transcript" },
@@ -34,7 +47,11 @@ const TABS: ReadonlyArray<TabItem<MeetingPanelTab>> = [
  * mounted while hidden, so the transcript keeps its search/scroll and the chat keeps its messages.
  */
 export function TranscriptPanel({ meetingId, participants }: TranscriptPanelProps) {
+  // The selected tab lives in UIContext (not local state), because the sidebar's AskFred button
+  // also selects it.
   const { meetingPanelTab: activeTab, setMeetingPanelTab: setActiveTab } = useUI();
+  // The transcript tab below shows exactly one of four states of this query: loading, error,
+  // empty, or loaded.
   const { data, error, isPending, isError, refetch, isRefetching } = useTranscript(meetingId);
 
   return (

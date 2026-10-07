@@ -1,3 +1,12 @@
+/**
+ * Left-menu definitions of the full-page settings layout.
+ *
+ * WHAT: Grouped menu items for Personal and Team mode, each with an icon, link and `?tab=` id.
+ * LAYER: Module constants (data).
+ * CALLED BY: `SettingsShell`.
+ * CALLS: `settingsTabRoute`, `teamTabRoute` (route helpers).
+ */
+
 import {
   Bell,
   BookOpen,
@@ -28,6 +37,7 @@ export interface SettingsNavItem {
 
 export type SettingsMode = "personal" | "team";
 
+// An array of groups; each group is an array of items, and groups are drawn with a divider.
 export const PERSONAL_NAV: ReadonlyArray<ReadonlyArray<SettingsNavItem>> = [
   [
     { label: "Profile", icon: UserRound, href: settingsTabRoute("profile"), tab: "profile" },

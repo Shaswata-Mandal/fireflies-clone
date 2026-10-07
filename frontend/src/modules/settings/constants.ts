@@ -1,3 +1,11 @@
+/**
+ * Settings tab definitions.
+ *
+ * WHAT: The tab ids, their labels, and the "Coming soon" icon/text for the unbuilt ones.
+ * LAYER: Module constants.
+ * CALLED BY: `SettingsView`, `SettingsShell`.
+ */
+
 import {
   Bell,
   BookOpen,
@@ -28,6 +36,7 @@ export const SETTINGS_TAB_IDS = [
   "cookies",
 ] as const;
 
+// A union of the ids above ("profile" | "account" | ...), derived so the two never drift apart.
 export type SettingsTabId = (typeof SETTINGS_TAB_IDS)[number];
 
 export const DEFAULT_SETTINGS_TAB: SettingsTabId = "profile";
@@ -52,6 +61,8 @@ interface ComingSoonTab {
 }
 
 /** Icon and one-liner for each unbuilt tab. */
+// `Exclude<Union, "a" | "b">` removes the built tabs, so this object needs entries ONLY for the
+// unbuilt ones and the compiler checks none is forgotten.
 export const COMING_SOON_TABS: Record<
   Exclude<SettingsTabId, "profile" | "account" | "appearance">,
   ComingSoonTab

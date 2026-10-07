@@ -1,3 +1,15 @@
+/**
+ * Summary tab: orchestrates empty, generating, read and edit states.
+ *
+ * WHAT: Decides which summary UI to show from the meeting data, the generate mutation and a local
+ *   `isEditing` flag.
+ * LAYER: Module component (client) - the "container".
+ * CALLED BY: `NotesTabPanel`.
+ * CALLS: `useGenerateSummary`, `useTranscript`, and the summary presentational components.
+ * INTERVIEW: the meeting (with its summary) is server state from TanStack Query; `isEditing` is
+ * plain local UI state. Keeping them separate is the pattern used across the app.
+ */
+
 "use client";
 
 import { useState } from "react";
@@ -19,6 +31,7 @@ interface SummaryPanelProps {
  * Whether a transcript exists comes from the transcript query the page already loaded (deduped).
  */
 export function SummaryPanel({ meeting }: SummaryPanelProps) {
+  // Local UI state: whether the inline editor is open.
   const [isEditing, setEditing] = useState(false);
   const generate = useGenerateSummary(meeting.id);
   const transcript = useTranscript(meeting.id);
@@ -28,6 +41,7 @@ export function SummaryPanel({ meeting }: SummaryPanelProps) {
   const isMissingTranscript = transcript.isSuccess && !hasTranscript;
   const generateSummary = () => generate.mutate();
 
+  // No summary yet: show a skeleton while generating, otherwise the invitation to generate one.
   if (!meeting.summary) {
     if (generate.isPending) return <SummarySkeleton />;
     return (

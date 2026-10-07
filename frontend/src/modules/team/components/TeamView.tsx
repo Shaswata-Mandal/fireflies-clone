@@ -1,3 +1,13 @@
+/**
+ * Team page body.
+ *
+ * WHAT: Reads `?tab=` and shows Workspace, Teammates or a "Coming soon" panel inside the shared
+ *   settings layout.
+ * LAYER: Module component (client).
+ * CALLED BY: `app/team/page.tsx`.
+ * CALLS: `useTabParam`, `SettingsShell` (from the settings module), the team panels.
+ */
+
 "use client";
 
 import { SettingsShell } from "@/modules/settings/components/SettingsShell";

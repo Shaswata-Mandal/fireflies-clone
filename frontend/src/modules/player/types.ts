@@ -1,3 +1,15 @@
+/**
+ * Player types.
+ *
+ * WHAT: `PlayerEngine` (what a clock implements), `ClockOptions`, and `PlayerApi` (what
+ *   `usePlayer()` returns).
+ * LAYER: Module types (type-only).
+ * CALLED BY: the clocks, `PlayerProvider`, `hooks.ts`, `context.ts`.
+ * CALLS: `time-store.ts` (type only).
+ * INTERVIEW: `PlayerEngine` is an interface with two implementations (simulated and real media),
+ * the strategy pattern. The provider picks one; nothing above it can tell which.
+ */
+
 import type { TimeStore } from "@/modules/player/time-store";
 
 /**

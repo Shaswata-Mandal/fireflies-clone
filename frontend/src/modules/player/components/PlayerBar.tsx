@@ -1,3 +1,12 @@
+/**
+ * Bottom player bar.
+ *
+ * WHAT: Seek bar, time label, speed menu, skip back/forward and play/pause.
+ * LAYER: Module component (client).
+ * CALLED BY: `MeetingDetailLayout`.
+ * CALLS: `usePlayer`, `SeekBar`, `PlayerTimeLabel`, `PlaybackSpeedMenu`, `usePlayerHotkeys`.
+ */
+
 "use client";
 
 import { Pause, Play, RotateCcw, RotateCw } from "lucide-react";
@@ -18,6 +27,7 @@ const ICON_BUTTON_CLASS =
  * themselves.
  */
 export function PlayerBar() {
+  // `usePlayer()` does NOT re-render on time ticks, so this bar only updates on play/pause/speed.
   const { isPlaying, durationMs, mediaUrl, toggle, skip } = usePlayer();
   const isDisabled = durationMs <= 0;
   usePlayerHotkeys(toggle, !isDisabled);

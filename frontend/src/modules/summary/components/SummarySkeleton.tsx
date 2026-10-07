@@ -1,3 +1,12 @@
+/**
+ * Loading placeholder while a summary is being generated.
+ *
+ * WHAT: Skeleton bars shaped like an overview, keyword chips and bullet lines.
+ * LAYER: Module component (server-safe).
+ * CALLED BY: `SummaryPanel`.
+ * `role="status"` + `aria-label` announce the loading state to screen readers.
+ */
+
 import { Skeleton } from "@/shared/components/ui/skeleton";
 
 const KEYWORD_WIDTHS = ["w-16", "w-24", "w-14", "w-20"] as const;

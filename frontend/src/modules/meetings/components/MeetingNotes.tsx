@@ -1,3 +1,12 @@
+/**
+ * Notes area of the meeting page.
+ *
+ * WHAT: A segmented tab bar (Notes | AI Skills) with the selected tab's panel underneath.
+ * LAYER: Module component (client).
+ * CALLED BY: `MeetingDetailLayout`.
+ * CALLS: `useNotesTab` (URL-backed), `TabList`, `NotesTabPanel`.
+ */
+
 "use client";
 
 import { NotesTabPanel } from "@/modules/meetings/components/NotesTabPanel";
@@ -17,6 +26,7 @@ interface MeetingNotesProps {
 
 const ID_PREFIX = "notes";
 
+// Computed once at module load (not per render): the tab list never changes.
 const TABS: ReadonlyArray<TabItem<NotesTabId>> = NOTES_TAB_CONFIG.map(({ id, label }) => ({
   id,
   label,

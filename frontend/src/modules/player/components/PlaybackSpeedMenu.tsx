@@ -1,3 +1,12 @@
+/**
+ * Playback-speed dropdown.
+ *
+ * WHAT: A "1x" button that opens a radio list of speeds.
+ * LAYER: Module component (client).
+ * CALLED BY: `PlayerBar`.
+ * CALLS: `usePlayer`, shadcn `DropdownMenu`.
+ */
+
 "use client";
 
 import { PLAYBACK_RATES } from "@/modules/player/constants";
@@ -36,6 +45,7 @@ export function PlaybackSpeedMenu({ disabled }: PlaybackSpeedMenuProps) {
       >
         <DropdownMenuLabel className="px-2 text-xs text-muted">Playback speed</DropdownMenuLabel>
         <DropdownMenuRadioGroup
+          // Radix radio values are strings, so convert in both directions.
           value={String(playbackRate)}
           onValueChange={(value) => setPlaybackRate(Number(value))}
         >

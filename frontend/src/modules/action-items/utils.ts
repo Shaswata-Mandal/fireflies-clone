@@ -1,14 +1,25 @@
+/**
+ * Pure helpers for action items.
+ *
+ * WHAT: Grouping into open/completed, overdue check and due-date formatting.
+ * LAYER: Module util (pure; unit-tested).
+ * CALLED BY: `ActionItemList`, `ActionItemRow`, `DueDateLabel`.
+ * CALLS: types only.
+ */
+
 import type { ActionItem, GroupedActionItems } from "@/modules/action-items/types";
 
 /** Splits into open / completed, keeping the server's `position` order inside each group. */
 export function groupActionItems(items: ReadonlyArray<ActionItem>): GroupedActionItems {
   const grouped: GroupedActionItems = { open: [], completed: [] };
   for (const item of items) {
+    // The ternary picks which array to push into; items stay in the server's order.
     (item.is_completed ? grouped.completed : grouped.open).push(item);
   }
   return grouped;
 }
 
+/** Zero-pads to two digits (5 -> "05"). */
 function pad2(value: number): string {
   return String(value).padStart(2, "0");
 }
@@ -22,11 +33,13 @@ export function toLocalIsoDate(date: Date): string {
  * Open and due before today. `now` is injected so tests (and the caller, at render time) decide what
  * "today" is. Due dates are `YYYY-MM-DD`, so plain string comparison orders them correctly.
  */
+// `Pick<...>` = only the two fields we need, which keeps the function easy to unit-test.
 export function isOverdue(item: Pick<ActionItem, "is_completed" | "due_date">, now: Date): boolean {
   if (item.is_completed || item.due_date === null) return false;
   return item.due_date < toLocalIsoDate(now);
 }
 
+// Created once at module load (building an Intl formatter is comparatively slow).
 const DUE_DATE_FORMAT = new Intl.DateTimeFormat(undefined, {
   month: "short",
   day: "numeric",

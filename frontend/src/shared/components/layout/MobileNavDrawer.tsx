@@ -1,3 +1,13 @@
+/**
+ * Slide-in navigation for small screens.
+ *
+ * WHAT: Puts the sidebar inside a left-side sheet (drawer) controlled by `isMobileNavOpen`.
+ * LAYER: Shared layout component (client).
+ * CALLED BY: `AppShell`.
+ * CALLS: `Sidebar`, shadcn `Sheet`, `useUI`.
+ * MERN EQUIVALENT: a MUI `<Drawer>` holding the nav.
+ */
+
 "use client";
 
 import { Sidebar } from "@/shared/components/layout/Sidebar";
@@ -9,6 +19,8 @@ import { useUI } from "@/shared/context/UIContext";
  * close and focus return to the hamburger button.
  */
 export function MobileNavDrawer() {
+  // `onOpenChange={setMobileNavOpen}` lets Radix close the sheet (Esc, overlay click) by calling
+  // our state setter.
   const { isMobileNavOpen, setMobileNavOpen } = useUI();
 
   return (

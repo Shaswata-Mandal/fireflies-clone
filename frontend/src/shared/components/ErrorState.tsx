@@ -1,3 +1,13 @@
+/**
+ * Inline error state for failed data loads.
+ *
+ * WHAT: An alert card with the error message and a Retry button.
+ * LAYER: Shared component.
+ * CALLED BY: every module view that uses `useQuery` (meetings list, detail, action items...).
+ * CALLS: `api-error.ts` (to read the message) and `cn`.
+ * MERN EQUIVALENT: the `if (error) return <Error />` branch of a fetch component.
+ */
+
 import { AlertCircle, RotateCw } from "lucide-react";
 import { isApiError } from "@/shared/lib/api-error";
 import { cn } from "@/shared/utils/cn";
@@ -13,7 +23,9 @@ interface ErrorStateProps {
 const FALLBACK_MESSAGE = "Something went wrong.";
 
 /** Inline failed-query state with Retry (queries never toast; see decision 15). */
+// @param error the query's error (unknown type); @param onRetry usually the query's `refetch`
 export function ErrorState({ title, error, onRetry, isRetrying, className }: ErrorStateProps) {
+  // Only our ApiError carries a user-safe message; anything else gets a generic one.
   const message = isApiError(error) ? error.message : FALLBACK_MESSAGE;
 
   return (

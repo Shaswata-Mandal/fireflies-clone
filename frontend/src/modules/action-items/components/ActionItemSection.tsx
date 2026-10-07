@@ -1,3 +1,12 @@
+/**
+ * Titled group of action items (e.g. "OPEN 3").
+ *
+ * WHAT: A labelled section with a count badge.
+ * LAYER: Module component (server-safe).
+ * CALLED BY: `ActionItemList`.
+ * `aria-labelledby` ties the section to its heading for screen readers.
+ */
+
 import type { ReactNode } from "react";
 
 interface ActionItemSectionProps {

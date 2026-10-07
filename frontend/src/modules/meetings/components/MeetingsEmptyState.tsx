@@ -1,3 +1,15 @@
+/**
+ * Empty states for the meetings library.
+ *
+ * WHAT: Two variants: "no meetings yet" (with an upload link) and "no results" (with a clear
+ *   button).
+ * LAYER: Module component (server-safe).
+ * CALLED BY: `MeetingsView`.
+ * CALLS: `NoResultsIllustration`, `MEETINGS_COPY`.
+ * INTERVIEW: the props are a discriminated union on `variant`, so TypeScript only allows
+ * `actionLabel` / `onClear` when `variant` is "no-results".
+ */
+
 import { Upload, Video } from "lucide-react";
 import Link from "next/link";
 import { NoResultsIllustration } from "@/modules/meetings/components/NoResultsIllustration";
@@ -13,6 +25,8 @@ type MeetingsEmptyStateProps =
 const OUTLINE_BUTTON =
   "flex h-9 items-center gap-2 rounded-md border bg-card px-4 text-sm text-default hover:bg-hover";
 
+// `props` is not destructured: narrowing on `props.variant` is what lets TypeScript know which
+// extra fields exist inside the `if`.
 export function MeetingsEmptyState(props: MeetingsEmptyStateProps) {
   if (props.variant === "no-results") {
     return (

@@ -1,3 +1,13 @@
+/**
+ * Notification bell with its dropdown.
+ *
+ * WHAT: Bell button with an unread badge; the popover has All/Unread filters and "mark all read".
+ * LAYER: Shared layout component (client).
+ * CALLED BY: `Navbar`.
+ * CALLS: `useNotifications`, `NotificationList`, shadcn `Popover`.
+ * MERN EQUIVALENT: a notification dropdown fed by local state.
+ */
+
 "use client";
 
 import { Bell, CheckCheck } from "lucide-react";
@@ -16,6 +26,7 @@ const FILTERS = [
   { label: "Unread", unreadOnly: true },
 ] as const;
 
+/** The bell and its popover. Only the filter choice is local state; the list comes from a hook. */
 export function NotificationsPopover() {
   const { notifications, unreadCount, markRead, markAllRead } = useNotifications();
   const [unreadOnly, setUnreadOnly] = useState(false);
@@ -23,6 +34,8 @@ export function NotificationsPopover() {
   const visible = unreadOnly ? notifications.filter((n) => !n.is_read) : notifications;
   const badge = unreadCount > MAX_BADGE_COUNT ? `${MAX_BADGE_COUNT}+` : String(unreadCount);
 
+  // `aria-pressed` marks the active filter for screen readers; the badge is aria-hidden because
+  // the button's label already announces the unread count.
   return (
     <Popover>
       <PopoverTrigger asChild>

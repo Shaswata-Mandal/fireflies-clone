@@ -1,3 +1,12 @@
+/**
+ * "Details" popup for a library row.
+ *
+ * WHAT: Shows privacy, channels and the invited people (with email and role) for one meeting.
+ * LAYER: Module component (client).
+ * CALLED BY: `MeetingRowActions`.
+ * CALLS: `useMeeting` (fetches only while the dialog is open), shadcn `Dialog`, `UserAvatar`.
+ */
+
 "use client";
 
 import { ChevronDown, Hash, Lock, Upload, Video } from "lucide-react";
@@ -26,6 +35,7 @@ interface MeetingDetailsDialogProps {
 
 const ROLE_LABELS = { host: "Host", attendee: "Attendee" } as const;
 
+/** One "label | value" row of the definition list. `children` is any JSX passed between the tags. */
 function DetailRow({ label, children }: { label: string; children: ReactNode }) {
   return (
     <div className="grid gap-2 sm:grid-cols-[8rem_1fr] sm:items-start">
@@ -45,6 +55,7 @@ export function MeetingDetailsDialog({
   open,
   onOpenChange,
 }: MeetingDetailsDialogProps) {
+  // `open` as the second argument = lazy fetch: nothing is requested until the dialog is opened.
   const { data: meeting, isPending, isError, refetch } = useMeeting(meetingId, open);
   const host = meeting?.participants.find((p) => p.role === "host") ?? meeting?.participants[0];
 

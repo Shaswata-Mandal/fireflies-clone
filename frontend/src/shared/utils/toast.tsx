@@ -1,6 +1,17 @@
+/**
+ * Custom success toast with an optional action button.
+ *
+ * WHAT: Wraps `toast.custom` to match the Fireflies toast look (screenshot 29).
+ * LAYER: Shared util that renders JSX, hence `.tsx`.
+ * CALLED BY: mutation hooks that want an "Undo" or "View" action after success.
+ * CALLS: react-hot-toast and lucide icons.
+ * MERN EQUIVALENT: `toast.custom((t) => <MyToast />)` from react-hot-toast.
+ */
+
 import { CircleCheck } from "lucide-react";
 import toast from "react-hot-toast";
 
+// Toasts with a button stay longer than plain ones so the user has time to reach the button.
 const ACTION_TOAST_DURATION_MS = 6000;
 
 interface ToastAction {
@@ -12,7 +23,10 @@ interface ToastAction {
  * Success toast in the style of screenshot 29 (surface bg, 1px border, rounded-md, leading icon),
  * with an optional text button. Plain `toast.success` can't hold a button, hence `toast.custom`.
  */
+// @param message the text; @param action optional { label, onClick } shown as a link-style button
 export function showSuccessToast(message: string, action?: ToastAction): void {
+  // The render function receives `instance` (visible flag and id) from react-hot-toast; the
+  // enter/exit animation classes (`animate-in`, `animate-out`) come from tw-animate-css.
   toast.custom(
     (instance) => (
       <div

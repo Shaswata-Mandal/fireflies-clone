@@ -1,3 +1,12 @@
+/**
+ * Tab bar of the create form.
+ *
+ * WHAT: Configures the shared `TabList` with this form's three tabs.
+ * LAYER: Module component (client).
+ * CALLED BY: `CreateMeetingForm`.
+ * CALLS: `shared/components/TabList`.
+ */
+
 "use client";
 
 import { CREATE_TAB_ITEMS, type CreateTab } from "@/modules/meetings/constants";

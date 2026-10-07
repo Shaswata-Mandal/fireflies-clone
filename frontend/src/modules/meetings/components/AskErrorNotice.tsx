@@ -1,3 +1,12 @@
+/**
+ * Inline error box for a failed AskFred request.
+ *
+ * WHAT: Shows the message and, when useful, a Retry button.
+ * LAYER: Module component (server-safe).
+ * CALLED BY: `AskMessageList`.
+ * CALLS: nothing (the message comes from `describeAskError`).
+ */
+
 import { AlertCircle, RotateCw } from "lucide-react";
 import type { AskErrorView } from "@/modules/meetings/ask-errors";
 

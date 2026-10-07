@@ -1,3 +1,12 @@
+/**
+ * Home feed tabs.
+ *
+ * WHAT: "Recent / Upcoming / AI Feed" tabs; only Recent has real data.
+ * LAYER: Module component (client: tab state).
+ * CALLED BY: `HomeView`.
+ * CALLS: `TabList`, `RecentMeetingsSection`, `ComingSoonPanel`.
+ */
+
 "use client";
 
 import { CalendarClock, Newspaper } from "lucide-react";
@@ -23,6 +32,7 @@ const ID_PREFIX = "home-feed";
 
 /** Recent / Upcoming / AI Feed tabs (docs/reference/08); only Recent has data. */
 export function HomeFeed() {
+  // Plain local state is enough here: this tab is not worth putting in the URL.
   const [tab, setTab] = useState<FeedTab>("recent");
 
   function renderPanel() {

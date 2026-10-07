@@ -1,3 +1,13 @@
+/**
+ * Inline editor for the summary.
+ *
+ * WHAT: Overview, keywords and notes fields with validation; Save calls the update mutation.
+ * LAYER: Module component (client).
+ * CALLED BY: `SummaryPanel`.
+ * CALLS: react-hook-form + `zodResolver`, `useUpdateSummary`.
+ * MERN EQUIVALENT: a Formik edit form that PATCHes the document.
+ */
+
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -35,6 +45,8 @@ export function SummaryEditForm({ meetingId, summary, onDone }: SummaryEditFormP
     defaultValues: toSummaryFormInput(summary),
   });
 
+  // `values` is already the validated, transformed payload (arrays, trimmed). The per-call
+  // `onSuccess` closes the editor only after the server accepted the change.
   const onSubmit = (values: SummaryFormOutput) => update.mutate(values, { onSuccess: onDone });
 
   function handleKeyDown(event: KeyboardEvent<HTMLFormElement>) {

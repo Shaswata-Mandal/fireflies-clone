@@ -1,3 +1,12 @@
+/**
+ * Metadata line under an action item.
+ *
+ * WHAT: Assignee, due date and a "jump to where it was said" chip.
+ * LAYER: Module component (server-safe; the chip child is a client component).
+ * CALLED BY: `ActionItemRow`.
+ * CALLS: `UserAvatar`, `DueDateLabel`, `SourceTimestampChip`.
+ */
+
 import { DueDateLabel } from "@/modules/action-items/components/DueDateLabel";
 import { SourceTimestampChip } from "@/modules/action-items/components/SourceTimestampChip";
 import type { ActionItem } from "@/modules/action-items/types";

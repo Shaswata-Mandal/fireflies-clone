@@ -1,3 +1,11 @@
+/**
+ * Titled block inside the summary.
+ *
+ * WHAT: An uppercase small heading followed by its content.
+ * LAYER: Module component (server-safe).
+ * CALLED BY: `SummaryView`.
+ */
+
 import type { ReactNode } from "react";
 
 interface SummarySectionProps {

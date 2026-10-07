@@ -1,3 +1,14 @@
+/**
+ * Source chips under an AskFred answer.
+ *
+ * WHAT: Shows each cited transcript moment as a clickable timestamp.
+ * LAYER: Module component (server-safe: no hooks).
+ * CALLED BY: `AskMessageBubble`.
+ * CALLS: `meetingDetailRoute`, `formatTimestamp`.
+ * INTERVIEW: single-meeting answers seek the player; cross-meeting answers link to
+ * `/meetings/{id}?t=<ms>` so the page opens at that moment (deep link).
+ */
+
 import Link from "next/link";
 import type { AskCitation } from "@/modules/meetings/types";
 import { meetingDetailRoute } from "@/shared/constants/routes";
@@ -9,6 +20,7 @@ interface AskCitationChipsProps {
   onSeek?: (ms: number) => void;
 }
 
+// One class string shared by the link and the button variant so both look the same.
 const CHIP_CLASS =
   "inline-block max-w-56 truncate rounded-md bg-primary-subtle px-2 py-0.5 text-xs text-primary-fg tabular-nums hover:bg-active focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none";
 

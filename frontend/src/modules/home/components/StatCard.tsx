@@ -1,3 +1,12 @@
+/**
+ * One stat card.
+ *
+ * WHAT: Icon tile, title and a subtitle that can be loading, failed or ready.
+ * LAYER: Module component (server-safe).
+ * CALLED BY: `HomeStats`.
+ * CALLS: shadcn `Skeleton`.
+ */
+
 import type { LucideIcon } from "lucide-react";
 import { Skeleton } from "@/shared/components/ui/skeleton";
 

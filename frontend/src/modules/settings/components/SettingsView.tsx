@@ -1,3 +1,12 @@
+/**
+ * Settings page body.
+ *
+ * WHAT: Reads the active tab from `?tab=` and shows the matching panel inside `SettingsShell`.
+ * LAYER: Module component (client).
+ * CALLED BY: `app/settings/page.tsx`.
+ * CALLS: `useTabParam`, the panels, `ComingSoonPanel`.
+ */
+
 "use client";
 
 import { AccountPanel } from "@/modules/settings/components/AccountPanel";
@@ -14,6 +23,7 @@ import {
 import { ComingSoonPanel } from "@/shared/components/ComingSoonPanel";
 import { useTabParam } from "@/shared/hooks/use-tab-param";
 
+/** Maps a tab id to its panel; the `default` branch covers every unbuilt tab with one placeholder. */
 function renderPanel(tab: SettingsTabId) {
   switch (tab) {
     case "profile":

@@ -1,3 +1,14 @@
+/**
+ * One chat message.
+ *
+ * WHAT: Name row (avatar + "You"/"AskFred"), the text, and citations for assistant answers.
+ * LAYER: Module component (server-safe).
+ * CALLED BY: `AskMessageList`.
+ * CALLS: `AskCitationChips`.
+ * INTERVIEW: the text is rendered as plain text (not HTML), so model output can never inject
+ * markup or scripts.
+ */
+
 import { AskCitationChips } from "@/modules/meetings/components/AskCitationChips";
 import { ASK_COPY } from "@/modules/meetings/constants";
 import type { AskChatMessage } from "@/modules/meetings/use-ask-chat";

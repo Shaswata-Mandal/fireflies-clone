@@ -1,3 +1,11 @@
+/**
+ * Keyword chips.
+ *
+ * WHAT: Renders each summary keyword as a small tinted pill.
+ * LAYER: Module component (server-safe).
+ * CALLED BY: `SummaryView`.
+ */
+
 interface KeywordChipsProps {
   keywords: ReadonlyArray<string>;
 }

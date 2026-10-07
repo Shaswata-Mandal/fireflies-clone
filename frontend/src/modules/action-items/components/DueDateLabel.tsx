@@ -1,3 +1,13 @@
+/**
+ * Due-date label.
+ *
+ * WHAT: Shows the date with a calendar icon; red with "Overdue" when past due.
+ * LAYER: Module component (server-safe).
+ * CALLED BY: `ActionItemMeta`.
+ * CALLS: `formatDueDate`.
+ * The <time dateTime> element gives machines the exact date while humans see "Oct 10".
+ */
+
 import { CalendarDays } from "lucide-react";
 import { ACTION_ITEMS_COPY } from "@/modules/action-items/constants";
 import { formatDueDate } from "@/modules/action-items/utils";

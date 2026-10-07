@@ -1,3 +1,15 @@
+/**
+ * One transcript line.
+ *
+ * WHAT: A real <button>: clicking seeks the player to this line and starts playback.
+ * LAYER: Module component (server-safe, wrapped in `memo`).
+ * CALLED BY: `SpeakerBlock`.
+ * CALLS: `HighlightedText`.
+ * INTERVIEW: with ~1,000 lines, re-rendering all of them on each active-line change would be
+ * slow. `memo` skips a line whose props are equal, and all props here are primitives or stable
+ * values, so only the previous and the new active line re-render.
+ */
+
 import { memo } from "react";
 import { HighlightedText } from "@/modules/transcript/components/HighlightedText";
 import type { TextRange } from "@/modules/transcript/types";
@@ -33,6 +45,7 @@ export const TranscriptLine = memo(function TranscriptLine({
   return (
     <button
       type="button"
+      // This attribute is how `dom.ts` finds the line again (no per-line ref needed).
       data-segment-index={index}
       aria-current={isActive ? "true" : undefined}
       onClick={() => onSelect(index)}

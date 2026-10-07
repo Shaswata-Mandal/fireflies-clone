@@ -1,3 +1,13 @@
+/**
+ * Account menu (avatar + name dropdown) in the sidebar header.
+ *
+ * WHAT: Shows the current user, links to Settings/Team/Theme, and "Coming soon" entries.
+ * LAYER: Shared layout component (client: data hook + dropdown state).
+ * CALLED BY: `SidebarHeader`.
+ * CALLS: `useCurrentUser` (settings module), `useTheme`, shadcn `DropdownMenu`, `ACCOUNT_MENU_ITEMS`.
+ * MERN EQUIVALENT: a user dropdown fed by `GET /me` through a data hook.
+ */
+
 "use client";
 
 import { ChevronDown } from "lucide-react";
@@ -24,10 +34,13 @@ interface AvatarMenuProps {
 }
 
 const FALLBACK_NAME = "Account";
+// Shared Tailwind classes for every menu row, so the rows look identical.
 const ITEM_CLASS = "text-default focus:bg-hover px-3 py-2 text-sm";
 
 /** Account menu from docs/reference/04 (left column): greeting, email, account links, logout. */
 export function AvatarMenu({ collapsed }: AvatarMenuProps) {
+  // INTERVIEW: TanStack Query returns `data`, `isPending` (no data yet) and `isError`; this
+  // component handles loading with a skeleton and tolerates errors by falling back to defaults.
   const { data: user, isPending } = useCurrentUser();
   const { theme } = useTheme();
 
@@ -44,6 +57,8 @@ export function AvatarMenu({ collapsed }: AvatarMenuProps) {
   // On error `user` is undefined: the avatar falls back to "?" and the menu still works.
   const name = user?.name ?? FALLBACK_NAME;
 
+  // `group` + `group-data-[state=open]:rotate-180` rotates the chevron while the Radix menu is
+  // open. Menu rows come from data: an item with `href` is a link, otherwise a "Coming soon" toast.
   return (
     <DropdownMenu>
       <DropdownMenuTrigger

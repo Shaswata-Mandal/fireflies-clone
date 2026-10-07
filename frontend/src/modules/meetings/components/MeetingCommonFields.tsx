@@ -1,3 +1,14 @@
+/**
+ * Fields shared by the create and edit forms.
+ *
+ * WHAT: Title, date/time, participants and (create only) the "Generate AI summary" checkbox.
+ * LAYER: Module component (client).
+ * CALLED BY: `CreateMeetingForm`, `EditMeetingForm`.
+ * CALLS: `FormField`, `ParticipantTagInput`.
+ * INTERVIEW: the parent passes in `register(...)` results (`UseFormRegisterReturn`), which is how
+ * react-hook-form connects a plain <input>; spreading `{...titleField}` adds name, ref, onChange.
+ */
+
 "use client";
 
 import type { UseFormRegisterReturn } from "react-hook-form";
@@ -27,6 +38,7 @@ export function MeetingCommonFields({
   onParticipantsChange,
   summaryField,
 }: MeetingCommonFieldsProps) {
+  // Unique ids tie each <label> to its input and each error message to its input (accessibility).
   const titleId = `${idPrefix}-title`;
   const dateId = `${idPrefix}-date`;
 

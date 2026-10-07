@@ -1,3 +1,12 @@
+/**
+ * Toolbar above the meeting list.
+ *
+ * WHAT: Ownership toggle, filters popover, sort menu and search.
+ * LAYER: Module component (client).
+ * CALLED BY: `MeetingsView`.
+ * CALLS: `HostedSharedToggle`, `MeetingsFilterPopover`, `MeetingsSortMenu`, `MeetingsSearch`.
+ */
+
 "use client";
 
 import { HostedSharedToggle } from "@/modules/meetings/components/HostedSharedToggle";

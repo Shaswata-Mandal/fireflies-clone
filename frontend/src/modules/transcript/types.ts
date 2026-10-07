@@ -1,3 +1,13 @@
+/**
+ * Transcript types.
+ *
+ * WHAT: The API shapes (`TranscriptSegment`, `Transcript`) and the derived UI shapes (speaker
+ *   blocks, search matches, highlight parts).
+ * LAYER: Module types (type-only).
+ * CALLED BY: api.ts, utils.ts, hooks and components of this module, plus smart-search.
+ * CALLS: nothing.
+ */
+
 // Mirrors backend/app/modules/transcripts/schemas.py (snake_case, no mapping layer).
 
 export interface TranscriptSegment {

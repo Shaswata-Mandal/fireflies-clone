@@ -1,3 +1,12 @@
+/**
+ * Toolbar above the summary.
+ *
+ * WHAT: Source badge plus Edit and Regenerate buttons, with the disabled rules.
+ * LAYER: Module component (server-safe: only calls the callbacks it receives).
+ * CALLED BY: `SummaryPanel`.
+ * CALLS: `GeneratedByBadge`, `Button`.
+ */
+
 import { Pencil, RotateCw } from "lucide-react";
 import type { GeneratedBy } from "@/modules/meetings/types";
 import { GeneratedByBadge } from "@/modules/summary/components/GeneratedByBadge";

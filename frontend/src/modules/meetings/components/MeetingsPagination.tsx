@@ -1,3 +1,11 @@
+/**
+ * Previous / Next pager.
+ *
+ * WHAT: Shows "Page n of m" with buttons that disable at the ends; hidden for a single page.
+ * LAYER: Module component (server-safe: it only calls the callback it is given).
+ * CALLED BY: `MeetingsView`.
+ */
+
 import { ChevronLeft, ChevronRight } from "lucide-react";
 
 interface MeetingsPaginationProps {

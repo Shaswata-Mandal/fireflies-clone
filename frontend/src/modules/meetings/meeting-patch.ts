@@ -1,3 +1,15 @@
+/**
+ * Builds the PATCH body for the edit form.
+ *
+ * WHAT: Compares the saved meeting with the edited values and keeps only the differences.
+ * LAYER: Module util (pure; unit-tested).
+ * CALLED BY: `EditMeetingForm`.
+ * CALLS: `participant-input.ts`.
+ * MERN EQUIVALENT: a "dirty fields only" payload builder.
+ * INTERVIEW: sending only changed fields matches the PATCH semantics of the backend, and lets the
+ * form say "No changes to save" without a request.
+ */
+
 import { participantKey } from "@/modules/meetings/participant-input";
 import type { MeetingUpdateBody, ParticipantDraft } from "@/modules/meetings/types";
 
@@ -8,6 +20,7 @@ interface MeetingSnapshot {
   participants: ReadonlyArray<ParticipantDraft>;
 }
 
+/** A comparable identity for a participant: name (case-insensitive) plus email. */
 function signature(participant: ParticipantDraft): string {
   return `${participantKey(participant)}|${(participant.email ?? "").toLowerCase()}`;
 }
@@ -17,6 +30,7 @@ function sameParticipants(
   b: ReadonlyArray<ParticipantDraft>,
 ): boolean {
   if (a.length !== b.length) return false;
+  // Set comparison: order does not matter, and `delete` returns true only if the item existed.
   const remaining = new Set(a.map(signature));
   return b.every((participant) => remaining.delete(signature(participant)));
 }

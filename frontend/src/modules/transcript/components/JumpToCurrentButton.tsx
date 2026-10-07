@@ -1,3 +1,11 @@
+/**
+ * "Jump to current" floating button.
+ *
+ * WHAT: A pill that appears when the playing line is scrolled out of view.
+ * LAYER: Module component (server-safe).
+ * CALLED BY: `TranscriptList`.
+ */
+
 import { ArrowDownToLine } from "lucide-react";
 
 interface JumpToCurrentButtonProps {

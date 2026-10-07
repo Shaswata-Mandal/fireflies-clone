@@ -1,3 +1,13 @@
+/**
+ * Grouped notification list.
+ *
+ * WHAT: Splits notifications into "New" and "Earlier" sections, or shows an empty state.
+ * LAYER: Shared layout component.
+ * CALLED BY: `NotificationsPopover`.
+ * CALLS: `NotificationItem`.
+ * MERN EQUIVALENT: a grouped list component.
+ */
+
 "use client";
 
 import { BellOff } from "lucide-react";
@@ -26,6 +36,7 @@ export function NotificationList({ notifications, onSelect }: NotificationListPr
     );
   }
 
+  // Derived on every render (cheap), so there is no extra state that could get out of sync.
   const sections: Section[] = [
     { label: "New", items: notifications.filter((n) => !n.is_read) },
     { label: "Earlier", items: notifications.filter((n) => n.is_read) },

@@ -1,3 +1,12 @@
+/**
+ * TypeScript types for the summary endpoints.
+ *
+ * WHAT: Request and response shapes for generate and edit.
+ * LAYER: Module types (type-only).
+ * CALLED BY: api.ts, hooks.ts.
+ * CALLS: meetings types.
+ */
+
 // Mirrors backend/app/modules/summaries/schemas.py. The summary itself (`MeetingSummary`) and
 // `Chapter` arrive inside the meeting detail, so they stay in modules/meetings/types.ts.
 import type { Chapter, MeetingSummary } from "@/modules/meetings/types";

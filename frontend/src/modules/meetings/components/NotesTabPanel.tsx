@@ -1,3 +1,13 @@
+/**
+ * Content of the selected notes tab.
+ *
+ * WHAT: The Notes tab stacks Summary, Action Items and Outline; other tabs show "Coming soon".
+ * LAYER: Module component (server-safe; the children are client components).
+ * CALLED BY: `MeetingNotes`.
+ * CALLS: `SummaryPanel`, `ActionItemsPanel`, `OutlineList`, `ComingSoonPanel`.
+ * MERN EQUIVALENT: a tab panel that composes feature components.
+ */
+
 import { Sparkles } from "lucide-react";
 import { ActionItemsPanel } from "@/modules/action-items/components/ActionItemsPanel";
 import { NOTES_TABS, NOTES_TAB_CONFIG, type NotesTabId } from "@/modules/meetings/notes-tabs";
@@ -16,6 +26,7 @@ interface NotesSectionProps {
   children: React.ReactNode;
 }
 
+/** A titled block; `children` is whatever JSX the caller puts between the tags. */
 function NotesSection({ title, children }: NotesSectionProps) {
   return (
     <section className="flex flex-col gap-3">

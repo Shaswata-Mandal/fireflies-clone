@@ -1,3 +1,14 @@
+/**
+ * Drag-and-drop file zone for transcript upload.
+ *
+ * WHAT: A dashed drop area plus a "Browse Files" button; shows the chosen file and any error.
+ * LAYER: Module component (client: drag state, file input ref).
+ * CALLED BY: `CreateMeetingForm` (upload tab).
+ * CALLS: `formatFileSize`, `Button`.
+ * INTERVIEW: validation lives in the zod schema, not here; this component only reports the file
+ * (single responsibility).
+ */
+
 "use client";
 
 import { FileText, Upload, X } from "lucide-react";
@@ -32,9 +43,12 @@ export function TranscriptFileDropzone({
   variant,
   onFileChange,
 }: TranscriptFileDropzoneProps) {
+  // The real <input type="file"> is hidden; the button calls `inputRef.current.click()` to open
+  // the system file picker. A ref is needed because we call a DOM method imperatively.
   const inputRef = useRef<HTMLInputElement>(null);
   const [isDragging, setDragging] = useState(false);
 
+  // Drag events: `onDragOver` must call preventDefault, or the browser would refuse the drop.
   function handleDrop(event: DragEvent<HTMLDivElement>) {
     event.preventDefault();
     setDragging(false);

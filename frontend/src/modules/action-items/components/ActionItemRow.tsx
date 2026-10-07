@@ -1,3 +1,14 @@
+/**
+ * One action item row.
+ *
+ * WHAT: Checkbox, text, meta, and edit/delete buttons; switches to an inline form while editing.
+ * LAYER: Module component (client: local edit/confirm state + three mutation hooks).
+ * CALLED BY: `ActionItemList`.
+ * CALLS: `useToggleActionItem`, `useUpdateActionItem`, `useDeleteActionItem`, `ActionItemForm`.
+ * INTERVIEW: the checkbox is a CONTROLLED input (`checked` comes from server data); the click
+ * calls the optimistic mutation, which updates the cache, which re-renders the checkbox.
+ */
+
 "use client";
 
 import { Pencil, Trash2 } from "lucide-react";
@@ -28,12 +39,14 @@ interface ActionItemRowProps {
  * belong to this row only. Toggle and delete are optimistic (see hooks.ts); edit waits.
  */
 export function ActionItemRow({ item, participants, isOverdue }: ActionItemRowProps) {
+  // Local UI state: is this row in edit mode, and is its delete confirmation open?
   const [isEditing, setEditing] = useState(false);
   const [isConfirmingDelete, setConfirmingDelete] = useState(false);
   const toggle = useToggleActionItem(item.meeting_id);
   const update = useUpdateActionItem(item.meeting_id);
   const remove = useDeleteActionItem(item.meeting_id);
 
+  // Early return: while editing, show the form instead of the normal row.
   if (isEditing) {
     return (
       <li className="rounded-lg border bg-card p-3">

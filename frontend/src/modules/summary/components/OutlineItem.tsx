@@ -1,3 +1,14 @@
+/**
+ * One row of the outline (chapter).
+ *
+ * WHAT: A button with the chapter's start time and title; clicking seeks the player.
+ * LAYER: Module component (server-safe; wrapped in `memo`).
+ * CALLED BY: `OutlineList`.
+ * CALLS: `formatTimestamp`.
+ * INTERVIEW: `memo` skips re-rendering when props are unchanged. It works here because every prop
+ * is a primitive or a stable function, so only the row that gains/loses `isActive` re-renders.
+ */
+
 import { memo } from "react";
 import { cn } from "@/shared/utils/cn";
 import { formatTimestamp } from "@/shared/utils/format-time";

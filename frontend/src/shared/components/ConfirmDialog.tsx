@@ -1,3 +1,13 @@
+/**
+ * Reusable "are you sure?" modal for destructive actions.
+ *
+ * WHAT: A shadcn/Radix Dialog with Cancel and a red confirm button, locked while a request runs.
+ * LAYER: Shared component (client: it handles events).
+ * CALLED BY: delete flows for meetings and action items.
+ * CALLS: shadcn `Dialog` and `Button`, `utils/focus.ts`.
+ * MERN EQUIVALENT: a `window.confirm` replacement, e.g. a React-Bootstrap confirm modal.
+ */
+
 "use client";
 
 import type { ReactNode, RefObject } from "react";
@@ -11,6 +21,7 @@ import {
   DialogTitle,
 } from "@/shared/components/ui/dialog";
 
+// "Controlled" dialog: the parent owns `open` and is told about changes via `onOpenChange`.
 interface ConfirmDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
@@ -42,14 +53,18 @@ export function ConfirmDialog({
   isPending = false,
   returnFocusRef,
 }: ConfirmDialogProps) {
+  // Ignore close requests (Esc, outside click, X) while the delete request is in flight.
   function handleOpenChange(next: boolean) {
     if (isPending) return;
     onOpenChange(next);
   }
 
+  // In the JSX below, `<DialogDescription asChild>` renders our own <div> instead of Radix's
+  // default <p>, so `description` may contain block-level content.
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogContent
+        // `isPending && event.preventDefault()` cancels the Radix close event only while pending.
         showCloseButton={!isPending}
         onEscapeKeyDown={(event) => isPending && event.preventDefault()}
         onInteractOutside={(event) => isPending && event.preventDefault()}

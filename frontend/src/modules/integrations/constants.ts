@@ -1,3 +1,11 @@
+/**
+ * Integrations data.
+ *
+ * WHAT: Tab ids, tab labels and the list of placeholder integrations.
+ * LAYER: Module constants (data).
+ * CALLED BY: the Integrations components.
+ */
+
 import {
   Building2,
   Calendar,

@@ -1,3 +1,13 @@
+/**
+ * TypeScript types for the action-items API.
+ *
+ * WHAT: Interfaces mirroring the backend's Pydantic models, plus a few UI helper shapes.
+ * LAYER: Module types (type-only; no runtime code).
+ * CALLED BY: api.ts, hooks.ts, utils and components of this module.
+ * CALLS: nothing.
+ * MERN EQUIVALENT: the TS interfaces for a REST resource.
+ */
+
 // Mirrors backend/app/modules/action_items/schemas.py (snake_case, no mapping layer).
 
 export interface AssigneeBrief {
@@ -32,6 +42,8 @@ export interface ActionItemCreate {
 }
 
 /** PATCH body: omitted = unchanged; `null` clears `assignee_id` / `due_date`. */
+// In a PATCH body, a missing field means "unchanged" and `null` means "clear it" (only for
+// assignee_id and due_date). The `?` makes each field optional.
 export interface ActionItemUpdate {
   text?: string;
   assignee_id?: number | null;

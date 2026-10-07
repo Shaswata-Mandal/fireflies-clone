@@ -1,3 +1,15 @@
+/**
+ * Library state <-> URL query string.
+ *
+ * WHAT: Parses `?q=&participant_id=&sort=&page=` into a typed state object and back.
+ * LAYER: Module util (pure; unit-tested).
+ * CALLED BY: `use-meetings-url-state.ts` and the filter components.
+ * CALLS: constants and types.
+ * MERN EQUIVALENT: `qs.parse` / `new URLSearchParams` helpers around `useSearchParams`.
+ * INTERVIEW: the URL is the source of truth for view state, so reload, Back and a shared link
+ * restore exactly the same filters, sort and page.
+ */
+
 // Meetings library state <-> URL search params. Pure functions (no React, no Next), so the rules for
 // what a valid URL looks like live in one place and can be unit-tested.
 
@@ -10,6 +22,7 @@ import {
 } from "@/modules/meetings/constants";
 import type { MeetingSort, MeetingsQuery } from "@/modules/meetings/types";
 
+// The typed shape of everything the URL can express.
 export interface MeetingsUrlState {
   view: MeetingView;
   q: string;
@@ -45,12 +58,14 @@ const VALID_SORTS = new Set<string>(SORT_OPTIONS.map((option) => option.value));
 
 // ── Parsing: anything malformed falls back to the default instead of producing a 422 ──────────
 
+/** "3" -> 3; null, "0", "-1", "1.5" or "abc" -> null. */
 function parsePositiveInt(raw: string | null): number | null {
   if (raw === null || !/^\d+$/.test(raw)) return null;
   const value = Number(raw);
   return value >= 1 && Number.isSafeInteger(value) ? value : null;
 }
 
+/** Accepts only a real `YYYY-MM-DD` date; anything else -> null. */
 function parseDate(raw: string | null): string | null {
   if (raw === null || !DATE_ONLY.test(raw)) return null;
   // Rejects impossible dates like 2026-02-31, which the regex alone lets through.
@@ -59,10 +74,15 @@ function parseDate(raw: string | null): string | null {
   return date.getUTCMonth() === month - 1 && date.getUTCDate() === day ? raw : null;
 }
 
+// A type guard: after it returns true, TypeScript treats `raw` as a `MeetingSort`.
 function isMeetingSort(raw: string | null): raw is MeetingSort {
   return raw !== null && VALID_SORTS.has(raw);
 }
 
+/**
+ * URL -> state. Never throws: bad values fall back to defaults, so a hand-edited URL cannot
+ * trigger an API 422.
+ */
 export function parseMeetingsParams(params: URLSearchParams): MeetingsUrlState {
   const sort = params.get(PARAM.SORT);
   return {
@@ -78,6 +98,7 @@ export function parseMeetingsParams(params: URLSearchParams): MeetingsUrlState {
 
 // ── Serializing: defaults are omitted so the plain view is just `/meetings` ─────────────────────
 
+/** State -> query string without the leading "?" ("" for the default view). */
 export function serializeMeetingsParams(state: MeetingsUrlState): string {
   const params = new URLSearchParams();
   if (state.view !== DEFAULT_MEETINGS_STATE.view) params.set(PARAM.VIEW, state.view);

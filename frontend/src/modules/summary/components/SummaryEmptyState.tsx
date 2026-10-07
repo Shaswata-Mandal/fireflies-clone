@@ -1,3 +1,13 @@
+/**
+ * Empty state for a meeting without a summary.
+ *
+ * WHAT: An illustration plus a "Generate summary" button, disabled (with the reason) when there
+ *   is no transcript.
+ * LAYER: Module component (server-safe).
+ * CALLED BY: `SummaryPanel`.
+ * CALLS: `SUMMARY_COPY`, `Button`.
+ */
+
 import { Sparkles } from "lucide-react";
 import { SUMMARY_COPY } from "@/modules/summary/constants";
 import { Button } from "@/shared/components/ui/button";

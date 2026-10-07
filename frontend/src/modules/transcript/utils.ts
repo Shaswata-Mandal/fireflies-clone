@@ -1,3 +1,15 @@
+/**
+ * Pure transcript logic.
+ *
+ * WHAT: Binary search for the active segment, grouping lines by speaker, and the search and
+ *   highlight maths.
+ * LAYER: Module util (no React, no DOM; thoroughly unit-tested in utils.test.ts).
+ * CALLED BY: the transcript hooks and components, and `summary/utils.ts` (chapters reuse the
+ *   binary search).
+ * CALLS: types only.
+ * MERN EQUIVALENT: plain helper functions you would unit-test with Jest.
+ */
+
 // Pure transcript logic (no React, no DOM), unit-tested in utils.test.ts.
 
 import type {
@@ -20,12 +32,20 @@ import type {
  * and after the last one, the previous segment stays active, so the highlight doesn't flicker
  * off and on between lines. `segments` must be sorted by `start_ms` (the API guarantees it).
  */
+// INTERVIEW: the binary search, step by step. The list is sorted by `start_ms`. We keep a window
+// [low, high] that could still contain the answer and look at the middle element:
+//   - mid starts at or before the playhead -> it is a candidate; remember it, then look RIGHT for
+//     a later candidate (low = mid + 1)
+//   - mid starts after the playhead -> too far; look LEFT (high = mid - 1)
+// Each step halves the window, so 1,000 lines need about 10 checks instead of 1,000. That is why
+// it can run on every animation frame. `(low + high) >>> 1` is an integer "half" (unsigned shift).
 export function findActiveSegmentIndex(
   segments: ReadonlyArray<Pick<TranscriptSegment, "start_ms">>,
   timeMs: number,
 ): number {
   let low = 0;
   let high = segments.length - 1;
+  // -1 means "no segment has started yet".
   let found = -1;
 
   while (low <= high) {
@@ -51,6 +71,7 @@ export function groupSegmentsBySpeaker(
   const blocks: SpeakerBlockData[] = [];
 
   segments.forEach((segment, index) => {
+    // The previous block, if any. Same speaker as this segment -> extend it, else start a new one.
     const last = blocks.at(-1);
     const sameSpeaker =
       last !== undefined &&
@@ -76,10 +97,12 @@ export function groupSegmentsBySpeaker(
 // Search
 // ---------------------------------------------------------------------------
 
+// Every character that has a special meaning inside a regular expression.
 const REGEXP_SPECIAL_CHARS = /[.*+?^${}()|[\]\\]/g;
 
 /** Makes user input safe to embed in a RegExp: "(a.*)" matches those five literal characters. */
 export function escapeRegExp(value: string): string {
+  // `$&` in the replacement means "the matched character", so each one gets a backslash before it.
   return value.replace(REGEXP_SPECIAL_CHARS, "\\$&");
 }
 
@@ -95,10 +118,13 @@ export function findMatches(
   const needle = query.trim();
   if (needle === "") return [];
 
+  // Flags: g = find all matches, i = ignore case. The text is escaped first so the user's input
+  // is searched literally (typing "(" must not break the regex).
   const pattern = new RegExp(escapeRegExp(needle), "gi");
   const matches: TranscriptMatch[] = [];
 
   segments.forEach((segment, segmentIndex) => {
+    // `matchAll` yields every match with its position (`hit.index`) in the text.
     for (const hit of segment.text.matchAll(pattern)) {
       matches.push({ segmentIndex, start: hit.index, end: hit.index + hit[0].length });
     }
@@ -116,6 +142,9 @@ export function splitHighlight(
   ranges: ReadonlyArray<TextRange>,
   currentStart: number | null = null,
 ): HighlightPart[] {
+  // Walk left to right: text between matches is "plain", each match becomes a highlighted part.
+  // The result is rendered as React elements (never innerHTML), so transcript text cannot inject
+  // markup.
   const parts: HighlightPart[] = [];
   let cursor = 0;
 

@@ -1,9 +1,20 @@
+/**
+ * Accessible tab bar.
+ *
+ * WHAT: A WAI-ARIA tablist with arrow-key navigation and two visual variants.
+ * LAYER: Shared component (client: keyboard handlers and refs).
+ * CALLED BY: Settings, Team and meeting-detail panels.
+ * CALLS: `utils/tab-navigation.ts`, `cn`.
+ * MERN EQUIVALENT: a `<Tabs>` component (MUI / Reach UI), written by hand.
+ */
+
 "use client";
 
 import { Fragment, useRef, type KeyboardEvent, type ReactNode } from "react";
 import { cn } from "@/shared/utils/cn";
 import { nextTabIndex } from "@/shared/utils/tab-navigation";
 
+// `<TId extends string>`: a generic so each page's own tab-id union is type-checked end to end.
 export interface TabItem<TId extends string> {
   id: TId;
   label: string;
@@ -24,14 +35,18 @@ interface TabListProps<TId extends string> {
   className?: string;
 }
 
+/** Id of a tab button; a panel points back at it with `aria-labelledby`. */
 export function tabElementId(idPrefix: string, id: string): string {
   return `${idPrefix}-tab-${id}`;
 }
 
+/** Id of a tab's panel; the tab points at it with `aria-controls`. */
 export function tabPanelElementId(idPrefix: string, id: string): string {
   return `${idPrefix}-panel-${id}`;
 }
 
+// Tailwind class sets per look, kept as data so the JSX stays free of ternaries.
+// `as const` makes the keys exact, so `VARIANT_CLASSES[variant]` is fully typed.
 const VARIANT_CLASSES = {
   segmented: {
     list: "inline-flex max-w-full items-center gap-1 overflow-x-auto rounded-lg border bg-card p-1",
@@ -61,9 +76,12 @@ export function TabList<TId extends string>({
   variant,
   className,
 }: TabListProps<TId>) {
+  // useRef (not useState): we only need the DOM nodes to call `.focus()`; storing them must not
+  // trigger a re-render.
   const tabRefs = useRef<Array<HTMLButtonElement | null>>([]);
   const classes = VARIANT_CLASSES[variant];
 
+  // One handler on the container (event delegation) instead of one per tab.
   function handleKeyDown(event: KeyboardEvent<HTMLDivElement>) {
     const currentIndex = tabs.findIndex((tab) => tab.id === activeId);
     const nextIndex = nextTabIndex(event.key, currentIndex, tabs.length);
@@ -87,6 +105,7 @@ export function TabList<TId extends string>({
           <Fragment key={tab.id}>
             {tab.separatorBefore && <span aria-hidden="true" className={classes.separator} />}
             <button
+              // Callback ref: React calls it with the DOM element, which we store by index.
               ref={(element) => {
                 tabRefs.current[index] = element;
               }}
@@ -95,6 +114,7 @@ export function TabList<TId extends string>({
               id={tabElementId(idPrefix, tab.id)}
               aria-selected={isActive}
               aria-controls={isActive ? tabPanelElementId(idPrefix, tab.id) : undefined}
+              // Roving tabindex: only the active tab is in the Tab order; arrow keys move between.
               tabIndex={isActive ? 0 : -1}
               onClick={() => onChange(tab.id)}
               className={cn(

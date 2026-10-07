@@ -1,3 +1,12 @@
+/**
+ * Settings > Account tab.
+ *
+ * WHAT: The signed-in email and a "Delete account" card (both read-only / "Coming soon").
+ * LAYER: Module component (client).
+ * CALLED BY: `SettingsView`.
+ * CALLS: `SettingsCard`, `UserDetailsFields`, `showComingSoon`.
+ */
+
 "use client";
 
 import { SettingsCard } from "@/modules/settings/components/SettingsCard";

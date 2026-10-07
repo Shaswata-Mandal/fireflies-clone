@@ -1,3 +1,12 @@
+/**
+ * The /uploads page body.
+ *
+ * WHAT: The create-meeting form laid out full width (variant "page").
+ * LAYER: Module component (client).
+ * CALLED BY: `app/uploads/page.tsx`.
+ * CALLS: `CreateMeetingForm`.
+ */
+
 "use client";
 
 import { CreateMeetingForm } from "@/modules/meetings/components/CreateMeetingForm";

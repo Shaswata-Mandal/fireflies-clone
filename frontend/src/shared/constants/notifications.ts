@@ -1,6 +1,17 @@
+/**
+ * Mock data for the navbar notification bell.
+ *
+ * WHAT: Types and a fixed list of fake notifications.
+ * LAYER: Shared constants (stand-in for a real API).
+ * CALLED BY: `hooks/use-notifications.ts`.
+ * CALLS: nothing.
+ * MERN EQUIVALENT: a JSON fixture used before the real endpoint exists.
+ */
+
 // Mock notifications for the navbar bell. There is no notifications table or endpoint (out of scope),
 // so these live client-side only; read state resets on reload.
 
+// A string-literal union: the only four values `kind` may hold (like an enum, but erased at runtime).
 export type NotificationKind = "summary" | "action_items" | "transcript" | "upload";
 
 export interface AppNotification {

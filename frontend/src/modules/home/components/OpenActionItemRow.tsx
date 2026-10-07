@@ -1,3 +1,12 @@
+/**
+ * One open action item on Home.
+ *
+ * WHAT: Checkbox, text, a link to its meeting and the due date.
+ * LAYER: Module component (client: mutation hook).
+ * CALLED BY: `OpenActionItemsSection`.
+ * CALLS: `useToggleOpenActionItem` (optimistic), `DueDateLabel`.
+ */
+
 "use client";
 
 import Link from "next/link";

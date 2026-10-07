@@ -1,3 +1,12 @@
+/**
+ * Loading placeholder for the library.
+ *
+ * WHAT: Six grey animated cards while the first page loads.
+ * LAYER: Module component (server-safe).
+ * CALLED BY: `MeetingsView`.
+ * CALLS: shadcn `Skeleton`.
+ */
+
 import { Skeleton } from "@/shared/components/ui/skeleton";
 
 const SKELETON_ROWS = 6;

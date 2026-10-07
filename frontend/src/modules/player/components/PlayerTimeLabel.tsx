@@ -1,3 +1,13 @@
+/**
+ * "00:08 / 02:06" time text.
+ *
+ * WHAT: Shows the current and total time.
+ * LAYER: Module component (client).
+ * CALLED BY: `PlayerBar`.
+ * CALLS: `usePlayerTimeMs`, `formatTimestamp`.
+ * INTERVIEW: a tiny component of its own, so the 10 re-renders per second affect only this text.
+ */
+
 "use client";
 
 import { usePlayer, usePlayerTimeMs } from "@/modules/player/hooks";

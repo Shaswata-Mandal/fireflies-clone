@@ -1,3 +1,12 @@
+/**
+ * Summary module constants and UI copy.
+ *
+ * WHAT: Field limits (mirroring the backend), form separators, badge labels and all fixed text.
+ * LAYER: Module constants.
+ * CALLED BY: schema.ts, hooks.ts and the summary components.
+ * CALLS: types only.
+ */
+
 import type { GeneratedBy } from "@/modules/meetings/types";
 
 // Same limits as backend/app/modules/summaries/schemas.py (SUMMARY_*_MAX_*).

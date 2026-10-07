@@ -1,3 +1,14 @@
+/**
+ * Numbers for the "Smart Search" side panel.
+ *
+ * WHAT: Counts transcript segments that look like questions, metrics, prices or dates, and
+ *   computes each speaker's share of talking time.
+ * LAYER: Module util (pure; unit-tested). No AI involved: it is regex and arithmetic.
+ * CALLED BY: `SmartSearchPanel`.
+ * CALLS: transcript types only.
+ * MERN EQUIVALENT: a few `array.filter(regex.test)` and `reduce` helpers.
+ */
+
 import type { TranscriptSegment } from "@/modules/transcript/types";
 
 // Numbers for the "Smart Search" side panel (docs/reference/17). Everything is derived from data we
@@ -31,6 +42,7 @@ const PATTERNS = {
   ),
 } as const;
 
+/** Number of segments whose text matches `pattern` (segments, not occurrences). */
 function countMatching(segments: readonly TranscriptSegment[], pattern: RegExp): number {
   return segments.filter((segment) => pattern.test(segment.text)).length;
 }
@@ -85,6 +97,7 @@ export interface Talktime {
 
 /** Share of speaking time per speaker, biggest first. Empty when nobody spoke. */
 export function getSpeakerTalktime(segments: readonly TranscriptSegment[]): Talktime[] {
+  // A Map keeps insertion order and handles any string key; here: speaker -> total spoken ms.
   const msBySpeaker = new Map<string, number>();
   for (const { speaker_label, start_ms, end_ms } of segments) {
     const spoken = Math.max(0, end_ms - start_ms);
@@ -93,6 +106,7 @@ export function getSpeakerTalktime(segments: readonly TranscriptSegment[]): Talk
   const total = [...msBySpeaker.values()].reduce((sum, ms) => sum + ms, 0);
   if (total === 0) return [];
 
+  // Sorted biggest share first; on a tie the subtraction gives 0 (falsy), so `||` falls back to A-Z.
   return [...msBySpeaker]
     .map(([speaker, ms]) => ({ speaker, percent: Math.round((ms / total) * PERCENT) }))
     .sort((a, b) => b.percent - a.percent || a.speaker.localeCompare(b.speaker));

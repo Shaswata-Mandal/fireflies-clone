@@ -1,3 +1,12 @@
+/**
+ * The Home dashboard.
+ *
+ * WHAT: Greeting, stats, feed and open action items stacked in one column.
+ * LAYER: Module component (server-safe: it only arranges children).
+ * CALLED BY: `app/page.tsx`.
+ * CALLS: `HomeGreeting`, `HomeStats`, `HomeFeed`, `OpenActionItemsSection`.
+ */
+
 import { HomeFeed } from "@/modules/home/components/HomeFeed";
 import { HomeGreeting } from "@/modules/home/components/HomeGreeting";
 import { HomeStats } from "@/modules/home/components/HomeStats";

@@ -1,3 +1,13 @@
+/**
+ * Turns a failed "ask" request into a friendly inline message.
+ *
+ * WHAT: Maps backend error codes (no API key, rate limit, anything else) to text and a retry flag.
+ * LAYER: Module util (pure; unit-tested).
+ * CALLED BY: `use-ask-chat.ts`, shown by `AskErrorNotice`.
+ * CALLS: `isApiError`, `ASK_COPY`.
+ * MERN EQUIVALENT: a switch on `err.response.data.code` in a catch block.
+ */
+
 import { ASK_COPY } from "@/modules/meetings/constants";
 import { isApiError } from "@/shared/lib/api-error";
 
@@ -11,6 +21,7 @@ export interface AskErrorView {
   canRetry: boolean;
 }
 
+/** Reads `details.retry_after` safely from an `unknown` value; falls back to a default. */
 function retryAfterSeconds(details: unknown): number {
   if (typeof details === "object" && details !== null && "retry_after" in details) {
     const { retry_after: value } = details;
@@ -20,6 +31,7 @@ function retryAfterSeconds(details: unknown): number {
 }
 
 /** Turns a failed ask into the inline message the panel shows. */
+// @param error whatever the mutation rejected with; @returns the message and whether to offer Retry
 export function describeAskError(error: unknown): AskErrorView {
   if (isApiError(error) && error.code === CODE_NOT_CONFIGURED) {
     return { message: ASK_COPY.NOT_CONFIGURED, canRetry: false };

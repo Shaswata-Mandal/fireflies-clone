@@ -1,3 +1,13 @@
+/**
+ * Smart Search side panel.
+ *
+ * WHAT: Collapsible sections with counts and talk-time bars computed from the transcript and
+ *   action items. No AI call; sentiment shows "no data".
+ * LAYER: Module component (client).
+ * CALLED BY: `MeetingDetailLayout`.
+ * CALLS: `useTranscript`, `useActionItems` (shared cache), `smart-search.ts`.
+ */
+
 "use client";
 
 import { ChevronsLeft } from "lucide-react";
@@ -22,6 +32,7 @@ const SENTIMENTS = ["Positive", "Neutral", "Negative"] as const;
 const NO_DATA = "–";
 const DOT = "size-1.5 shrink-0 rounded-full bg-current";
 
+/** Grid of count tiles. A tiny inline-typed component, used only in this file. */
 function FilterTiles({ filters }: { filters: SmartFilter[] }) {
   return (
     <ul className="grid grid-cols-2 gap-3">
@@ -39,6 +50,7 @@ function FilterTiles({ filters }: { filters: SmartFilter[] }) {
   );
 }
 
+/** One progress bar per speaker; `role="meter"` plus aria-value* makes it readable by assistive tech. */
 function SpeakerBars({ talktime }: { talktime: Talktime[] }) {
   if (talktime.length === 0) return <p className="text-sm text-muted">No speaking time yet.</p>;
   return (
@@ -70,6 +82,8 @@ function SpeakerBars({ talktime }: { talktime: Talktime[] }) {
  * Counts come from the transcript and action items already cached by the other panels.
  */
 export function SmartSearchPanel({ meeting, onCollapse }: SmartSearchPanelProps) {
+  // These calls hit the TanStack cache (the transcript and action-item panels use the same keys),
+  // so the panel adds no extra requests.
   const { data: transcript } = useTranscript(meeting.id);
   const { data: actionItems } = useActionItems(meeting.id);
   const segments = transcript?.segments ?? [];

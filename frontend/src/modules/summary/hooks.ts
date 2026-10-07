@@ -1,3 +1,15 @@
+/**
+ * TanStack Query hooks for summaries.
+ *
+ * WHAT: Two mutations: regenerate the summary + chapters, and edit the summary by hand.
+ * LAYER: Module hooks layer: components -> THIS FILE -> `api.ts`.
+ * CALLED BY: `SummaryPanel`, `SummaryEditForm`.
+ * CALLS: `summary/api.ts`, `shared/constants/query-keys.ts`.
+ * INTERVIEW: there is no `useQuery` here on purpose. The summary arrives inside
+ * `GET /meetings/{id}`, so mutations write their result into THAT cache entry with
+ * `setQueryData`; every component reading the meeting updates without another request.
+ */
+
 "use client";
 
 import { useMutation, useQueryClient } from "@tanstack/react-query";
@@ -17,11 +29,14 @@ import { queryKeys } from "@/shared/constants/query-keys";
  * The response is written into the meeting cache at once; the invalidations then reconcile anything
  * else that changed (the action-items list, and the library's preview / open count).
  */
+// The mutation takes no argument (`mutationFn: () => ...`), so call it as `mutate()`.
 export function useGenerateSummary(meetingId: number) {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: () => generateSummary(meetingId, { include_action_items: true }),
     onSuccess: async ({ summary, chapters }) => {
+      // `setQueryData` with an updater function: receives the cached meeting, returns the new one
+      // (a copy with the new summary and chapters; the cache entry itself is never mutated).
       queryClient.setQueryData<MeetingDetail>(queryKeys.meetings.detail(meetingId), (meeting) =>
         meeting ? { ...meeting, summary, chapters } : meeting,
       );

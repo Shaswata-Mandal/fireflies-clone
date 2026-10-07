@@ -1,3 +1,13 @@
+/**
+ * The Action Items tab content.
+ *
+ * WHAT: Add form plus the list, with loading, error (Retry) and empty states.
+ * LAYER: Module component (client) - the "container" that owns the data.
+ * CALLED BY: `NotesTabPanel`.
+ * CALLS: `useActionItems`, `useCreateActionItem`, `ActionItemForm`, `ActionItemList`.
+ * MERN EQUIVALENT: a component that `useQuery`s a list and renders by status.
+ */
+
 "use client";
 
 import { ListChecks } from "lucide-react";
@@ -16,6 +26,7 @@ interface ActionItemsPanelProps {
 
 /** Action Items tab: add form on top, then loading / inline error with Retry / empty / list. */
 export function ActionItemsPanel({ meetingId, participants }: ActionItemsPanelProps) {
+  // The usual query flags: `isPending` (first load), `isError`, and `refetch` for the Retry button.
   const {
     data: items,
     error,

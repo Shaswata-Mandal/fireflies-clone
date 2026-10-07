@@ -1,3 +1,13 @@
+/**
+ * Top bar.
+ *
+ * WHAT: Hamburger (small screens), section title, search, Upgrade, notifications and Upload.
+ * LAYER: Shared layout component (client).
+ * CALLED BY: `AppShell`.
+ * CALLS: `NavbarSearch`, `NotificationsPopover`, `CaptureButton`, `useRouteTitle`, `useUI`.
+ * MERN EQUIVALENT: a `<Header>` / `<AppBar>` component.
+ */
+
 "use client";
 
 import { Menu } from "lucide-react";
@@ -13,6 +23,7 @@ const UPGRADE_LABEL = "Upgrade";
 
 /** Top bar (docs/reference/03): section title, search, Upgrade, bell, Capture. */
 export function Navbar() {
+  // Only the setter is needed here: this component never re-renders because of drawer state.
   const { setMobileNavOpen } = useUI();
   const title = useRouteTitle();
 

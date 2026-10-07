@@ -1,3 +1,13 @@
+/**
+ * Edit-meeting dialog.
+ *
+ * WHAT: Loads the full meeting, then shows loading / error / the form inside a dialog.
+ * LAYER: Module component (client).
+ * CALLED BY: library row actions and the meeting-detail actions menu.
+ * CALLS: `useMeeting` (fetches only while open), `EditMeetingForm`, `ErrorState`.
+ * INTERVIEW: this shows the three states every data view needs: loading, error, success.
+ */
+
 "use client";
 
 import { useState, type RefObject } from "react";
@@ -35,6 +45,8 @@ export function EditMeetingModal({
   returnFocusRef,
 }: EditMeetingModalProps) {
   const [isPending, setPending] = useState(false);
+  // `enabled = open`: do not fetch until the dialog is actually opened. Renaming `isPending` to
+  // `isLoading` avoids a clash with the local `isPending` (a save in progress) above.
   const {
     data: meeting,
     isPending: isLoading,

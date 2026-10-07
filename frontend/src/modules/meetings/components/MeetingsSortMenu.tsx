@@ -1,3 +1,12 @@
+/**
+ * Sort dropdown.
+ *
+ * WHAT: A radio-style menu over the API's four allowed sort values.
+ * LAYER: Module component (client).
+ * CALLED BY: `MeetingsToolbar`.
+ * CALLS: shadcn `DropdownMenu`, `SORT_OPTIONS`.
+ */
+
 "use client";
 
 import { ArrowUpDown } from "lucide-react";
@@ -17,6 +26,7 @@ interface MeetingsSortMenuProps {
   onChange: (sort: MeetingSort) => void;
 }
 
+// Radix gives back a plain string; this type guard narrows it to `MeetingSort` before we use it.
 function isMeetingSort(value: string): value is MeetingSort {
   return SORT_OPTIONS.some((option) => option.value === value);
 }

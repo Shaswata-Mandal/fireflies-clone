@@ -1,3 +1,14 @@
+/**
+ * Settings > Language & Appearance tab.
+ *
+ * WHAT: Light / Dark / System theme picker.
+ * LAYER: Module component (client).
+ * CALLED BY: `SettingsView`.
+ * CALLS: `useTheme` (the ThemeContext from shared).
+ * INTERVIEW: it is a real ARIA radio group (`role="radiogroup"` + `role="radio"` +
+ * `aria-checked`), because exactly one option is selected, like native radios.
+ */
+
 "use client";
 
 import { Monitor, Moon, Sun, type LucideIcon } from "lucide-react";

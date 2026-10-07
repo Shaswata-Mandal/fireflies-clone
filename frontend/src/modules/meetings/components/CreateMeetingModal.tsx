@@ -1,3 +1,13 @@
+/**
+ * Create-meeting dialog.
+ *
+ * WHAT: A Radix Dialog around `CreateMeetingForm` that cannot be dismissed mid-request.
+ * LAYER: Module component (client).
+ * CALLED BY: `CreateMeetingProvider` (rendered once for the whole app).
+ * CALLS: shadcn `Dialog`, `CreateMeetingForm`.
+ * MERN EQUIVALENT: a React-Bootstrap `<Modal>` containing a form.
+ */
+
 "use client";
 
 import { useState } from "react";
@@ -20,6 +30,7 @@ interface CreateMeetingModalProps {
  * returns it to whatever opened the dialog (the navbar Upload button or a menu item).
  */
 export function CreateMeetingModal({ open, onOpenChange }: CreateMeetingModalProps) {
+  // The form reports when a request is running, so the modal can refuse to close meanwhile.
   const [isPending, setPending] = useState(false);
 
   function handleOpenChange(next: boolean) {

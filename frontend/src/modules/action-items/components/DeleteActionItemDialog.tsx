@@ -1,3 +1,12 @@
+/**
+ * Delete-action-item confirmation.
+ *
+ * WHAT: The generic `ConfirmDialog` with action-item wording.
+ * LAYER: Module component (client).
+ * CALLED BY: `ActionItemRow`.
+ * CALLS: `ConfirmDialog`.
+ */
+
 "use client";
 
 import { ConfirmDialog } from "@/shared/components/ConfirmDialog";

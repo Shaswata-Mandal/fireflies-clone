@@ -1,3 +1,14 @@
+/**
+ * Full-page layout for Settings and Team.
+ *
+ * WHAT: A left menu (user, Personal/Team switch, grouped links) next to the content area.
+ * LAYER: Module component (client).
+ * CALLED BY: `SettingsView` and `TeamView`.
+ * CALLS: `useCurrentUser`, the nav definitions, `UserAvatar`.
+ * INTERVIEW: `AppShell` renders these routes WITHOUT the main sidebar/navbar
+ * (`isFullPageRoute`), so this shell supplies its own menu.
+ */
+
 "use client";
 
 import { ArrowLeft } from "lucide-react";
@@ -25,6 +36,7 @@ interface SettingsShellProps {
 const NAV_LINK =
   "flex h-9 items-center gap-3 rounded-md px-3 text-sm text-default hover:bg-hover focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none";
 
+/** One menu link. `aria-current="page"` tells screen readers which item is the current one. */
 function NavLink({ item, active }: { item: SettingsNavItem; active: boolean }) {
   const Icon = item.icon;
   return (
@@ -46,6 +58,7 @@ function NavLink({ item, active }: { item: SettingsNavItem; active: boolean }) {
 export function SettingsShell({ mode, activeTab, children }: SettingsShellProps) {
   const { data: user } = useCurrentUser();
   const groups = mode === "personal" ? PERSONAL_NAV : TEAM_NAV;
+  // A small helper that returns the classes of the Personal/Team switch buttons.
   const switchClass = (active: boolean) =>
     cn(
       "flex-1 rounded-md py-1.5 text-center text-sm text-secondary hover:text-primary",

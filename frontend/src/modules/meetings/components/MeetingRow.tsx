@@ -1,3 +1,15 @@
+/**
+ * One meeting card in the library.
+ *
+ * WHAT: Avatar, linked title, meta line (date, time, duration, host), preview, tags, open
+ *   action-item count, participants, and the hover action buttons.
+ * LAYER: Module component (server-safe; the interactive menu is a child client component).
+ * CALLED BY: `MeetingsList`.
+ * CALLS: `MeetingRowActions`, `ParticipantAvatarStack`, format helpers.
+ * INTERVIEW: the whole card is clickable through the "stretched link" trick (an `after:absolute
+ * after:inset-0` overlay on the title link), which keeps valid HTML and real link behaviour.
+ */
+
 import { ArrowUp, ChevronRight, ListChecks } from "lucide-react";
 import Link from "next/link";
 import { MeetingRowActions } from "@/modules/meetings/components/MeetingRowActions";
@@ -14,6 +26,8 @@ interface MeetingRowProps {
 
 // Revealed on hover/focus (screenshot 11). Kept visible while its menu or dialog is open, and
 // always visible below md where there is no hover.
+// Tailwind variants: `md:group-hover:flex` = on md+ screens, show when the parent `group` (the
+// card) is hovered; `md:has-[[data-state=open]]:flex` keeps it visible while a menu inside is open.
 const ACTIONS_CLASS =
   "relative z-10 flex md:hidden md:group-hover:flex md:group-focus-within:flex md:has-[[data-state=open]]:flex";
 const META_CLASS =

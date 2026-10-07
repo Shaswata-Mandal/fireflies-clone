@@ -1,3 +1,12 @@
+/**
+ * "Jump to where it was said" chip.
+ *
+ * WHAT: A small button that seeks the player to the action item's source moment.
+ * LAYER: Module component (client: it uses the player context).
+ * CALLED BY: `ActionItemMeta`.
+ * CALLS: `usePlayer` (the player module's context hook).
+ */
+
 "use client";
 
 import { Play } from "lucide-react";

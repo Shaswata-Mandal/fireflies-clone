@@ -1,3 +1,11 @@
+/**
+ * Home constants.
+ *
+ * WHAT: How many rows each Home list shows, and the fixed Home text.
+ * LAYER: Module constants.
+ * CALLED BY: the Home components.
+ */
+
 /** Rows shown in each Home list; "View all" links lead to the full pages. */
 export const HOME_LIST_LIMIT = 5;
 

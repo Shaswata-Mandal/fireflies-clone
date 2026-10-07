@@ -1,3 +1,13 @@
+/**
+ * Left navigation sidebar.
+ *
+ * WHAT: Renders the nav groups and footer from data, works out the active item, handles clicks.
+ * LAYER: Shared layout component (client).
+ * CALLED BY: `AppShell` (desktop) and `MobileNavDrawer` (`inDrawer`).
+ * CALLS: `SidebarHeader`, `SidebarItem`, `NAV_GROUPS`, `useUI`, `usePathname`.
+ * MERN EQUIVALENT: a `<Sidebar>` with `NavLink` items (active styling from the URL).
+ */
+
 "use client";
 
 import { Mail } from "lucide-react";
@@ -18,6 +28,7 @@ interface SidebarProps {
   inDrawer?: boolean;
 }
 
+// @param collapsed icon-only rail; @param inDrawer true when shown inside the mobile sheet
 export function Sidebar({ collapsed, inDrawer = false }: SidebarProps) {
   const pathname = usePathname();
   const {
@@ -31,6 +42,7 @@ export function Sidebar({ collapsed, inDrawer = false }: SidebarProps) {
   // A meeting page has its own AskFred tab, so the global panel must not open on top of it.
   const isMeetingPage = isMeetingDetailRoute(pathname);
 
+  // The active item comes from the URL (links) or from UI state (the AskFred toggle).
   function isActive(item: NavItem): boolean {
     if (item.action === "toggle-askfred") {
       return isMeetingPage ? meetingPanelTab === "askfred" : isAskFredOpen;
@@ -47,6 +59,7 @@ export function Sidebar({ collapsed, inDrawer = false }: SidebarProps) {
     } else if (!item.href) showComingSoon(item.label);
   }
 
+  // One renderer for both lists (main groups and footer), so they stay consistent.
   function renderItem(item: NavItem) {
     return (
       <SidebarItem
@@ -59,6 +72,8 @@ export function Sidebar({ collapsed, inDrawer = false }: SidebarProps) {
     );
   }
 
+  // Tailwind: the width switches between `w-14` (rail) and `w-58`, animated by
+  // `transition-[width]`; `mt-auto` on the footer block pushes it to the bottom of the column.
   return (
     <aside
       className={cn(

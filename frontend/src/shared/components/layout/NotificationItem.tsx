@@ -1,3 +1,13 @@
+/**
+ * One notification row.
+ *
+ * WHAT: Icon tile, title, body, time and an unread dot.
+ * LAYER: Shared layout component.
+ * CALLED BY: `NotificationList`.
+ * CALLS: `formatShortTimestamp`, `cn`.
+ * MERN EQUIVALENT: a list-item component.
+ */
+
 "use client";
 
 import { FileText, ListChecks, MessageSquareText, Upload, type LucideIcon } from "lucide-react";
@@ -5,6 +15,7 @@ import type { AppNotification, NotificationKind } from "@/shared/constants/notif
 import { formatShortTimestamp } from "@/shared/utils/format-date";
 import { cn } from "@/shared/utils/cn";
 
+// `Record<NotificationKind, LucideIcon>` = an object that must have an icon for every kind.
 const KIND_ICONS: Record<NotificationKind, LucideIcon> = {
   summary: FileText,
   action_items: ListChecks,
@@ -20,6 +31,7 @@ interface NotificationItemProps {
 /** One row of docs/reference/05: purple icon tile, title, body, time; unread rows get a dot. */
 export function NotificationItem({ notification, onSelect }: NotificationItemProps) {
   const { id, kind, title, body, created_at, is_read } = notification;
+  // Look up the component first; JSX needs a capitalised variable to render it as `<Icon />`.
   const Icon = KIND_ICONS[kind];
 
   return (

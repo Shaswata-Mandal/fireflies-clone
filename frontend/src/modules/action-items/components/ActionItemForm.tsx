@@ -1,3 +1,14 @@
+/**
+ * Add / edit form for one action item.
+ *
+ * WHAT: Text, assignee and due-date fields; the same component is used to add (blank, resets
+ *   after success) and to edit (prefilled, with Cancel / Save).
+ * LAYER: Module component (client).
+ * CALLED BY: `ActionItemsPanel` (add) and `ActionItemRow` (edit).
+ * CALLS: react-hook-form + `zodResolver`, `AssigneeSelect`.
+ * MERN EQUIVALENT: a Formik form with an inline submit.
+ */
+
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -33,6 +44,7 @@ const INPUT_CLASS =
  * <fieldset> locks every control while the request is in flight, so it can't be sent twice.
  */
 export function ActionItemForm({ participants, isPending, onSubmit, edit }: ActionItemFormProps) {
+  // `useId` makes a unique id per form instance, so several forms on a page never share ids.
   const idPrefix = useId();
   const textId = `${idPrefix}-text`;
   const {
@@ -45,6 +57,7 @@ export function ActionItemForm({ participants, isPending, onSubmit, edit }: Acti
     defaultValues: edit?.defaultValues ?? EMPTY_ACTION_ITEM_FORM,
   });
 
+  // Runs after zod passes. `onSubmit` is a prop returning a Promise; we only reset on success.
   async function submit(values: ActionItemFormOutput) {
     try {
       await onSubmit(values);
@@ -54,6 +67,7 @@ export function ActionItemForm({ participants, isPending, onSubmit, edit }: Acti
     }
   }
 
+  // The keydown bubbles up from any field to the form, so one handler covers Esc everywhere.
   function handleKeyDown(event: KeyboardEvent<HTMLFormElement>) {
     if (edit && event.key === "Escape" && !isPending) edit.onCancel();
   }

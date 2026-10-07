@@ -1,3 +1,12 @@
+/**
+ * Small badge showing who wrote the summary.
+ *
+ * WHAT: "Seed" for sample data, "AI generated" for the mock or the LLM.
+ * LAYER: Module component (server-safe).
+ * CALLED BY: `SummaryToolbar`.
+ * CALLS: `GENERATED_BY_LABEL`, `cn`.
+ */
+
 import { Database, Sparkles } from "lucide-react";
 import type { GeneratedBy } from "@/modules/meetings/types";
 import { GENERATED_BY_LABEL } from "@/modules/summary/constants";

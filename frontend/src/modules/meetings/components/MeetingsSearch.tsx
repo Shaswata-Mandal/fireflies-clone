@@ -1,3 +1,14 @@
+/**
+ * Debounced search box for the library.
+ *
+ * WHAT: An icon that expands into an input; typing updates the URL's `q` after a short pause.
+ * LAYER: Module component (client).
+ * CALLED BY: `MeetingsToolbar`.
+ * CALLS: `useDebounce`.
+ * INTERVIEW: this component keeps the typed text in local state (so typing feels instant) but
+ * the URL `q` is the source of truth; the block marked below re-syncs when `q` changes elsewhere.
+ */
+
 "use client";
 
 import { Search, X } from "lucide-react";
@@ -15,6 +26,7 @@ interface MeetingsSearchProps {
 
 /** Search icon that expands into the input from screenshot 14. Typing is debounced into `q`. */
 export function MeetingsSearch({ value, onSearch }: MeetingsSearchProps) {
+  // useRef: the DOM node of the input, to focus it programmatically (no re-render needed).
   const inputRef = useRef<HTMLInputElement>(null);
   const [text, setText] = useState(value);
   const [isOpen, setIsOpen] = useState(false);
@@ -22,12 +34,16 @@ export function MeetingsSearch({ value, onSearch }: MeetingsSearchProps) {
 
   // When `q` changes from outside (Clear filters, Back button), show it in the box. Changes that
   // came from our own debounce are skipped, so text typed since then isn't overwritten.
+  // "Adjusting state while rendering": React allows setting state during render when it is guarded
+  // by a comparison like the one below. It avoids an extra effect and an extra paint.
   const [lastValue, setLastValue] = useState(value);
   if (value !== lastValue) {
     setLastValue(value);
     if (value !== debouncedText.trim()) setText(value);
   }
 
+  // `useEffectEvent` = a function that always sees the latest props/state but is NOT a dependency
+  // of the effect below. That is why the effect can depend only on `debouncedText`.
   const commit = useEffectEvent((next: string) => {
     if (next !== value) onSearch(next);
   });
@@ -43,6 +59,7 @@ export function MeetingsSearch({ value, onSearch }: MeetingsSearchProps) {
   function open() {
     setIsOpen(true);
     // Focus after the input has rendered.
+    // `requestAnimationFrame` waits until the browser has painted the input before focusing it.
     requestAnimationFrame(() => inputRef.current?.focus());
   }
 

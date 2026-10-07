@@ -1,3 +1,12 @@
+/**
+ * Home headline and quick actions.
+ *
+ * WHAT: "Good morning, <name>" plus Upload and View-all buttons.
+ * LAYER: Module component (client: reads the user and the browser clock).
+ * CALLED BY: `HomeView`.
+ * CALLS: `useCurrentUser`, `getGreeting`.
+ */
+
 "use client";
 
 import { Upload, Video } from "lucide-react";

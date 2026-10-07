@@ -1,3 +1,12 @@
+/**
+ * Player constants.
+ *
+ * WHAT: Playback speeds, skip distances, how often time-driven UI refreshes, media file types.
+ * LAYER: Module constants.
+ * CALLED BY: the clocks, the provider, the player bar components and `utils.ts`.
+ * CALLS: nothing.
+ */
+
 /** Speed menu options, slowest first. */
 export const PLAYBACK_RATES = [0.5, 0.75, 1, 1.25, 1.5, 1.75, 2] as const;
 export const DEFAULT_PLAYBACK_RATE = 1;

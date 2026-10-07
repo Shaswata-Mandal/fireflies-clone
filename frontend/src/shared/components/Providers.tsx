@@ -1,3 +1,16 @@
+/**
+ * Client-side provider stack for the whole app.
+ *
+ * WHAT: Wraps the app in the TanStack Query cache, theme, UI state, tooltip and create-meeting
+ *   contexts, and mounts the toast container.
+ * LAYER: Shared component (client boundary).
+ * CALLED BY: `app/layout.tsx` (a server component), which renders `<Providers>{children}</Providers>`.
+ * CALLS: `lib/query-client.ts`, the context providers and react-hot-toast.
+ * MERN EQUIVALENT: the `<Provider store={store}><ThemeProvider>...` block in `index.js`.
+ * INTERVIEW: the root layout is a server component and cannot hold state or hooks, so all
+ * providers live in this one "use client" component.
+ */
+
 "use client";
 
 import { QueryClientProvider } from "@tanstack/react-query";
@@ -21,9 +34,14 @@ const TOAST_STYLE = {
   fontSize: "14px",
 } as const;
 
+/**
+ * @param children the whole page tree
+ * @returns the tree wrapped in every provider
+ */
 export function Providers({ children }: ProvidersProps) {
   // useState (not a module-level constant) gives each browser session one client that survives
   // re-renders, and never shares a cache between server requests.
+  // Passing the function (not calling it) is a lazy initialiser: it runs once, on first render.
   const [queryClient] = useState(makeQueryClient);
 
   return (

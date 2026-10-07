@@ -1,3 +1,12 @@
+/**
+ * "Hosted by me | Shared with me" buttons.
+ *
+ * WHAT: Visual-only toggle that shows a "Coming soon" toast (sharing is out of scope).
+ * LAYER: Module component (client).
+ * CALLED BY: `MeetingsToolbar`.
+ * CALLS: `showComingSoon`.
+ */
+
 "use client";
 
 import { showComingSoon } from "@/shared/utils/coming-soon";

@@ -1,3 +1,11 @@
+/**
+ * Loading placeholder for the transcript.
+ *
+ * WHAT: Five skeleton speaker blocks.
+ * LAYER: Module component (server-safe).
+ * CALLED BY: `TranscriptPanel`, `MeetingDetailSkeleton`.
+ */
+
 import { Skeleton } from "@/shared/components/ui/skeleton";
 
 const SKELETON_BLOCKS = 5;

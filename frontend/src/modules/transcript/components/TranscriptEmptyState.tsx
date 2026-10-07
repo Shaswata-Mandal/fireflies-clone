@@ -1,3 +1,11 @@
+/**
+ * Empty state for a meeting with no transcript.
+ *
+ * WHAT: Illustration plus an explanation.
+ * LAYER: Module component (server-safe).
+ * CALLED BY: `TranscriptPanel`.
+ */
+
 import { TRANSCRIPT_COPY } from "@/modules/transcript/constants";
 import { cn } from "@/shared/utils/cn";
 

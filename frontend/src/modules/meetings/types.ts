@@ -1,3 +1,15 @@
+/**
+ * TypeScript types for the meetings API.
+ *
+ * WHAT: Interfaces and unions that mirror the backend's Pydantic response/request models.
+ * LAYER: Module types (type-only file; produces no JavaScript at runtime).
+ * CALLED BY: api.ts, hooks.ts and every meetings component.
+ * CALLS: nothing.
+ * MERN EQUIVALENT: the `types.ts` / `interfaces.ts` of a TS React app (or JSDoc typedefs).
+ * INTERVIEW: field names stay snake_case exactly as the API sends them, so there is no mapping
+ * layer to maintain or get wrong. The cost: the types are kept in sync with the backend by hand.
+ */
+
 // Mirrors backend/app/modules/meetings/schemas.py and participants/schemas.py (snake_case, no mapping layer).
 
 export type MeetingPlatform = "zoom" | "google_meet" | "teams" | "upload";
@@ -43,6 +55,7 @@ export interface MeetingListItem {
   tags: Tag[];
 }
 
+// `<T>` is a generic: `Paginated<MeetingListItem>` is the same envelope for any item type.
 export interface Paginated<T> {
   items: T[];
   total: number;

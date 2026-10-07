@@ -1,3 +1,13 @@
+/**
+ * Top bar of the meeting page.
+ *
+ * WHAT: Menu button, breadcrumb back to the library, the meeting actions menu, and header buttons
+ *   (Share, copy link, upload, notifications, account).
+ * LAYER: Module component (client).
+ * CALLED BY: `MeetingDetailView` and `MeetingDetailLayout`.
+ * CALLS: `MeetingActionsMenu`, `useUI`, `useCreateMeetingModal`, shared layout pieces.
+ */
+
 "use client";
 
 import { ChevronDown, Hash, Link2, Lock, Menu, Plus } from "lucide-react";
@@ -30,6 +40,7 @@ export function MeetingNavbar({ meeting }: MeetingNavbarProps) {
   const { setMobileNavOpen } = useUI();
   const { open: openCreateMeeting } = useCreateMeetingModal();
 
+  // `async` because the clipboard API returns a Promise; the click handler wraps it in `void`.
   async function copyMeetingLink() {
     const copied = await copyToClipboard(window.location.href);
     if (copied) toast.success("Link copied");

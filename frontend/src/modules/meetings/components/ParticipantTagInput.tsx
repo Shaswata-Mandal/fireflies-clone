@@ -1,3 +1,16 @@
+/**
+ * Tag-style participant input with suggestions.
+ *
+ * WHAT: A text box where "Name" or "Name <email>" becomes a removable chip; suggests people from
+ *   other meetings.
+ * LAYER: Module component (client).
+ * CALLED BY: `MeetingCommonFields`.
+ * CALLS: `parseParticipantInput`, `addParticipant`, `useParticipants`.
+ * MERN EQUIVALENT: a "tags input" widget (like react-tagsinput).
+ * INTERVIEW: it is a controlled component: the parent owns the list (`value` / `onChange`), and
+ * this component keeps only the text being typed and UI flags.
+ */
+
 "use client";
 
 import { X } from "lucide-react";
@@ -21,6 +34,7 @@ interface ParticipantTagInputProps {
 }
 
 const MAX_SUGGESTIONS = 5;
+// Keys that turn the typed text into a chip.
 const ADD_KEYS = new Set(["Enter", ","]);
 
 /**
@@ -32,8 +46,10 @@ export function ParticipantTagInput({ id, value, onChange, disabled }: Participa
   const [text, setText] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [isFocused, setFocused] = useState(false);
+  // `data: known = []` renames `data` and defaults it to an empty list while loading.
   const { data: known = [] } = useParticipants();
 
+  // Derived values (recomputed each render): names already added, and the matching suggestions.
   const query = text.trim().toLowerCase();
   const taken = new Set(value.map(participantKey));
   const suggestions = known
@@ -61,6 +77,7 @@ export function ParticipantTagInput({ id, value, onChange, disabled }: Participa
 
   function handleKeyDown(event: KeyboardEvent<HTMLInputElement>) {
     if (ADD_KEYS.has(event.key)) {
+      // Stop Enter from submitting the surrounding form, and the comma from being typed.
       event.preventDefault();
       commitText();
     } else if (event.key === "Backspace" && !text && value.length > 0) {
@@ -111,6 +128,7 @@ export function ParticipantTagInput({ id, value, onChange, disabled }: Participa
           }}
           onKeyDown={handleKeyDown}
           onFocus={() => setFocused(true)}
+          // Leaving the field also commits what was typed, so nothing is silently lost.
           onBlur={() => {
             setFocused(false);
             commitText();

@@ -1,3 +1,13 @@
+/**
+ * Raw HTTP calls for summaries.
+ *
+ * WHAT: Generate (or regenerate) a meeting's summary and edit it by hand.
+ * LAYER: Module API layer: components -> hooks.ts -> THIS FILE -> `apiClient` -> backend.
+ * CALLED BY: `summary/hooks.ts`.
+ * CALLS: `shared/lib/api-client.ts`.
+ * MERN EQUIVALENT: axios wrappers around `POST .../generate` and `PATCH .../summary`.
+ */
+
 import type { MeetingSummary } from "@/modules/meetings/types";
 import type {
   GenerateSummaryRequest,
@@ -12,6 +22,7 @@ import { apiClient } from "@/shared/lib/api-client";
  */
 const GENERATE_TIMEOUT_MS = 60_000;
 
+/** POST /meetings/{id}/summary/generate, with a longer per-request timeout than the default. */
 export async function generateSummary(
   meetingId: number,
   body: GenerateSummaryRequest,
@@ -24,6 +35,7 @@ export async function generateSummary(
   return data;
 }
 
+/** PATCH /meetings/{id}/summary: only the fields in `body` change. */
 export async function updateSummary(
   meetingId: number,
   body: SummaryUpdate,

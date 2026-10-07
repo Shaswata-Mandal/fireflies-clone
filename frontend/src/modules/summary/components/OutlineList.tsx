@@ -1,3 +1,12 @@
+/**
+ * Outline (chapters) list.
+ *
+ * WHAT: Chapters in order; clicking one seeks the player; the playing chapter is highlighted.
+ * LAYER: Module component (client: player context + external-store hook).
+ * CALLED BY: `NotesTabPanel`.
+ * CALLS: `usePlayer`, `useActiveChapterIndex`, `OutlineItem`.
+ */
+
 "use client";
 
 import { ListTree } from "lucide-react";
@@ -13,9 +22,11 @@ interface OutlineListProps {
 
 /** Outline tab: chapters in order; click seeks, the playing chapter is highlighted. */
 export function OutlineList({ chapters }: OutlineListProps) {
+  // `seek` is a stable function from the player context, so memoised rows are not invalidated.
   const { seek } = usePlayer();
   const activeIndex = useActiveChapterIndex(chapters);
 
+  // Empty state first (a data view always needs one), then the list.
   if (chapters.length === 0) {
     return (
       <div className="flex flex-col items-center gap-3 px-6 py-16 text-center">

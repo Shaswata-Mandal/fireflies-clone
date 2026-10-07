@@ -1,3 +1,12 @@
+/**
+ * Slim tool column on the left of the meeting page.
+ *
+ * WHAT: A Smart Search toggle plus placeholder tools that show "Coming soon".
+ * LAYER: Module component (client).
+ * CALLED BY: `MeetingDetailLayout` (hidden below the `lg` breakpoint).
+ * CALLS: `IconButton`, `showComingSoon`.
+ */
+
 "use client";
 
 import { AudioLines, Bookmark, MessageCircle, Search, Smile } from "lucide-react";
