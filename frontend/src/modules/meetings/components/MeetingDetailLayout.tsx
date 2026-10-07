@@ -2,6 +2,9 @@
 
 import { useState } from "react";
 import { MeetingHeader } from "@/modules/meetings/components/MeetingHeader";
+import { MeetingNavbar } from "@/modules/meetings/components/MeetingNavbar";
+import { MeetingRail } from "@/modules/meetings/components/MeetingRail";
+import { SmartSearchPanel } from "@/modules/meetings/components/SmartSearchPanel";
 import { MeetingNotes } from "@/modules/meetings/components/MeetingNotes";
 import type { MeetingDetail } from "@/modules/meetings/types";
 import { MediaSurface } from "@/modules/player/components/MediaSurface";
@@ -22,13 +25,22 @@ interface MeetingDetailLayoutProps {
  */
 export function MeetingDetailLayout({ meeting }: MeetingDetailLayoutProps) {
   const [isVideoVisible, setVideoVisible] = useState(false);
+  const [isSearchOpen, setSearchOpen] = useState(true);
   // Same query as the panel (deduped by TanStack Query); only used to know when data is in.
   const transcript = useTranscript(meeting.id);
   useDeepLinkSeek(!transcript.isPending);
 
   return (
     <div className="flex h-full flex-col">
+      <MeetingNavbar meeting={meeting} />
       <div className="flex min-h-0 flex-1 flex-col overflow-y-auto lg:flex-row lg:overflow-hidden">
+        <MeetingRail
+          isSearchOpen={isSearchOpen}
+          onToggleSearch={() => setSearchOpen((open) => !open)}
+        />
+        {isSearchOpen && (
+          <SmartSearchPanel meeting={meeting} onCollapse={() => setSearchOpen(false)} />
+        )}
         <div className="min-w-0 flex-1 lg:overflow-y-auto">
           <div className="mx-auto flex max-w-4xl flex-col gap-8 px-4 py-8 sm:px-6 lg:px-10">
             <MediaSurface isVisible={isVideoVisible} />

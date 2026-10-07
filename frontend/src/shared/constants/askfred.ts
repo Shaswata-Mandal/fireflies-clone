@@ -1,6 +1,6 @@
 import { CircleHelp, FileText, Sparkles, SquareCheck, Target, type LucideIcon } from "lucide-react";
 
-// Prompt chips copied from the screenshots. AskFred is a UI placeholder until the bonus phase.
+// Prompt chips copied from the screenshots.
 
 export interface AskFredPrompt {
   label: string;
@@ -31,6 +31,8 @@ export const ASKFRED_PLACEHOLDERS = {
   dock: "Type / to run AI skills",
   panel: "Ask anything. Type / to run AI skills.",
 } as const;
+
+export const ASKFRED_HEADLINE = "Get ready for your meeting";
 
 /** Context chip above the panel input (docs/reference/15). */
 export const ASKFRED_CONTEXT_LABEL = "My Meetings";

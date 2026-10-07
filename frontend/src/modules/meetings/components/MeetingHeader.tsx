@@ -1,5 +1,4 @@
 import { Video, VideoOff } from "lucide-react";
-import { MeetingActionsMenu } from "@/modules/meetings/components/MeetingActionsMenu";
 import { ParticipantAvatarStack } from "@/modules/meetings/components/ParticipantAvatarStack";
 import type { MeetingDetail } from "@/modules/meetings/types";
 import { UserAvatar } from "@/shared/components/UserAvatar";
@@ -13,9 +12,8 @@ interface MeetingHeaderProps {
 }
 
 /**
- * Title row and meta line from 17: title + ⋯ menu + "Video" toggle, then host, date and time,
- * duration and participant avatars. (In Fireflies the ⋯ sits in the navbar breadcrumb; here it
- * stays next to the title so the global navbar doesn't need page data.)
+ * Title row and meta line from 17: title + "Video" toggle, then host, date and time, duration and
+ * participant avatars. The ⋯ menu lives in the navbar breadcrumb (MeetingNavbar), as in Fireflies.
  */
 export function MeetingHeader({ meeting, isVideoVisible, onToggleVideo }: MeetingHeaderProps) {
   const host =
@@ -27,7 +25,6 @@ export function MeetingHeader({ meeting, isVideoVisible, onToggleVideo }: Meetin
         <h1 className="min-w-0 flex-1 text-2xl font-medium break-words text-primary">
           {meeting.title}
         </h1>
-        <MeetingActionsMenu meetingId={meeting.id} title={meeting.title} />
         <button
           type="button"
           onClick={onToggleVideo}

@@ -1,5 +1,7 @@
 import { apiClient } from "@/shared/lib/api-client";
 import type {
+  AskBody,
+  AskResponse,
   ExportedFile,
   ExportFormat,
   MeetingDetail,
@@ -69,4 +71,15 @@ export async function updateMeeting(id: number, body: MeetingUpdateBody): Promis
 
 export async function deleteMeeting(id: number): Promise<void> {
   await apiClient.delete(`/meetings/${id}`);
+}
+
+/** Question across all of the user's meetings (home AskFred). */
+export async function askWorkspace(body: AskBody): Promise<AskResponse> {
+  const { data } = await apiClient.post<AskResponse>("/ask", body);
+  return data;
+}
+
+export async function askMeeting(id: number, body: AskBody): Promise<AskResponse> {
+  const { data } = await apiClient.post<AskResponse>(`/meetings/${id}/ask`, body);
+  return data;
 }

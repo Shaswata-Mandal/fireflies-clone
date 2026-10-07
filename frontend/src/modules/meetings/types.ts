@@ -140,3 +140,34 @@ export interface MeetingUpdateBody {
   /** When present it replaces the whole list. */
   participants?: ParticipantDraft[];
 }
+
+// ---------------------------------------------------------------------------
+// Ask (POST /meetings/{id}/ask)
+// ---------------------------------------------------------------------------
+
+export type AskRole = "user" | "assistant";
+
+/** A turn sent back as context, so follow-up questions make sense. */
+export interface AskHistoryMessage {
+  role: AskRole;
+  content: string;
+}
+
+export interface AskCitation {
+  segment_id: number;
+  start_ms: number;
+  speaker_label: string;
+  /** Only on answers from the cross-meeting `POST /ask`. */
+  meeting_id?: number;
+  meeting_title?: string;
+}
+
+export interface AskBody {
+  question: string;
+  history: AskHistoryMessage[];
+}
+
+export interface AskResponse {
+  answer: string;
+  citations: AskCitation[];
+}

@@ -6,7 +6,7 @@ import { Fragment } from "react";
 import { SidebarHeader } from "@/shared/components/layout/SidebarHeader";
 import { SidebarItem } from "@/shared/components/layout/SidebarItem";
 import { NAV_FOOTER, NAV_GROUPS, type NavItem } from "@/shared/constants/navigation";
-import { isRouteActive } from "@/shared/constants/routes";
+import { isMeetingDetailRoute, isRouteActive } from "@/shared/constants/routes";
 import { useUI } from "@/shared/context/UIContext";
 import { showComingSoon } from "@/shared/utils/coming-soon";
 import { cn } from "@/shared/utils/cn";
@@ -20,18 +20,31 @@ interface SidebarProps {
 
 export function Sidebar({ collapsed, inDrawer = false }: SidebarProps) {
   const pathname = usePathname();
-  const { toggleSidebar, setMobileNavOpen, isAskFredOpen, setAskFredOpen } = useUI();
+  const {
+    toggleSidebar,
+    setMobileNavOpen,
+    isAskFredOpen,
+    setAskFredOpen,
+    meetingPanelTab,
+    setMeetingPanelTab,
+  } = useUI();
+  // A meeting page has its own AskFred tab, so the global panel must not open on top of it.
+  const isMeetingPage = isMeetingDetailRoute(pathname);
 
   function isActive(item: NavItem): boolean {
-    if (item.action === "toggle-askfred") return isAskFredOpen;
+    if (item.action === "toggle-askfred") {
+      return isMeetingPage ? meetingPanelTab === "askfred" : isAskFredOpen;
+    }
     return item.href ? isRouteActive(pathname, item.href) : false;
   }
 
   function handleSelect(item: NavItem) {
     // Any choice closes the mobile drawer (a no-op on desktop), including re-clicking the current page.
     setMobileNavOpen(false);
-    if (item.action === "toggle-askfred") setAskFredOpen(!isAskFredOpen);
-    else if (!item.href) showComingSoon(item.label);
+    if (item.action === "toggle-askfred") {
+      if (isMeetingPage) setMeetingPanelTab("askfred");
+      else setAskFredOpen(!isAskFredOpen);
+    } else if (!item.href) showComingSoon(item.label);
   }
 
   function renderItem(item: NavItem) {

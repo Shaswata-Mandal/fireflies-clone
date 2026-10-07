@@ -1,14 +1,14 @@
 "use client";
 
-import { useState } from "react";
+import { AskMeetingPanel } from "@/modules/meetings/components/AskMeetingPanel";
 import type { ParticipantBrief } from "@/modules/meetings/types";
 import { TranscriptEmptyState } from "@/modules/transcript/components/TranscriptEmptyState";
 import { TranscriptList } from "@/modules/transcript/components/TranscriptList";
 import { TranscriptSkeleton } from "@/modules/transcript/components/TranscriptSkeleton";
 import { TRANSCRIPT_COPY } from "@/modules/transcript/constants";
 import { useTranscript } from "@/modules/transcript/hooks";
-import { ComingSoonPanel } from "@/shared/components/ComingSoonPanel";
 import { ErrorState } from "@/shared/components/ErrorState";
+import { useUI, type MeetingPanelTab } from "@/shared/context/UIContext";
 import { FredMark } from "@/shared/components/FredMark";
 import {
   TabList,
@@ -16,28 +16,25 @@ import {
   tabPanelElementId,
   type TabItem,
 } from "@/shared/components/TabList";
-import { ASKFRED_COMING_SOON } from "@/shared/constants/messages";
 
 interface TranscriptPanelProps {
   meetingId: number;
   participants: ParticipantBrief[];
 }
 
-type RightTab = "askfred" | "transcript";
-
 const ID_PREFIX = "right-panel";
 
-const TABS: ReadonlyArray<TabItem<RightTab>> = [
+const TABS: ReadonlyArray<TabItem<MeetingPanelTab>> = [
   { id: "askfred", label: "AskFred", icon: <FredMark className="size-4" /> },
   { id: "transcript", label: "Transcript" },
 ];
 
 /**
- * Right panel (≈430px in 17/19): AskFred | Transcript tabs. AskFred is a placeholder, so the panel
- * opens on Transcript. The transcript stays mounted while hidden, keeping its search and scroll.
+ * Right panel (≈430px in 17/19): AskFred | Transcript tabs; opens on AskFred (17). Both panels stay
+ * mounted while hidden, so the transcript keeps its search/scroll and the chat keeps its messages.
  */
 export function TranscriptPanel({ meetingId, participants }: TranscriptPanelProps) {
-  const [activeTab, setActiveTab] = useState<RightTab>("transcript");
+  const { meetingPanelTab: activeTab, setMeetingPanelTab: setActiveTab } = useUI();
   const { data, error, isPending, isError, refetch, isRefetching } = useTranscript(meetingId);
 
   return (
@@ -56,16 +53,15 @@ export function TranscriptPanel({ meetingId, participants }: TranscriptPanelProp
         />
       </div>
 
-      {activeTab === "askfred" && (
-        <div
-          role="tabpanel"
-          id={tabPanelElementId(ID_PREFIX, "askfred")}
-          aria-labelledby={tabElementId(ID_PREFIX, "askfred")}
-          className="overflow-y-auto"
-        >
-          <ComingSoonPanel icon={FredMark} title="AskFred" description={ASKFRED_COMING_SOON} />
-        </div>
-      )}
+      <div
+        role="tabpanel"
+        id={tabPanelElementId(ID_PREFIX, "askfred")}
+        aria-labelledby={tabElementId(ID_PREFIX, "askfred")}
+        hidden={activeTab !== "askfred"}
+        className="flex min-h-0 flex-1 flex-col"
+      >
+        <AskMeetingPanel key={meetingId} meetingId={meetingId} />
+      </div>
 
       <div
         role="tabpanel"

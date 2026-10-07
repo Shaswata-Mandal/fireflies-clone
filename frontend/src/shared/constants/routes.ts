@@ -33,6 +33,11 @@ export function isFullPageRoute(pathname: string): boolean {
   return isRouteActive(pathname, ROUTES.SETTINGS) || isRouteActive(pathname, ROUTES.TEAM);
 }
 
+/** `/meetings/12`: the page that carries its own AskFred | Transcript panel. */
+export function isMeetingDetailRoute(pathname: string): boolean {
+  return pathname.startsWith(`${ROUTES.MEETINGS}/`);
+}
+
 /** The `[id]` route segment → a positive integer id, or null for "abc", "0", "1.5"… */
 export function parseMeetingIdParam(value: string): number | null {
   if (!/^\d+$/.test(value)) return null;

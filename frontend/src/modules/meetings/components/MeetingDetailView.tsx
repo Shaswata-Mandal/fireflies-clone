@@ -2,6 +2,7 @@
 
 import { MeetingDetailLayout } from "@/modules/meetings/components/MeetingDetailLayout";
 import { MeetingDetailSkeleton } from "@/modules/meetings/components/MeetingDetailSkeleton";
+import { MeetingNavbar } from "@/modules/meetings/components/MeetingNavbar";
 import { MeetingNotFound } from "@/modules/meetings/components/MeetingNotFound";
 import { useMeeting } from "@/modules/meetings/hooks";
 import { PlayerProvider } from "@/modules/player/components/PlayerProvider";
@@ -18,19 +19,33 @@ interface MeetingDetailViewProps {
 export function MeetingDetailView({ meetingId }: MeetingDetailViewProps) {
   const { data: meeting, error, isPending, isError, refetch, isRefetching } = useMeeting(meetingId);
 
-  if (isPending) return <MeetingDetailSkeleton />;
+  if (isPending) {
+    return (
+      <>
+        <MeetingNavbar meeting={null} />
+        <MeetingDetailSkeleton />
+      </>
+    );
+  }
 
   if (isError) {
-    if (isApiError(error) && error.status === HTTP_NOT_FOUND) return <MeetingNotFound />;
+    const isNotFound = isApiError(error) && error.status === HTTP_NOT_FOUND;
     return (
-      <div className="p-6">
-        <ErrorState
-          title="Couldn't load this meeting"
-          error={error}
-          onRetry={() => void refetch()}
-          isRetrying={isRefetching}
-        />
-      </div>
+      <>
+        <MeetingNavbar meeting={null} />
+        {isNotFound ? (
+          <MeetingNotFound />
+        ) : (
+          <div className="p-6">
+            <ErrorState
+              title="Couldn't load this meeting"
+              error={error}
+              onRetry={() => void refetch()}
+              isRetrying={isRefetching}
+            />
+          </div>
+        )}
+      </>
     );
   }
 

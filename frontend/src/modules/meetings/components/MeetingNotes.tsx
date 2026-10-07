@@ -1,7 +1,7 @@
 "use client";
 
 import { NotesTabPanel } from "@/modules/meetings/components/NotesTabPanel";
-import { NOTES_TAB_CONFIG, NOTES_TABS, type NotesTabId } from "@/modules/meetings/notes-tabs";
+import { NOTES_TAB_CONFIG, type NotesTabId } from "@/modules/meetings/notes-tabs";
 import type { MeetingDetail } from "@/modules/meetings/types";
 import { useNotesTab } from "@/modules/meetings/use-notes-tab";
 import {
@@ -17,11 +17,9 @@ interface MeetingNotesProps {
 
 const ID_PREFIX = "notes";
 
-/** Divider before the first placeholder tab, separating built features from "Coming soon" ones. */
 const TABS: ReadonlyArray<TabItem<NotesTabId>> = NOTES_TAB_CONFIG.map(({ id, label }) => ({
   id,
   label,
-  separatorBefore: id === NOTES_TABS.AI_SKILLS,
 }));
 
 /**

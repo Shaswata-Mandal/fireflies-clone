@@ -8,6 +8,8 @@ import { readStorage, writeStorage } from "@/shared/utils/safe-storage";
 
 const SIDEBAR_COLLAPSED_KEY = "ui.sidebarCollapsed";
 
+export type MeetingPanelTab = "askfred" | "transcript";
+
 interface UIContextValue {
   isSidebarCollapsed: boolean;
   toggleSidebar: () => void;
@@ -15,6 +17,9 @@ interface UIContextValue {
   setMobileNavOpen: (open: boolean) => void;
   isAskFredOpen: boolean;
   setAskFredOpen: (open: boolean) => void;
+  /** Right-hand tab on a meeting page. The sidebar's AskFred button selects it there. */
+  meetingPanelTab: MeetingPanelTab;
+  setMeetingPanelTab: (tab: MeetingPanelTab) => void;
 }
 
 const UIContext = createContext<UIContextValue | null>(null);
@@ -25,6 +30,7 @@ interface UIProviderProps {
 
 export function UIProvider({ children }: UIProviderProps) {
   const [isSidebarCollapsed, setSidebarCollapsed] = useState(false);
+  const [meetingPanelTab, setMeetingPanelTab] = useState<MeetingPanelTab>("askfred");
   const [isMobileNavOpen, setMobileNavOpen] = useState(false);
   const [isAskFredOpen, setAskFredOpen] = useState(false);
 
@@ -50,8 +56,10 @@ export function UIProvider({ children }: UIProviderProps) {
       setMobileNavOpen,
       isAskFredOpen,
       setAskFredOpen,
+      meetingPanelTab,
+      setMeetingPanelTab,
     }),
-    [isSidebarCollapsed, toggleSidebar, isMobileNavOpen, isAskFredOpen],
+    [isSidebarCollapsed, toggleSidebar, isMobileNavOpen, isAskFredOpen, meetingPanelTab],
   );
 
   return <UIContext.Provider value={value}>{children}</UIContext.Provider>;

@@ -12,13 +12,25 @@ interface AskFredComposerProps {
   /** "dock": single-line bar (07). "panel": context chip + multi-line box (06 / 15). */
   variant: "dock" | "panel";
   onSend: (message: string) => void;
+  /** Panel chip text; defaults to the global "My Meetings" scope. */
+  contextLabel?: string;
+  /** Blocks sending (e.g. while an answer is loading) but keeps the text box editable. */
+  disabled?: boolean;
+  /** Max characters the box accepts; omitted = unlimited. */
+  maxLength?: number;
 }
 
 /** Message box shared by the dock and the panel. Enter sends, Shift+Enter adds a line. */
-export function AskFredComposer({ variant, onSend }: AskFredComposerProps) {
+export function AskFredComposer({
+  variant,
+  onSend,
+  contextLabel = ASKFRED_CONTEXT_LABEL,
+  disabled = false,
+  maxLength,
+}: AskFredComposerProps) {
   const [message, setMessage] = useState("");
   const isPanel = variant === "panel";
-  const canSend = message.trim().length > 0;
+  const canSend = !disabled && message.trim().length > 0;
 
   function send() {
     if (!canSend) return;
@@ -48,7 +60,7 @@ export function AskFredComposer({ variant, onSend }: AskFredComposerProps) {
       {isPanel && (
         <span className="flex w-fit items-center gap-1 rounded-md bg-hover px-2 py-1 text-sm text-default">
           <Hash className="size-3.5" aria-hidden="true" />
-          {ASKFRED_CONTEXT_LABEL}
+          {contextLabel}
         </span>
       )}
       <label className="sr-only" htmlFor={`askfred-input-${variant}`}>
@@ -60,6 +72,7 @@ export function AskFredComposer({ variant, onSend }: AskFredComposerProps) {
         onChange={(event) => setMessage(event.target.value)}
         onKeyDown={handleKeyDown}
         rows={isPanel ? 2 : 1}
+        maxLength={maxLength}
         placeholder={ASKFRED_PLACEHOLDERS[variant]}
         className="min-w-0 flex-1 resize-none bg-transparent text-sm leading-6 text-default outline-none placeholder:text-muted"
       />

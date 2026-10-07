@@ -95,3 +95,31 @@ export const FORM_COPY = {
   NO_CHANGES: "No changes to save",
   MANUAL_HINT: "Add a meeting with just a title and date. You can add a transcript later.",
 } as const;
+
+// ---------------------------------------------------------------------------
+// Ask a question about this meeting
+// ---------------------------------------------------------------------------
+
+/** Matches the backend, which only uses the last 6 messages anyway. */
+export const ASK_HISTORY_LIMIT = 6;
+export const ASK_QUESTION_MAX_LENGTH = 500;
+
+export const ASK_SUGGESTED_PROMPTS = [
+  "Summarize this meeting",
+  "What are the action items?",
+  "What decisions were made?",
+] as const;
+
+export const ASK_COPY = {
+  CONTEXT_LABEL: "This meeting",
+  GREETING_FALLBACK_NAME: "there",
+  HEADLINE: "Ask anything about this meeting",
+  YOU: "You",
+  ASSISTANT: "AskFred",
+  THINKING: "Thinking…",
+  CLEAR: "Clear chat",
+  NOT_CONFIGURED:
+    "AskFred isn't set up on this server yet. Ask the admin to add a Groq API key to enable it.",
+  RATE_LIMITED_FALLBACK_SECONDS: 60,
+  GENERIC_ERROR: "AskFred couldn't answer that. Please try again.",
+} as const;

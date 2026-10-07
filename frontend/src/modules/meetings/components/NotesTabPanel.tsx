@@ -1,4 +1,4 @@
-import { AudioLines, Bookmark, MessageSquare, Sparkles, type LucideIcon } from "lucide-react";
+import { Sparkles } from "lucide-react";
 import { ActionItemsPanel } from "@/modules/action-items/components/ActionItemsPanel";
 import { NOTES_TABS, NOTES_TAB_CONFIG, type NotesTabId } from "@/modules/meetings/notes-tabs";
 import type { MeetingDetail } from "@/modules/meetings/types";
@@ -11,33 +11,41 @@ interface NotesTabPanelProps {
   meeting: MeetingDetail;
 }
 
-/** Icons of the placeholder tabs, matching the 17 icon rail and the AI Skills sparkle (20). */
-const COMING_SOON_ICONS: Partial<Record<NotesTabId, LucideIcon>> = {
-  [NOTES_TABS.AI_SKILLS]: Sparkles,
-  [NOTES_TABS.SOUNDBITES]: AudioLines,
-  [NOTES_TABS.DISCUSSION]: MessageSquare,
-  [NOTES_TABS.BOOKMARKS]: Bookmark,
-};
+interface NotesSectionProps {
+  title: string;
+  children: React.ReactNode;
+}
+
+function NotesSection({ title, children }: NotesSectionProps) {
+  return (
+    <section className="flex flex-col gap-3">
+      <h2 className="text-base font-medium text-primary">{title}</h2>
+      {children}
+    </section>
+  );
+}
 
 /** Content of the selected notes tab. */
 export function NotesTabPanel({ tab, meeting }: NotesTabPanelProps) {
-  switch (tab) {
-    case NOTES_TABS.SUMMARY:
-      return <SummaryPanel meeting={meeting} />;
-    case NOTES_TABS.ACTION_ITEMS:
-      return <ActionItemsPanel meetingId={meeting.id} participants={meeting.participants} />;
-    case NOTES_TABS.OUTLINE:
-      return <OutlineList chapters={meeting.chapters} />;
-    default: {
-      const config = NOTES_TAB_CONFIG.find((entry) => entry.id === tab);
-      if (!config?.comingSoonDescription) return null;
-      return (
-        <ComingSoonPanel
-          icon={COMING_SOON_ICONS[tab] ?? Sparkles}
-          title={config.label}
-          description={config.comingSoonDescription}
-        />
-      );
-    }
+  if (tab === NOTES_TABS.NOTES) {
+    return (
+      <div className="flex flex-col gap-8">
+        <NotesSection title="Summary">
+          <SummaryPanel meeting={meeting} />
+        </NotesSection>
+        <NotesSection title="Action Items">
+          <ActionItemsPanel meetingId={meeting.id} participants={meeting.participants} />
+        </NotesSection>
+        <NotesSection title="Outline">
+          <OutlineList chapters={meeting.chapters} />
+        </NotesSection>
+      </div>
+    );
   }
+
+  const config = NOTES_TAB_CONFIG.find((entry) => entry.id === tab);
+  if (!config?.comingSoonDescription) return null;
+  return (
+    <ComingSoonPanel icon={Sparkles} title={config.label} description={config.comingSoonDescription} />
+  );
 }

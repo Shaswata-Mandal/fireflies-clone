@@ -1,14 +1,14 @@
 "use client";
 
 import { usePathname } from "next/navigation";
-import { useState } from "react";
 import type { ReactNode } from "react";
+import { useAskChat } from "@/modules/meetings/use-ask-chat";
 import { AskFredDock } from "@/shared/components/layout/AskFredDock";
 import { AskFredPanel } from "@/shared/components/layout/AskFredPanel";
 import { MobileNavDrawer } from "@/shared/components/layout/MobileNavDrawer";
 import { Navbar } from "@/shared/components/layout/Navbar";
 import { Sidebar } from "@/shared/components/layout/Sidebar";
-import { ROUTES, isFullPageRoute } from "@/shared/constants/routes";
+import { ROUTES, isFullPageRoute, isMeetingDetailRoute } from "@/shared/constants/routes";
 import { useUI } from "@/shared/context/UIContext";
 import { cn } from "@/shared/utils/cn";
 
@@ -23,13 +23,16 @@ interface AppShellProps {
 export function AppShell({ children }: AppShellProps) {
   const pathname = usePathname();
   const { isSidebarCollapsed, isAskFredOpen, setAskFredOpen } = useUI();
-  // Shared by dock and panel: asking from the dock opens the panel, which then shows the note.
-  const [hasAskedFred, setHasAskedFred] = useState(false);
+  // One cross-meeting conversation shared by the dock and the panel.
+  const chat = useAskChat(null);
+  const isMeetingPage = isMeetingDetailRoute(pathname);
 
   const showDock = pathname === ROUTES.HOME && !isAskFredOpen;
+  // A meeting page has its own AskFred tab, so the global panel must not open on top of it.
+  const showGlobalPanel = isAskFredOpen && !isMeetingPage;
 
-  function handleAsk() {
-    setHasAskedFred(true);
+  function handleAsk(message: string) {
+    chat.send(message);
     setAskFredOpen(true);
   }
 
@@ -46,13 +49,16 @@ export function AppShell({ children }: AppShellProps) {
         Skip to content
       </a>
 
-      <div className="hidden lg:flex">
-        <Sidebar collapsed={isSidebarCollapsed} />
-      </div>
+      {/* The meeting page has its own rail (docs/reference/17); the app menu opens from ☰. */}
+      {!isMeetingPage && (
+        <div className="hidden lg:flex">
+          <Sidebar collapsed={isSidebarCollapsed} />
+        </div>
+      )}
       <MobileNavDrawer />
 
       <div className="flex min-w-0 flex-1 flex-col">
-        <Navbar />
+        {!isMeetingPage && <Navbar />}
         <div className="relative flex min-h-0 flex-1">
           <main
             id="main-content"
@@ -61,14 +67,7 @@ export function AppShell({ children }: AppShellProps) {
             {children}
           </main>
           {showDock && <AskFredDock onAsk={handleAsk} onOpenPanel={() => setAskFredOpen(true)} />}
-          {isAskFredOpen && (
-            <AskFredPanel
-              showComingSoonNote={hasAskedFred}
-              onAsk={handleAsk}
-              onNewChat={() => setHasAskedFred(false)}
-              onClose={() => setAskFredOpen(false)}
-            />
-          )}
+          {showGlobalPanel && <AskFredPanel chat={chat} onClose={() => setAskFredOpen(false)} />}
         </div>
       </div>
     </div>

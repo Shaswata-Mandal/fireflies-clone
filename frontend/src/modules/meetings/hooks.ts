@@ -9,6 +9,8 @@ import {
 } from "@tanstack/react-query";
 import toast from "react-hot-toast";
 import {
+  askMeeting,
+  askWorkspace,
   createMeeting,
   deleteMeeting,
   exportMeeting,
@@ -20,6 +22,7 @@ import {
 } from "@/modules/meetings/api";
 import { FORM_COPY } from "@/modules/meetings/constants";
 import type {
+  AskBody,
   ExportFormat,
   MeetingCreateBody,
   MeetingList,
@@ -166,5 +169,18 @@ export function useDeleteMeeting() {
         queryClient.invalidateQueries({ queryKey: queryKeys.actionItems.all }),
       ]);
     },
+  });
+}
+
+/**
+ * Asks a question about one meeting, or across all meetings when `meetingId` is null. The panel shows failures inline (with a retry), so the global
+ * error toast is switched off for this mutation. Nothing is cached or invalidated: a chat turn is
+ * not server state.
+ */
+export function useAskMeeting(meetingId: number | null) {
+  return useMutation({
+    mutationFn: (body: AskBody) =>
+      meetingId === null ? askWorkspace(body) : askMeeting(meetingId, body),
+    meta: { suppressErrorToast: true },
   });
 }

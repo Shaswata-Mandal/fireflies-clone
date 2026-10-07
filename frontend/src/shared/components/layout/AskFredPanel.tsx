@@ -1,24 +1,24 @@
 "use client";
 
-import { Ellipsis, Info, PanelRightClose, Plus } from "lucide-react";
+import { Ellipsis, PanelRightClose, Plus } from "lucide-react";
+import { AskChatBody } from "@/modules/meetings/components/AskChatBody";
+import type { useAskChat } from "@/modules/meetings/use-ask-chat";
 import { FredMark } from "@/shared/components/FredMark";
 import { IconButton } from "@/shared/components/IconButton";
-import { AskFredComposer } from "@/shared/components/layout/AskFredComposer";
-import { AskFredEmptyState } from "@/shared/components/layout/AskFredEmptyState";
 import { AskFredHistoryPopover } from "@/shared/components/layout/AskFredHistoryPopover";
-import { ASKFRED_COMING_SOON } from "@/shared/constants/messages";
+import { ASKFRED_CONTEXT_LABEL, ASKFRED_HEADLINE, PANEL_PROMPTS } from "@/shared/constants/askfred";
 import { showComingSoon } from "@/shared/utils/coming-soon";
 
 interface AskFredPanelProps {
-  /** True once the user has sent something; chat isn't built, so we explain that instead. */
-  showComingSoonNote: boolean;
-  onAsk: (message: string) => void;
-  onNewChat: () => void;
+  /** Owned by AppShell so the dock and this panel share one conversation. */
+  chat: ReturnType<typeof useAskChat>;
   onClose: () => void;
 }
 
-/** Right-side assistant panel (docs/reference/06, 15). Full-screen overlay below the lg breakpoint. */
-export function AskFredPanel({ showComingSoonNote, onAsk, onNewChat, onClose }: AskFredPanelProps) {
+const PROMPT_LABELS = PANEL_PROMPTS.map(({ label }) => label);
+
+/** Right-side assistant panel (docs/reference/06, 15): asks across all of the user's meetings. */
+export function AskFredPanel({ chat, onClose }: AskFredPanelProps) {
   return (
     <aside
       aria-label="AskFred"
@@ -32,7 +32,7 @@ export function AskFredPanel({ showComingSoonNote, onAsk, onNewChat, onClose }: 
             <Ellipsis />
           </IconButton>
           <AskFredHistoryPopover />
-          <IconButton label="New chat" onClick={onNewChat}>
+          <IconButton label="New chat" onClick={chat.clear}>
             <Plus />
           </IconButton>
           <IconButton label="Close AskFred" onClick={onClose}>
@@ -41,22 +41,13 @@ export function AskFredPanel({ showComingSoonNote, onAsk, onNewChat, onClose }: 
         </div>
       </header>
 
-      <div className="min-h-0 flex-1 overflow-y-auto pb-6">
-        <AskFredEmptyState onPrompt={onAsk} />
-        {showComingSoonNote && (
-          <p
-            role="status"
-            className="mx-6 mt-8 flex gap-2 rounded-lg bg-primary-subtle px-4 py-3 text-sm text-default"
-          >
-            <Info className="mt-0.5 size-4 shrink-0 text-primary-fg" aria-hidden="true" />
-            {ASKFRED_COMING_SOON}
-          </p>
-        )}
-      </div>
-
-      <div className="shrink-0 p-4">
-        <AskFredComposer variant="panel" onSend={onAsk} />
-      </div>
+      <AskChatBody
+        chat={chat}
+        headline={ASKFRED_HEADLINE}
+        prompts={PROMPT_LABELS}
+        contextLabel={ASKFRED_CONTEXT_LABEL}
+        showClear={false}
+      />
     </aside>
   );
 }
