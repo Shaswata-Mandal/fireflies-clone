@@ -9,6 +9,12 @@ from app.core.config import settings
 from app.core.enums import GeneratedBy
 from app.models import ActionItem, Chapter, Participant, Summary, TranscriptSegment
 from app.modules.summaries import builder
+from app.modules.summaries.schemas import (
+    SUMMARY_KEYWORD_MAX_LENGTH,
+    SUMMARY_LINE_MAX_LENGTH,
+    SUMMARY_MAX_KEYWORDS,
+    SUMMARY_OVERVIEW_MAX_LENGTH,
+)
 from tests.helpers import OTHER_USER_ID, MakeMeeting
 
 API = "/api/v1"
@@ -248,3 +254,18 @@ def test_patch_summary_other_users_meeting_is_404(
 
     assert response.status_code == 404
     assert response.json()["error"]["code"] == "MEETING_NOT_FOUND"
+
+
+def test_patch_summary_enforces_length_limits(api: TestClient, make_meeting: MakeMeeting) -> None:
+    meeting = make_meeting(overview="Original")
+    too_long = [
+        {"overview": "x" * (SUMMARY_OVERVIEW_MAX_LENGTH + 1)},
+        {"bullet_points": ["x" * (SUMMARY_LINE_MAX_LENGTH + 1)]},
+        {"keywords": ["x" * (SUMMARY_KEYWORD_MAX_LENGTH + 1)]},
+        {"keywords": [f"k{i}" for i in range(SUMMARY_MAX_KEYWORDS + 1)]},
+    ]
+
+    for payload in too_long:
+        response = api.patch(f"{API}/meetings/{meeting.id}/summary", json=payload)
+        assert response.status_code == 422, payload
+        assert response.json()["error"]["code"] == "VALIDATION_ERROR"

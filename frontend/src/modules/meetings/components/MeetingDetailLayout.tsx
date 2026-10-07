@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { MeetingHeader } from "@/modules/meetings/components/MeetingHeader";
-import { NotesPlaceholder } from "@/modules/meetings/components/NotesPlaceholder";
+import { MeetingNotes } from "@/modules/meetings/components/MeetingNotes";
 import type { MeetingDetail } from "@/modules/meetings/types";
 import { MediaSurface } from "@/modules/player/components/MediaSurface";
 import { PlayerBar } from "@/modules/player/components/PlayerBar";
@@ -16,7 +16,7 @@ interface MeetingDetailLayoutProps {
 
 /**
  * Page shell from 17/21, inside the PlayerProvider:
- *   [centre: video (toggle) + header + notes] | [transcript ≈430px]
+ *   [centre: video (toggle) + header + notes tabs] | [transcript ≈430px]
  *   [player bar, full width]
  * Centre and transcript scroll independently; the player stays at the bottom.
  */
@@ -37,7 +37,7 @@ export function MeetingDetailLayout({ meeting }: MeetingDetailLayoutProps) {
               isVideoVisible={isVideoVisible}
               onToggleVideo={() => setVideoVisible((visible) => !visible)}
             />
-            <NotesPlaceholder />
+            <MeetingNotes meeting={meeting} />
           </div>
         </div>
         <TranscriptPanel meetingId={meeting.id} participants={meeting.participants} />

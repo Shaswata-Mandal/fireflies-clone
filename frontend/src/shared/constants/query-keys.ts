@@ -14,4 +14,10 @@ export const queryKeys = {
   participants: {
     all: ["participants"] as const,
   },
+  // Top-level, not under meetings.detail: a summary edit invalidates the meeting without refetching
+  // its action items, and a future cross-meeting "my tasks" list can live under `all` too.
+  actionItems: {
+    all: ["action-items"] as const,
+    byMeeting: (meetingId: number) => [...queryKeys.actionItems.all, "meeting", meetingId] as const,
+  },
 };

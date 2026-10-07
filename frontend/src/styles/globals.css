@@ -112,6 +112,9 @@
 /* ========================================================================== */
 
 .dark {
+  /* Native controls (date picker icon, select popup, scrollbars) follow the theme. */
+  color-scheme: dark;
+
   /* surfaces */
   --bg-page: #131314;
   --bg-card: #19191a;

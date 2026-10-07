@@ -246,3 +246,38 @@ Format: **Decision** — why — alternatives considered.
 81. **CORS `expose_headers=["Content-Disposition"]`** — cross-origin JS can't read non-safelisted headers, so the
     export filename (slugified on the server) would be invisible; the client falls back to `meeting-<id>.<format>`.
     Export is a mutation (user action, nothing to cache); the file is saved via a temporary object URL.
+82. **Notes tabs live in the column left of the transcript** — in 17/20/24–26 Fireflies has an icon rail (Smart Search,
+    Soundbite, Discussion, Bookmarks), a centre "Notes | AI Skills" toggle and a right AskFred | Transcript panel. No
+    screenshot shows a filled summary, action item or outline (colors.md §1.10), so only the empty state (copy verbatim),
+    the 17.1 skeleton and the toggle/underline styles are copied; the populated layout is designed from existing tokens.
+    One segmented tablist holds Summary · Action Items · Outline, then AI Skills · Soundbites · Discussion · Bookmarks as
+    "Coming soon" panels; the right panel gains an AskFred "Coming soon" tab (updates 80). No icon rail is built.
+83. **`?tab=` uses `router.replace`** — refines 63: arrow keys move through tabs one by one, and each step shouldn't be a
+    Back-button entry. Other params (`?t=`) are preserved; the default tab is omitted; unknown values fall back to Summary.
+84. **One generic `TabList`** (shared/components) implements the WAI-ARIA tabs pattern once (roving tabindex, ←/→/Home/End,
+    automatic activation) for both tablists; the key → index logic is a pure, tested function.
+85. **Action items have their own top-level query key** (`["action-items", "meeting", id]`), not nested under the
+    meeting detail: a summary edit invalidates the meeting without refetching action items, and the future "my tasks"
+    list can sit under `["action-items"]`.
+86. **Summary has no query of its own** — it arrives with `GET /meetings/{id}`, so the summary mutations write their
+    response into that cache entry (`setQueryData`) and then invalidate it with `exact: true` (the transcript key is
+    nested under the detail key and didn't change).
+87. **Regenerate sends `include_action_items: true`** — the server appends newly extracted items (deduped), so the
+    action-items query and the library list (open count, summary preview) are invalidated afterwards.
+88. **Optimistic toggle and delete, pessimistic add and edit** — `onMutate` cancels in-flight refetches, snapshots and
+    patches the cache; `onError` restores the snapshot; `onSettled` refetches. Each row calls its own mutation hooks,
+    so `isPending` disables only that row. Item mutations opt out of the global error toast so a 404 (deleted in
+    another tab) can say "no longer exists"; a 404 on delete keeps the item removed instead of rolling back.
+89. **Forms are strings in, API payload out** — zod schemas accept what inputs produce (`""` for "Unassigned" / no date)
+    and transform to the API shape (`null`), so clearing an assignee sends `assignee_id: null`. Summary bullets are a
+    textarea (one per line) and keywords a comma-separated input; lists are validated with `refine` so the error lands
+    on the field. A disabled `<fieldset>` locks every control while saving (no double submits).
+90. **Summary edit limits added to the backend** — `SummaryUpdate` had no max lengths; the frontend needed one, so both
+    sides now share: overview 5000, bullet 500, keyword 50, 20 keywords (docs/api.md).
+91. **"Overdue" is computed at render time** — `isOverdue(item, now)` compares the `YYYY-MM-DD` due date with the
+    viewer's local date (`now` injected for tests). Due dates are formatted in UTC so a date-only value never shifts a day.
+92. **Active chapter reuses the transcript's binary search** — "last start ≤ t" is the same rule, so
+    `findActiveChapterIndex` delegates to `findActiveSegmentIndex`, and `useActiveChapterIndex` uses the same
+    `useSyncExternalStore` index snapshot, re-rendering only when the chapter changes.
+93. **`color-scheme: dark` on `.dark`** — native controls (date picker icon, checkboxes, select popup) otherwise render
+    light-theme glyphs on dark surfaces.

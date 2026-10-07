@@ -54,8 +54,10 @@ Tick boxes as you go — this file is also Claude's progress tracker.
       click-to-seek (+ "Jump to current", empty/loading/error states)
 - [x] Transcript search: highlight, n of m, prev/next
 - [x] Vitest for pure frontend logic (`npm run test`)
-- [ ] Left panel tabs: Summary (overview, keywords chips, bullets), Action Items (add/edit/complete/
+- [x] Left panel tabs: Summary (overview, keywords chips, bullets), Action Items (add/edit/complete/
       delete, optimistic toggle, "jump to" timestamp), Outline/Chapters (click → seek)
+      (+ `?tab=` URL state, Regenerate / inline summary edit, AI Skills / Soundbites / Discussion / Bookmarks
+      and right-panel AskFred as "Coming soon" tabs)
 - [ ] Edit meeting modal (title, participants)
 - [x] `?t=ms` deep link seeks on load
 

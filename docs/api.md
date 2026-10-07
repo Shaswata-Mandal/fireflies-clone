@@ -142,6 +142,8 @@ existing ones, skipping any whose text already exists (case-insensitive, trimmed
 ### `PATCH /meetings/{id}/summary`
 `{ "overview": "...", "bullet_points": [...], "keywords": [...] }` → 200 summary (manual edits)
 All fields optional, none nullable. `generated_by` is left unchanged (there is no `manual` value). No summary yet → 404 `SUMMARY_NOT_FOUND`.
+Strings are trimmed and must be non-empty. Limits: `overview` ≤ 5000 chars, each bullet ≤ 500, each keyword ≤ 50,
+at most 20 keywords; over a limit → 422 `VALIDATION_ERROR`.
 
 ---
 
