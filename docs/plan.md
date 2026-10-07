@@ -70,7 +70,10 @@ Tick boxes as you go — this file is also Claude's progress tracker.
 - [ ] Ask about this meeting (LLM) — only if time remains
 
 ## Phase 6 — Ship (3h)
+- [x] Deployment readiness: `start.sh`, `render.yaml`, CORS from env (+ regex), `/health/db`, request logging,
+      requirements split, `scripts/smoke.py`, `docs/deployment.md`, build-time `NEXT_PUBLIC_API_URL` check
 - [ ] Deploy backend (Render/Railway): start command runs `alembic upgrade head` + seed-if-empty
+      (config ready, see `docs/deployment.md`; the actual deploy is still to do)
 - [ ] Deploy frontend (Vercel) with `NEXT_PUBLIC_API_URL`; set backend `CORS_ORIGINS`
 - [ ] README (setup, stack, architecture diagram, schema, API overview, assumptions, limitations)
 - [ ] Full click-through on deployed URLs; fix; final commit

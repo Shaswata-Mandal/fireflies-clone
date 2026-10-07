@@ -1,0 +1,55 @@
+# Render Blueprint: one web service for the FastAPI backend. The frontend is deployed on Vercel.
+# Step-by-step instructions: docs/deployment.md
+services:
+  - type: web
+    name: fireflies-clone-api
+    runtime: python
+    rootDir: backend
+    buildCommand: pip install -r requirements.txt
+    # Applies migrations, then starts uvicorn on $PORT. See backend/scripts/start.sh.
+    startCommand: sh scripts/start.sh
+    healthCheckPath: /health
+    envVars:
+      # Keep in step with backend/.python-version.
+      - key: PYTHON_VERSION
+        value: "3.12"
+      - key: ENV
+        value: production
+      - key: LOG_LEVEL
+        value: INFO
+      # Seed the demo meetings when the database is empty (every redeploy on an ephemeral disk).
+      - key: SEED_ON_STARTUP
+        value: "true"
+      # Ephemeral by default: the file is lost on each deploy/restart and re-seeded on boot.
+      # To keep data, enable the disk block below and use sqlite:////var/data/fireflies.db instead.
+      - key: DATABASE_URL
+        value: sqlite:///./fireflies.db
+      # Per-environment values you enter in the Render dashboard (never committed).
+      # CORS_ORIGINS is a JSON list, e.g. ["https://your-app.vercel.app"]
+      - key: CORS_ORIGINS
+        sync: false
+      # Optional, e.g. https://your-app-.*\.vercel\.app to allow Vercel preview deployments.
+      - key: CORS_ORIGIN_REGEX
+        sync: false
+      # Optional: leave unset to use the deterministic mock summary generator.
+      - key: LLM_API_KEY
+        sync: false
+      - key: LLM_BASE_URL
+        sync: false
+      - key: LLM_MODEL
+        sync: false
+
+    # --- Optional persistent disk (commented out) -------------------------------------------------
+    # SQLite lives in a single file. Without a disk the file is discarded whenever the service is
+    # rebuilt or restarted on a new instance, so user-created meetings vanish (the seed data is
+    # restored on boot). A disk keeps the file between deploys. Disks are only offered on some
+    # hosts/plans and may cost money: check Render's current documentation and pricing first.
+    # A service with a disk also cannot scale beyond one instance.
+    # To use it: uncomment the block, and change DATABASE_URL above to
+    #   sqlite:////var/data/fireflies.db
+    # (four slashes = absolute path; the app creates missing parent folders).
+    #
+    # disk:
+    #   name: fireflies-data
+    #   mountPath: /var/data
+    #   sizeGB: 1

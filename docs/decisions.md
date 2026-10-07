@@ -306,3 +306,25 @@ Format: **Decision** — why — alternatives considered.
     trigger on close, because the menu item that opened the dialog no longer exists.
 101. **`ConfirmDialog` is shared** — the action-item delete became a thin wrapper. It is not dismissable while pending;
     the create and edit modals use the same Esc / outside-click guard.
+102. **Migrations run on every boot, in the start script** — `alembic upgrade head` is a no-op at head, so there is no
+    "first deploy" special case, and a failing migration stops the script (`set -e`) so the deploy fails instead of
+    serving a half-migrated schema. Seeding stays inside the app lifespan (`SEED_ON_STARTUP` + empty DB) so the same
+    rule applies under `uvicorn --reload` and in tests.
+103. **Two health endpoints** — `/health` is liveness and touches nothing (the host polls it often); `/health/db`
+    runs `SELECT 1` and returns a 503 in the standard error envelope. A DB problem should not make the host restart-loop
+    a process that is otherwise fine, which is why the host's check points at `/health`.
+104. **CORS: exact list plus an optional regex** — `CORS_ORIGINS` (JSON list) for known origins, `CORS_ORIGIN_REGEX` for
+    Vercel preview URLs whose host changes per deploy. A blank env value counts as unset, so `.env.example` can list it.
+105. **SQLite parent directory is created in `database.py`** — it runs at import, before the engine and before Alembic
+    (which imports `Base` from there), so one call covers both the app and migrations on a freshly mounted `/var/data`.
+106. **Access log is a pure ASGI middleware** — `BaseHTTPMiddleware` buffers/streams the response and has known problems
+    with exceptions and background tasks; observing `http.response.start` needs neither. The request id lives in a
+    `ContextVar` so a log filter can add it to every line, including those from services. uvicorn's own access log is
+    switched off in `start.sh` to avoid logging each request twice.
+107. **`requirements.txt` is runtime only** — `requirements-dev.txt` includes it and adds pytest, httpx (TestClient),
+    ruff and black. The host installs the smaller file; CI and developers install the dev one.
+108. **Python 3.12 on the host, ruff/black target `py311`** — 3.12 is what Render is pinned to and what we develop on;
+    the lint target stays at the project's minimum supported version (3.11).
+109. **Frontend build fails without `NEXT_PUBLIC_API_URL`** — only when `NODE_ENV=production`. `next.config.ts` imports
+    `shared/lib/env.ts` so the check runs at the very start of `next build`; a silent localhost fallback would ship a
+    site that "builds fine" but cannot reach its API. Development keeps the localhost default.

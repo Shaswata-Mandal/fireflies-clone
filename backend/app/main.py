@@ -11,7 +11,9 @@ from app import models  # noqa: F401  (registers all models so cross-module rela
 from app.core.config import API_V1_PREFIX, settings
 from app.core.database import SessionLocal
 from app.core.exceptions import register_exception_handlers
+from app.core.health import router as health_router
 from app.core.logging import setup_logging
+from app.core.request_logging import RequestLoggingMiddleware
 from app.modules.action_items.router import router as action_items_router
 from app.modules.exports.router import router as exports_router
 from app.modules.meetings.router import router as meetings_router
@@ -39,9 +41,12 @@ def create_app() -> FastAPI:
 
     app = FastAPI(title="Fireflies Clone API", version="0.1.0", lifespan=lifespan)
 
+    # Added first = innermost; CORS wraps it and answers preflights itself, so those aren't logged.
+    app.add_middleware(RequestLoggingMiddleware)
     app.add_middleware(
         CORSMiddleware,
         allow_origins=settings.CORS_ORIGINS,
+        allow_origin_regex=settings.CORS_ORIGIN_REGEX,
         allow_credentials=True,
         allow_methods=["*"],
         allow_headers=["*"],
@@ -51,10 +56,7 @@ def create_app() -> FastAPI:
     )
     register_exception_handlers(app)
 
-    # Outside /api/v1 on purpose: it's for the host's health check, not the API contract.
-    @app.get("/health", tags=["health"])
-    def health() -> dict[str, str]:
-        return {"status": "ok"}
+    app.include_router(health_router)
 
     # Feature routers are included here under API_V1_PREFIX as modules are built.
     for router in (

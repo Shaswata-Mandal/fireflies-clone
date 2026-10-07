@@ -31,7 +31,13 @@ All bodies are JSON, snake_case. Datetimes are ISO 8601 UTC. In-meeting times ar
 
 ## Health
 
-`GET /health` → `{ "status": "ok" }` (not under `/api/v1`; used by the host's health check)
+`GET /health` → `{ "status": "ok" }` (not under `/api/v1`; used by the host's health check). Liveness only: no DB access.
+
+`GET /health/db` → `{ "status": "ok" }` after a `SELECT 1`; `503 DB_UNAVAILABLE` if the database cannot be read
+(readiness; used by `scripts/smoke.py`).
+
+Every response carries an `X-Request-ID` header (the client's own value is reused when sent); it also appears in the
+server's access log line.
 
 ## Current user
 

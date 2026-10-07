@@ -14,6 +14,11 @@ _TBD — fill in at the end (core + bonus checklist)._
 ## Setup
 See `CLAUDE.md` §9 for commands. _TBD: copy final steps here._
 
+## Deployment
+
+Render (backend) + Vercel (frontend): see [docs/deployment.md](docs/deployment.md). Post-deploy check:
+`python scripts/smoke.py <backend-url>`.
+
 ## Architecture
 _TBD — diagram + layer explanation._
 
