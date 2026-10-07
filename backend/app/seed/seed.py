@@ -39,8 +39,8 @@ logger = logging.getLogger(__name__)
 
 # `__file__` is this file's path, so the data folder is found whatever the working directory is.
 SEED_DATA_DIR = Path(__file__).parent / "data"
-DEFAULT_USER_NAME = "Alex Morgan"
-DEFAULT_USER_EMAIL = "alex.morgan@northwind.example"
+DEFAULT_USER_NAME = "Shaswata Mandal"
+DEFAULT_USER_EMAIL = "shaswata@scalerailabs.com"
 DEFAULT_TAG_COLOR = "#7c3aed"
 TAG_COLORS = {
     "Roadmap": "#7c3aed",

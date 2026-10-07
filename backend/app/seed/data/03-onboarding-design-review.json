@@ -1,7 +1,7 @@
 {
   "title": "Design Review: Admin-Invite Onboarding Flow",
   "meeting_date": "2026-09-29T16:30:00Z",
-  "duration_ms": 587800,
+  "duration_ms": 594300,
   "platform": "google_meet",
   "source": "seed",
   "media_url": null,
@@ -92,235 +92,235 @@
     {
       "speaker": "sam",
       "start_ms": 115900,
-      "end_ms": 120700,
+      "end_ms": 120900,
       "text": "And the checklist updates in real time when the admin connects?"
     },
     {
       "speaker": "elena",
-      "start_ms": 121900,
-      "end_ms": 139300,
+      "start_ms": 122100,
+      "end_ms": 139500,
       "text": "Yes. The moment credentials are verified, the banner turns into a message, your data is connected, switch to your real workspace, with a single button. We don't switch them automatically, because losing the dashboard they were exploring would be jarring."
     },
     {
       "speaker": "sam",
-      "start_ms": 140000,
-      "end_ms": 143500,
+      "start_ms": 140200,
+      "end_ms": 145200,
       "text": "Good call."
     },
     {
       "speaker": "elena",
-      "start_ms": 144600,
-      "end_ms": 162900,
+      "start_ms": 146300,
+      "end_ms": 164600,
       "text": "The admin's side is a single page. It shows who asked, what we'll access, how to create a read-only user for the most common databases, and a field to paste the credentials. The link is single use and expires in seventy-two hours."
     },
     {
       "speaker": "hannah",
-      "start_ms": 164500,
-      "end_ms": 182300,
+      "start_ms": 166200,
+      "end_ms": 184000,
       "text": "Okay, I'll go through the usability results. We ran six sessions last week, all people who recently signed up for a data tool, none of them familiar with Beacon. Five of six found the invite-your-admin option without help, which is great."
     },
     {
       "speaker": "hannah",
-      "start_ms": 183200,
-      "end_ms": 204100,
+      "start_ms": 184900,
+      "end_ms": 205800,
       "text": "The problem was the words. Four of the six read the phrase read-only access and weren't sure whether it meant we could change their data. Two of them said they'd need to ask their security team before sending it, which is exactly the delay we're trying to avoid."
     },
     {
       "speaker": "priya",
-      "start_ms": 205500,
-      "end_ms": 211200,
+      "start_ms": 207200,
+      "end_ms": 212900,
       "text": "That's an important finding. So the wording is the risk, not the flow."
     },
     {
       "speaker": "hannah",
-      "start_ms": 213300,
-      "end_ms": 229800,
+      "start_ms": 215000,
+      "end_ms": 231500,
       "text": "Right. When we replaced read-only access with we can only look at your data, we can never change it, all four said it was clear. So I'm recommending that copy in the email and on the admin page."
     },
     {
       "speaker": "tom",
-      "start_ms": 230600,
-      "end_ms": 243200,
+      "start_ms": 232300,
+      "end_ms": 244900,
       "text": "That matches what I hear from prospects. Their IT people want to see the exact permissions, not a reassurance. Could the admin page include the exact SQL grant statement?"
     },
     {
       "speaker": "elena",
-      "start_ms": 244400,
-      "end_ms": 253500,
+      "start_ms": 246100,
+      "end_ms": 255200,
       "text": "I can add a copy-to-clipboard block with the grant statement for Postgres, MySQL and the warehouse connectors. That's a small change."
     },
     {
       "speaker": "hannah",
-      "start_ms": 254200,
-      "end_ms": 260700,
+      "start_ms": 255900,
+      "end_ms": 262400,
       "text": "That would help a lot. Two participants said they would have felt better with that."
     },
     {
       "speaker": "sam",
-      "start_ms": 261800,
-      "end_ms": 267000,
+      "start_ms": 263500,
+      "end_ms": 268700,
       "text": "What about reminders? If the admin ignores the first email, what happens?"
     },
     {
       "speaker": "elena",
-      "start_ms": 268600,
-      "end_ms": 282100,
+      "start_ms": 270300,
+      "end_ms": 283800,
       "text": "I'm proposing a reminder after twenty-four hours and another at seventy-two hours, just before the link expires. After that the signup person gets a nudge to resend it or connect themselves."
     },
     {
       "speaker": "hannah",
-      "start_ms": 283000,
-      "end_ms": 296000,
+      "start_ms": 284700,
+      "end_ms": 297700,
       "text": "In the sessions, people said one reminder felt helpful and two felt a bit pushy. So maybe the second reminder goes to the person who invited, not to the admin."
     },
     {
       "speaker": "elena",
-      "start_ms": 297400,
-      "end_ms": 313100,
+      "start_ms": 299100,
+      "end_ms": 314800,
       "text": "Oh, that's a good distinction. First reminder to the admin at twenty-four hours. At seventy-two hours the link is about to expire, so we email the person who signed up, not the admin, offering to resend."
     },
     {
       "speaker": "priya",
-      "start_ms": 315200,
-      "end_ms": 327400,
+      "start_ms": 316900,
+      "end_ms": 329100,
       "text": "On security, I need to flag that legal will want to look at the wording about data access. Can we get sign-off before we ship? I'll take that."
     },
     {
       "speaker": "elena",
-      "start_ms": 328200,
-      "end_ms": 335200,
+      "start_ms": 329900,
+      "end_ms": 336900,
       "text": "Yes please, and the token details too. Single use, seventy-two hours, revocable from the settings page."
     },
     {
       "speaker": "priya",
-      "start_ms": 336400,
-      "end_ms": 340300,
+      "start_ms": 338100,
+      "end_ms": 343100,
       "text": "I'll bring all of that to them this week."
     },
     {
       "speaker": "tom",
-      "start_ms": 341000,
-      "end_ms": 352700,
+      "start_ms": 343800,
+      "end_ms": 355500,
       "text": "Now the sample data. For demos, I'd love different industries. Right now it's an e-commerce store, and that doesn't land with a prospect in healthcare or software."
     },
     {
       "speaker": "elena",
-      "start_ms": 353800,
-      "end_ms": 365100,
+      "start_ms": 356600,
+      "end_ms": 367900,
       "text": "For version one I'd do two datasets, e-commerce and a software subscription business, because those are most of our signups. Healthcare and logistics can come later."
     },
     {
       "speaker": "sam",
-      "start_ms": 366700,
-      "end_ms": 374100,
+      "start_ms": 369500,
+      "end_ms": 376900,
       "text": "Agreed. I looked at our signup survey and those two cover about sixty percent of new workspaces."
     },
     {
       "speaker": "elena",
-      "start_ms": 375000,
-      "end_ms": 387200,
+      "start_ms": 377800,
+      "end_ms": 390000,
       "text": "Okay, I'll write up a spec for the two datasets, what tables and what dashboards each includes, so engineering can build them. I'll have that by the thirteenth."
     },
     {
       "speaker": "sam",
-      "start_ms": 388600,
-      "end_ms": 405600,
+      "start_ms": 391400,
+      "end_ms": 408400,
       "text": "On measurement, I want to define the funnel events now so we don't retrofit them. Invite sent, invite opened by the admin, credentials submitted, connection verified, first dashboard built. Then we can see exactly where the thirty-one minutes goes."
     },
     {
       "speaker": "priya",
-      "start_ms": 407700,
-      "end_ms": 412000,
+      "start_ms": 410500,
+      "end_ms": 415500,
       "text": "What's the success metric? I'd like it to be unambiguous."
     },
     {
       "speaker": "sam",
-      "start_ms": 412800,
-      "end_ms": 425000,
+      "start_ms": 416300,
+      "end_ms": 428500,
       "text": "Median time to first dashboard. It's fifty-two minutes today. The target is under thirty, and I'd like activation at day seven to move from thirty-eight percent toward forty-five."
     },
     {
       "speaker": "priya",
-      "start_ms": 426200,
-      "end_ms": 435800,
+      "start_ms": 429700,
+      "end_ms": 439300,
       "text": "Good. And how do we roll it out? I don't want to find out we made things worse after everyone has it."
     },
     {
       "speaker": "sam",
-      "start_ms": 436500,
-      "end_ms": 449100,
+      "start_ms": 440000,
+      "end_ms": 452600,
       "text": "I'd put it behind a flag at fifty percent of new signups, and compare the two groups for three weeks. We get enough signups for that to be meaningful."
     },
     {
       "speaker": "tom",
-      "start_ms": 450200,
-      "end_ms": 461500,
+      "start_ms": 453700,
+      "end_ms": 465000,
       "text": "Can I get a handful of design partners? I could ask three or four prospects to try it with their IT teams before the public rollout."
     },
     {
       "speaker": "elena",
-      "start_ms": 463100,
-      "end_ms": 470900,
+      "start_ms": 466600,
+      "end_ms": 474400,
       "text": "That would be amazing for feedback. Tom, can you send me three or four contacts who'd be willing?"
     },
     {
       "speaker": "tom",
-      "start_ms": 471800,
-      "end_ms": 475300,
+      "start_ms": 475300,
+      "end_ms": 480300,
       "text": "Yes, I'll send those by next Thursday."
     },
     {
       "speaker": "priya",
-      "start_ms": 476700,
-      "end_ms": 507100,
+      "start_ms": 481700,
+      "end_ms": 512100,
       "text": "Let me recap the decisions. We're going with the new copy, we can only look at your data, we can never change it. The admin page includes the grant statements. Reminders at twenty-four hours to the admin, and at seventy-two hours to the person who signed up. Two sample datasets for version one. And we roll it out to half of new signups behind a flag. Did I miss anything?"
     },
     {
       "speaker": "elena",
-      "start_ms": 509200,
-      "end_ms": 520500,
+      "start_ms": 514200,
+      "end_ms": 525500,
       "text": "No, that's it. One more open question is whether to offer a Slack option for the invite, in addition to email. Some teams live in Slack."
     },
     {
       "speaker": "hannah",
-      "start_ms": 521300,
-      "end_ms": 532600,
+      "start_ms": 526300,
+      "end_ms": 537600,
       "text": "Two of my six participants said they'd rather ask in Slack. But it adds a lot of surface area, so I'd say not for version one."
     },
     {
       "speaker": "priya",
-      "start_ms": 533800,
-      "end_ms": 539000,
+      "start_ms": 538800,
+      "end_ms": 544000,
       "text": "Agreed, not version one. Let's park it as a question for later."
     },
     {
       "speaker": "hannah",
-      "start_ms": 539700,
-      "end_ms": 552700,
+      "start_ms": 544700,
+      "end_ms": 557700,
       "text": "I'd like to run a second round of tests with the revised copy before we ship. Five sessions, same recruiting. I can have results by Friday the ninth of October."
     },
     {
       "speaker": "elena",
-      "start_ms": 553800,
-      "end_ms": 565100,
+      "start_ms": 558800,
+      "end_ms": 570100,
       "text": "Perfect. I'll update the copy on the credential request page by Friday so you can test it. I'll post the new mocks in the design channel."
     },
     {
       "speaker": "sam",
-      "start_ms": 566700,
-      "end_ms": 576300,
+      "start_ms": 571700,
+      "end_ms": 581300,
       "text": "And I'll write up the event definitions and a dashboard for the funnel by Monday, so engineering can instrument as they build."
     },
     {
       "speaker": "priya",
-      "start_ms": 577200,
-      "end_ms": 582900,
+      "start_ms": 582200,
+      "end_ms": 587900,
       "text": "Great, thanks all. This is in much better shape than the first draft."
     },
     {
       "speaker": "elena",
-      "start_ms": 584300,
-      "end_ms": 587800,
+      "start_ms": 589300,
+      "end_ms": 594300,
       "text": "Thanks everyone. That was really productive."
     }
   ],
@@ -352,19 +352,19 @@
     },
     {
       "title": "Usability findings",
-      "start_ms": 164500
+      "start_ms": 166200
     },
     {
       "title": "Reminders, security and sample data",
-      "start_ms": 261800
+      "start_ms": 263500
     },
     {
       "title": "Metrics and rollout",
-      "start_ms": 388600
+      "start_ms": 391400
     },
     {
       "title": "Decisions and next steps",
-      "start_ms": 476700
+      "start_ms": 481700
     }
   ],
   "action_items": [

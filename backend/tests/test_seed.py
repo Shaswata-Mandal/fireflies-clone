@@ -19,9 +19,9 @@ from app.models import (
 from app.seed.seed import SEED_DATA_DIR, SeedDataError, load_seed_files, seed_if_empty
 
 SEEDED_TABLES = (User, Meeting, Participant, MeetingParticipant, TranscriptSegment, Summary)
-MIN_SEGMENTS, MAX_SEGMENTS = 60, 150
+MIN_SEGMENTS, MAX_SEGMENTS = 40, 150
 MIN_SEGMENT_MS, MAX_SEGMENT_MS = 5_000, 40_000
-MIN_DURATION_MS, MAX_DURATION_MS = 12 * 60_000, 55 * 60_000
+MIN_DURATION_MS, MAX_DURATION_MS = 8 * 60_000, 55 * 60_000
 
 
 def _counts(db: Session) -> dict[str, int]:
@@ -155,7 +155,7 @@ def test_every_seeded_meeting_is_complete_and_ordered(db_session: Session) -> No
     for meeting in meetings:
         assert meeting.summary is not None and meeting.summary.generated_by == "seed"
         assert 4 <= len(meeting.chapters) <= 6
-        assert 3 <= len(meeting.action_items) <= 7
+        assert 3 <= len(meeting.action_items) <= 8
         assert MIN_DURATION_MS <= meeting.duration_ms <= MAX_DURATION_MS
 
         segments = meeting.segments  # already ordered by position

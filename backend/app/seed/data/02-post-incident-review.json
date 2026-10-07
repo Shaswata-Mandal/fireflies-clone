@@ -1,7 +1,7 @@
 {
   "title": "Post-Incident Review: Dashboard Degradation of Sept 9",
   "meeting_date": "2026-09-16T14:00:00Z",
-  "duration_ms": 669900,
+  "duration_ms": 676600,
   "platform": "zoom",
   "source": "seed",
   "media_url": null,
@@ -140,229 +140,229 @@
     {
       "speaker": "sam",
       "start_ms": 226300,
-      "end_ms": 229800,
+      "end_ms": 231300,
       "text": "How did we eventually recover?"
     },
     {
       "speaker": "nadia",
-      "start_ms": 231000,
-      "end_ms": 250600,
+      "start_ms": 232500,
+      "end_ms": 252100,
       "text": "Two things. At fourteen-forty-one we rolled back the deploy, but that alone didn't help because the cache was still full of synchronized keys. At fourteen-fifty-one Diego flushed the cache manually and staggered the warm-up, and that's what finally stopped it. Full recovery was at fourteen-fifty-nine."
     },
     {
       "speaker": "marcus",
-      "start_ms": 251300,
-      "end_ms": 255200,
+      "start_ms": 252800,
+      "end_ms": 257800,
       "text": "So forty-seven minutes from first symptom to full recovery."
     },
     {
       "speaker": "diego",
-      "start_ms": 256300,
-      "end_ms": 267200,
+      "start_ms": 258900,
+      "end_ms": 269800,
       "text": "Forty-seven, yeah. And I'll own that the rollback was the wrong first move. We spent nineteen minutes on it before anyone looked at the cache."
     },
     {
       "speaker": "marcus",
-      "start_ms": 268800,
-      "end_ms": 283100,
+      "start_ms": 271400,
+      "end_ms": 285700,
       "text": "I'd push back on that framing, Diego. Based on what we knew at fourteen-twenty, rolling back was the standard play. Our runbook says roll back first. The runbook is what needs to change."
     },
     {
       "speaker": "nadia",
-      "start_ms": 284000,
-      "end_ms": 290500,
+      "start_ms": 286600,
+      "end_ms": 293100,
       "text": "Agreed. There's nothing in the runbook about cache behavior. I'll add a section on it."
     },
     {
       "speaker": "priya",
-      "start_ms": 291900,
-      "end_ms": 303600,
+      "start_ms": 294500,
+      "end_ms": 306200,
       "text": "Okay, can we talk about detection? Because from where I sat, I heard about this from Tom, who heard it from a customer, not from an alert."
     },
     {
       "speaker": "nadia",
-      "start_ms": 305700,
-      "end_ms": 321400,
+      "start_ms": 308300,
+      "end_ms": 324000,
       "text": "That one's on the alerting setup. The p95 latency alert did fire, at fourteen-fourteen. But it was routed to the old alerts channel from before the team reorganization, so nobody was paged. I found it afterwards."
     },
     {
       "speaker": "marcus",
-      "start_ms": 322200,
-      "end_ms": 326100,
+      "start_ms": 324800,
+      "end_ms": 329800,
       "text": "So the first human to notice was in support."
     },
     {
       "speaker": "sam",
-      "start_ms": 327300,
-      "end_ms": 333800,
+      "start_ms": 331000,
+      "end_ms": 337500,
       "text": "Yeah. Our first support ticket came in at fourteen-nineteen, and it got escalated at fourteen-twenty-two."
     },
     {
       "speaker": "priya",
-      "start_ms": 334500,
-      "end_ms": 341000,
+      "start_ms": 338200,
+      "end_ms": 344700,
       "text": "And the status page. I checked at fourteen-thirty and it still said everything was operational."
     },
     {
       "speaker": "nadia",
-      "start_ms": 342100,
-      "end_ms": 355600,
+      "start_ms": 345800,
+      "end_ms": 359300,
       "text": "We posted at fourteen-thirty-six, which was twenty-two minutes after the alert should have fired. Posting is manual, and the person who can do it was in the incident call, heads down."
     },
     {
       "speaker": "priya",
-      "start_ms": 357200,
-      "end_ms": 373300,
+      "start_ms": 360900,
+      "end_ms": 377000,
       "text": "So I'd propose that the status page goes up automatically when the latency alert has been firing for five minutes, with a generic message, and a human edits it afterwards. A wrong-but-early message beats a late one."
     },
     {
       "speaker": "marcus",
-      "start_ms": 374200,
-      "end_ms": 377700,
+      "start_ms": 377900,
+      "end_ms": 382900,
       "text": "I like that. Nadia, is that doable?"
     },
     {
       "speaker": "nadia",
-      "start_ms": 379100,
-      "end_ms": 392100,
+      "start_ms": 384300,
+      "end_ms": 397300,
       "text": "Our status page has an API, so yes. Two or three days of work, mostly writing the message templates. I can have it done before the end of next week."
     },
     {
       "speaker": "priya",
-      "start_ms": 394200,
-      "end_ms": 410300,
+      "start_ms": 399400,
+      "end_ms": 415500,
       "text": "Great. And for the customer summary, I'm going to write it tomorrow and send it to the admins of the affected workspaces. Can I have a sentence on the cause and the fix that I can quote?"
     },
     {
       "speaker": "diego",
-      "start_ms": 411100,
-      "end_ms": 416800,
+      "start_ms": 416300,
+      "end_ms": 422000,
       "text": "I'll write you two sentences in plain English after this call. No jargon."
     },
     {
       "speaker": "sam",
-      "start_ms": 418000,
-      "end_ms": 428000,
+      "start_ms": 423200,
+      "end_ms": 433200,
       "text": "One question on impact. Do we want to offer credits? Eleven hundred workspaces, but most were degraded for a few minutes, not down."
     },
     {
       "speaker": "priya",
-      "start_ms": 428700,
-      "end_ms": 437800,
+      "start_ms": 433900,
+      "end_ms": 443000,
       "text": "I'd say no blanket credits. Anyone on an enterprise plan with an SLA, I'll check individually. Tom is pulling that list."
     },
     {
       "speaker": "marcus",
-      "start_ms": 438900,
-      "end_ms": 445000,
+      "start_ms": 444100,
+      "end_ms": 450200,
       "text": "That makes sense. Let's move to what went well, because there was a lot."
     },
     {
       "speaker": "nadia",
-      "start_ms": 446600,
-      "end_ms": 455300,
+      "start_ms": 451800,
+      "end_ms": 460500,
       "text": "The incident channel worked. We had an incident commander within about six minutes of escalation, and updates every ten minutes."
     },
     {
       "speaker": "diego",
-      "start_ms": 456200,
-      "end_ms": 468800,
+      "start_ms": 461400,
+      "end_ms": 474000,
       "text": "And the feature flag for batching meant we could have disabled it in seconds, if we'd realized sooner that was the right lever. Next time that's a faster option."
     },
     {
       "speaker": "sam",
-      "start_ms": 470200,
-      "end_ms": 478900,
+      "start_ms": 475400,
+      "end_ms": 484100,
       "text": "Support also did a great job. They used the same holding message for every ticket, so customers got consistent answers."
     },
     {
       "speaker": "marcus",
-      "start_ms": 481000,
-      "end_ms": 486200,
+      "start_ms": 486200,
+      "end_ms": 491400,
       "text": "Good. Okay, let's turn this into actions. Diego, the cache fixes first."
     },
     {
       "speaker": "diego",
-      "start_ms": 487000,
-      "end_ms": 510500,
+      "start_ms": 492200,
+      "end_ms": 515700,
       "text": "So the cache fix is two parts. One, add random jitter of about twenty percent to every expiry time so keys can't line up. Two, single-flight coalescing, where if a hundred requests need the same missing key, only one recomputes and the rest wait for it. I can have both done by next Wednesday."
     },
     {
       "speaker": "marcus",
-      "start_ms": 511700,
-      "end_ms": 528700,
+      "start_ms": 516900,
+      "end_ms": 533900,
       "text": "Good. And the pool problem. Separate from the cache, a heavy query shouldn't be able to starve the health check. I'd like a dedicated small pool for health checks, and a concurrency limit per workspace for the aggregate queries."
     },
     {
       "speaker": "diego",
-      "start_ms": 529400,
-      "end_ms": 540300,
+      "start_ms": 534600,
+      "end_ms": 545500,
       "text": "That's more work than the cache fix. A week, maybe more, because the limit needs a sensible default and a bypass for our biggest customers."
     },
     {
       "speaker": "marcus",
-      "start_ms": 541400,
-      "end_ms": 549200,
+      "start_ms": 546600,
+      "end_ms": 554400,
       "text": "I'll take that one myself and scope it. I'll have it done by the end of the month."
     },
     {
       "speaker": "nadia",
-      "start_ms": 550800,
-      "end_ms": 564300,
+      "start_ms": 556000,
+      "end_ms": 569500,
       "text": "For the alerting, I fixed the routing for the p95 alert already. I'll double check the other six alerts that point to the old channel, and I'll report back by Friday."
     },
     {
       "speaker": "priya",
-      "start_ms": 565200,
-      "end_ms": 572600,
+      "start_ms": 570400,
+      "end_ms": 577800,
       "text": "I'll send the customer summary by end of day tomorrow, after Diego sends me his two sentences."
     },
     {
       "speaker": "diego",
-      "start_ms": 574000,
-      "end_ms": 589700,
+      "start_ms": 579200,
+      "end_ms": 594900,
       "text": "And I want to add a load test to the release checklist, specifically for the case where lots of cache keys expire at the same moment. We'd have caught this in staging if we'd tried it."
     },
     {
       "speaker": "marcus",
-      "start_ms": 591800,
-      "end_ms": 606100,
+      "start_ms": 597000,
+      "end_ms": 611300,
       "text": "Yes, please. Let's make it a required step for any change that touches the cache layer. And let's put a date on it so it doesn't drift. Is the ninth of October reasonable?"
     },
     {
       "speaker": "diego",
-      "start_ms": 606900,
-      "end_ms": 610400,
+      "start_ms": 612100,
+      "end_ms": 617100,
       "text": "The ninth of October works."
     },
     {
       "speaker": "sam",
-      "start_ms": 611600,
-      "end_ms": 623800,
+      "start_ms": 618300,
+      "end_ms": 630500,
       "text": "One open question I'd like on the list. Should we put a read replica behind the dashboard queries? It would take pressure off the primary regardless of caching."
     },
     {
       "speaker": "marcus",
-      "start_ms": 624500,
-      "end_ms": 640200,
+      "start_ms": 631200,
+      "end_ms": 646900,
       "text": "It's a good question, but it's a bigger decision with a real cost, so let's not decide it today. I'll put it on the list unassigned, and we can revisit it at the next architecture review."
     },
     {
       "speaker": "nadia",
-      "start_ms": 641300,
-      "end_ms": 655200,
+      "start_ms": 648000,
+      "end_ms": 661900,
       "text": "Can I ask that we do a short follow-up in two weeks to check that all of these actually landed? Last time we had a review and half the actions went quiet."
     },
     {
       "speaker": "marcus",
-      "start_ms": 656800,
-      "end_ms": 663300,
+      "start_ms": 663500,
+      "end_ms": 670000,
       "text": "Yes, I'll book it. Fifteen minutes, September thirtieth. Thanks, everyone, this was a good conversation."
     },
     {
       "speaker": "priya",
-      "start_ms": 664200,
-      "end_ms": 669900,
+      "start_ms": 670900,
+      "end_ms": 676600,
       "text": "Thanks, all. Very helpful. I feel much better about what I'm telling customers."
     }
   ],
@@ -402,15 +402,15 @@
     },
     {
       "title": "Detection and communication gaps",
-      "start_ms": 291900
+      "start_ms": 294500
     },
     {
       "title": "What went well",
-      "start_ms": 438900
+      "start_ms": 444100
     },
     {
       "title": "Action items and follow-ups",
-      "start_ms": 481000
+      "start_ms": 486200
     }
   ],
   "action_items": [
@@ -439,7 +439,7 @@
       "text": "Automate a generic status page post when the p95 latency alert fires for five minutes",
       "assignee": "nadia",
       "due_date": "2026-09-25",
-      "is_completed": true,
+      "is_completed": false,
       "source_segment": 29
     },
     {

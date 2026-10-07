@@ -1,7 +1,7 @@
 {
   "title": "Lumen Retail: Quarterly Business Review",
   "meeting_date": "2026-10-05T10:00:00Z",
-  "duration_ms": 566300,
+  "duration_ms": 574700,
   "platform": "zoom",
   "source": "seed",
   "media_url": null,
@@ -115,217 +115,217 @@
     {
       "speaker": "owen",
       "start_ms": 163500,
-      "end_ms": 168300,
+      "end_ms": 168500,
       "text": "Since the fourteenth of September, yes. Zero failures for three Mondays."
     },
     {
       "speaker": "tom",
-      "start_ms": 169700,
-      "end_ms": 181900,
+      "start_ms": 169900,
+      "end_ms": 182100,
       "text": "Good. And Owen, a technical tip: if you add jitter to the retries, you'll be safer even if we're ever under load. I can send you an example."
     },
     {
       "speaker": "owen",
-      "start_ms": 184000,
-      "end_ms": 188300,
+      "start_ms": 184200,
+      "end_ms": 189200,
       "text": "Yes, please. That's actually a smart thing to do regardless."
     },
     {
       "speaker": "rachel",
-      "start_ms": 189100,
-      "end_ms": 200800,
+      "start_ms": 190000,
+      "end_ms": 201700,
       "text": "The other issue is dashboard speed. The sales dashboard has fourteen widgets, and when the whole team opens it at nine in the morning, it takes ages."
     },
     {
       "speaker": "jade",
-      "start_ms": 202000,
-      "end_ms": 212900,
+      "start_ms": 202900,
+      "end_ms": 213800,
       "text": "That's one we've seen across customers. Engineering shipped a fix in September, which batches the queries and caches the results. Have you noticed a difference?"
     },
     {
       "speaker": "owen",
-      "start_ms": 213600,
-      "end_ms": 222700,
+      "start_ms": 214500,
+      "end_ms": 223600,
       "text": "Definitely. It used to take about six seconds, it's about two now. There was one bad day in early September, though."
     },
     {
       "speaker": "jade",
-      "start_ms": 223800,
-      "end_ms": 236000,
+      "start_ms": 224700,
+      "end_ms": 236900,
       "text": "Yes, that was the incident on the ninth. We published a summary, and the cause was fixed the following week. I'll make sure you have the written version."
     },
     {
       "speaker": "rachel",
-      "start_ms": 237600,
-      "end_ms": 243700,
+      "start_ms": 238500,
+      "end_ms": 244600,
       "text": "I did get it. It was clear. I appreciated that it didn't make excuses."
     },
     {
       "speaker": "jade",
-      "start_ms": 244600,
-      "end_ms": 248100,
+      "start_ms": 245500,
+      "end_ms": 250500,
       "text": "Thank you. Okay, roadmap."
     },
     {
       "speaker": "tom",
-      "start_ms": 249500,
-      "end_ms": 262500,
+      "start_ms": 251900,
+      "end_ms": 264900,
       "text": "So, here's what's coming in the next quarter. First, SAML single sign-on, targeted for the end of October. I know Lumen uses Okta, and I believe you asked about this."
     },
     {
       "speaker": "rachel",
-      "start_ms": 264600,
-      "end_ms": 272400,
+      "start_ms": 267000,
+      "end_ms": 274800,
       "text": "We did. Our IT team would honestly make it a condition for the renewal if it wasn't coming."
     },
     {
       "speaker": "tom",
-      "start_ms": 273200,
-      "end_ms": 282300,
+      "start_ms": 275600,
+      "end_ms": 284700,
       "text": "Then good news. It's committed, and we'd love to have your IT team pilot it. Would they be open to that?"
     },
     {
       "speaker": "rachel",
-      "start_ms": 283500,
-      "end_ms": 292600,
+      "start_ms": 285900,
+      "end_ms": 295000,
       "text": "I think so. I'll ask them, but I can't promise anything yet. Let's leave it as an open question for now."
     },
     {
       "speaker": "owen",
-      "start_ms": 293300,
-      "end_ms": 300300,
+      "start_ms": 295700,
+      "end_ms": 302700,
       "text": "What about background exports? I know you mentioned it. That would solve our Monday problem permanently."
     },
     {
       "speaker": "tom",
-      "start_ms": 301400,
-      "end_ms": 323100,
+      "start_ms": 303800,
+      "end_ms": 325500,
       "text": "It's in the backlog, not committed for this quarter, because only a handful of customers need it. But your use case is exactly the evidence we need. If I can show them the volume you run, I think it moves up. Could you send me your export schedule and sizes?"
     },
     {
       "speaker": "owen",
-      "start_ms": 324700,
-      "end_ms": 329900,
+      "start_ms": 327100,
+      "end_ms": 332300,
       "text": "Sure, I can pull that together. By the end of this week?"
     },
     {
       "speaker": "tom",
-      "start_ms": 330800,
-      "end_ms": 339500,
+      "start_ms": 333200,
+      "end_ms": 341900,
       "text": "That would be perfect. And I'll ask product whether we can offer you early access if it makes the plan."
     },
     {
       "speaker": "jade",
-      "start_ms": 340900,
-      "end_ms": 354400,
+      "start_ms": 343300,
+      "end_ms": 356800,
       "text": "One more item, a new feature. Dashboards now show a small 'updated forty seconds ago' label with a refresh button, since results are cached. How has that landed with your users?"
     },
     {
       "speaker": "rachel",
-      "start_ms": 356500,
-      "end_ms": 365200,
+      "start_ms": 358900,
+      "end_ms": 367600,
       "text": "Honestly, it's been good. One person was confused at first, but now they use refresh when they need live numbers."
     },
     {
       "speaker": "jade",
-      "start_ms": 366000,
-      "end_ms": 369500,
+      "start_ms": 368400,
+      "end_ms": 373400,
       "text": "Great. Okay, the renewal."
     },
     {
       "speaker": "tom",
-      "start_ms": 370700,
-      "end_ms": 383300,
+      "start_ms": 374600,
+      "end_ms": 387200,
       "text": "So your contract ends on December thirty-first. I'd like to start the conversation early so there's no scramble in December. Rachel, what's most important to you for the renewal?"
     },
     {
       "speaker": "rachel",
-      "start_ms": 384000,
-      "end_ms": 394900,
+      "start_ms": 387900,
+      "end_ms": 398800,
       "text": "Price predictability, mainly. We're growing, and I need to tell our CFO what to expect for the next two years. And, as I said, SSO."
     },
     {
       "speaker": "tom",
-      "start_ms": 396000,
-      "end_ms": 415600,
+      "start_ms": 399900,
+      "end_ms": 419500,
       "text": "Understood. So, the Growth tier moves from forty-nine to fifty-nine dollars per seat in November, and that includes SSO and the higher rate limit. Existing customers are held at their current price until renewal. On renewal there's a twenty percent discount if you pay annually."
     },
     {
       "speaker": "rachel",
-      "start_ms": 417200,
-      "end_ms": 422900,
+      "start_ms": 421100,
+      "end_ms": 426800,
       "text": "So if we renew in December, we'd be at fifty-nine, minus the discount?"
     },
     {
       "speaker": "tom",
-      "start_ms": 423800,
-      "end_ms": 439500,
+      "start_ms": 427700,
+      "end_ms": 443400,
       "text": "Right, but what I want to explore is a twenty-four month agreement with the price locked for the whole term. That would give your CFO the predictability, and it's something I can bring to my team."
     },
     {
       "speaker": "rachel",
-      "start_ms": 440900,
-      "end_ms": 452200,
+      "start_ms": 444800,
+      "end_ms": 456100,
       "text": "That's interesting. At two hundred and twelve seats, and probably two-fifty by next year, a lock would be valuable. Can you put some numbers on paper?"
     },
     {
       "speaker": "tom",
-      "start_ms": 454300,
-      "end_ms": 471300,
+      "start_ms": 458200,
+      "end_ms": 475200,
       "text": "I'll send a proposal with three options: twelve months, twenty-four months with a price lock, and twenty-four with a seat band so you can grow without a new quote. I'll have it for you by the sixteenth of October."
     },
     {
       "speaker": "rachel",
-      "start_ms": 472100,
-      "end_ms": 484300,
+      "start_ms": 476000,
+      "end_ms": 488200,
       "text": "That works. I need to know our internal approval process before I can commit to a date, so let me check with finance and get back to you."
     },
     {
       "speaker": "owen",
-      "start_ms": 485500,
-      "end_ms": 497200,
+      "start_ms": 489400,
+      "end_ms": 501100,
       "text": "And can I raise one more thing before we finish? We're onboarding about fifteen new analysts next month. Is there any training we can do for them?"
     },
     {
       "speaker": "jade",
-      "start_ms": 497900,
-      "end_ms": 508800,
+      "start_ms": 501800,
+      "end_ms": 512700,
       "text": "Yes, absolutely. I can run a ninety-minute live workshop, and record it for future hires. Let me schedule it for the week of the twelfth."
     },
     {
       "speaker": "owen",
-      "start_ms": 509900,
-      "end_ms": 513400,
+      "start_ms": 513800,
+      "end_ms": 518800,
       "text": "Perfect, thank you."
     },
     {
       "speaker": "jade",
-      "start_ms": 515000,
-      "end_ms": 538900,
+      "start_ms": 520400,
+      "end_ms": 544300,
       "text": "So, to recap. I'll send the usage report and the deck today. Owen sends the export schedule by Friday. Tom sends the renewal proposal by the sixteenth and asks product about early access to background exports. Rachel confirms your approval process with finance. And I'll schedule the analyst workshop for the week of the twelfth."
     },
     {
       "speaker": "rachel",
-      "start_ms": 539800,
-      "end_ms": 547200,
+      "start_ms": 545200,
+      "end_ms": 552600,
       "text": "Sounds right. Thank you both for the honesty on the issues. It makes the renewal conversation easier."
     },
     {
       "speaker": "tom",
-      "start_ms": 548600,
-      "end_ms": 556400,
+      "start_ms": 554000,
+      "end_ms": 561800,
       "text": "Thank you, Rachel. We value the partnership. Let's meet again in three weeks to go through the proposal."
     },
     {
       "speaker": "jade",
-      "start_ms": 558500,
-      "end_ms": 562000,
+      "start_ms": 563900,
+      "end_ms": 568900,
       "text": "I'll send the invite. Thanks, everyone."
     },
     {
       "speaker": "owen",
-      "start_ms": 562800,
-      "end_ms": 566300,
+      "start_ms": 569700,
+      "end_ms": 574700,
       "text": "Thanks all, have a good week."
     }
   ],
@@ -365,15 +365,15 @@
     },
     {
       "title": "Roadmap preview",
-      "start_ms": 249500
+      "start_ms": 251900
     },
     {
       "title": "Renewal and pricing",
-      "start_ms": 370700
+      "start_ms": 374600
     },
     {
       "title": "Summary and next steps",
-      "start_ms": 515000
+      "start_ms": 520400
     }
   ],
   "action_items": [
