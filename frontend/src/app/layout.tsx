@@ -15,6 +15,9 @@ const inter = Inter({
 export const metadata: Metadata = {
   title: "Fireflies Clone",
   description: "Meeting library, transcripts and AI summaries",
+  icons: {
+    icon: "/icon.svg",
+  },
 };
 
 // Runs before first paint so a saved "light"/"system" choice never flashes dark. Mirrors

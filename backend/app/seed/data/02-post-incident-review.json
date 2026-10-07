@@ -1,0 +1,467 @@
+{
+  "title": "Post-Incident Review: Dashboard Degradation of Sept 9",
+  "meeting_date": "2026-09-16T14:00:00Z",
+  "duration_ms": 669900,
+  "platform": "zoom",
+  "source": "seed",
+  "media_url": null,
+  "tags": [
+    "Engineering",
+    "Incident"
+  ],
+  "participants": [
+    {
+      "key": "marcus",
+      "name": "Marcus Chen",
+      "email": "marcus.chen@northwind.example",
+      "avatar_color": "#2563eb",
+      "role": "host"
+    },
+    {
+      "key": "nadia",
+      "name": "Nadia Hussain",
+      "email": "nadia.hussain@northwind.example",
+      "avatar_color": "#0891b2",
+      "role": "attendee"
+    },
+    {
+      "key": "diego",
+      "name": "Diego Alvarez",
+      "email": "diego.alvarez@northwind.example",
+      "avatar_color": "#dc2626",
+      "role": "attendee"
+    },
+    {
+      "key": "priya",
+      "name": "Priya Raman",
+      "email": "priya.raman@northwind.example",
+      "avatar_color": "#7c3aed",
+      "role": "attendee"
+    },
+    {
+      "key": "sam",
+      "name": "Sam Whitaker",
+      "email": "sam.whitaker@northwind.example",
+      "avatar_color": "#d97706",
+      "role": "attendee"
+    }
+  ],
+  "segments": [
+    {
+      "speaker": "marcus",
+      "start_ms": 2000,
+      "end_ms": 21600,
+      "text": "Okay, let's get started. Thanks for making time. This is the review for the September ninth dashboard incident. Same ground rules as always: blameless, we're looking at systems and process, not people. Nadia has the timeline, so I'll hand it to her in a second."
+    },
+    {
+      "speaker": "priya",
+      "start_ms": 22300,
+      "end_ms": 38400,
+      "text": "Before we dive in, can I get one thing clarified? I need to know what I can say to customers by end of day. I've been giving people the short version, but I'd like the real one."
+    },
+    {
+      "speaker": "marcus",
+      "start_ms": 39500,
+      "end_ms": 45600,
+      "text": "Fair. Part of the goal today is to give you that. Nadia, go ahead."
+    },
+    {
+      "speaker": "nadia",
+      "start_ms": 47200,
+      "end_ms": 65500,
+      "text": "Sure. All times are UTC. At fourteen-oh-eight, a routine deploy went out with the dashboard query batching change. At fourteen-twelve, the first cache refresh cycle hit, and database CPU went from around thirty percent to a hundred percent in under a minute."
+    },
+    {
+      "speaker": "nadia",
+      "start_ms": 66400,
+      "end_ms": 80700,
+      "text": "By fourteen-fourteen, p95 dashboard load time was above twenty seconds and connection pool saturation was at a hundred percent. The API started returning five-oh-threes for any dashboard with more than a few widgets."
+    },
+    {
+      "speaker": "sam",
+      "start_ms": 82100,
+      "end_ms": 100400,
+      "text": "From the customer side, that's the part I saw. About eleven hundred workspaces had at least one failed dashboard load during the window, out of the eighteen hundred active ones. And we had sixty-three support tickets by the end of the day."
+    },
+    {
+      "speaker": "nadia",
+      "start_ms": 102500,
+      "end_ms": 116400,
+      "text": "Right. And it wasn't a clean outage, which made it harder. It would recover for twenty or thirty seconds and then fall over again. It looked like a sawtooth on the graph."
+    },
+    {
+      "speaker": "diego",
+      "start_ms": 117200,
+      "end_ms": 124200,
+      "text": "Which, once we saw the sawtooth, was the clue. That's the shape of a cache stampede."
+    },
+    {
+      "speaker": "marcus",
+      "start_ms": 125400,
+      "end_ms": 131100,
+      "text": "Diego, can you explain that for people who weren't in the incident channel?"
+    },
+    {
+      "speaker": "diego",
+      "start_ms": 131800,
+      "end_ms": 157500,
+      "text": "Yeah. So the new batching code caches the aggregate for each dashboard for sixty seconds. When we deployed, a warm-up job populated the cache for every active workspace in one go, which means all those keys got the same expiry time. Sixty seconds later they all expired together, and every dashboard load recomputed its aggregate at the same moment."
+    },
+    {
+      "speaker": "diego",
+      "start_ms": 158600,
+      "end_ms": 169500,
+      "text": "Then the recomputed values were written back, again with a sixty-second expiry, so sixty seconds after that they all expired together again. That's the sawtooth."
+    },
+    {
+      "speaker": "priya",
+      "start_ms": 171100,
+      "end_ms": 177600,
+      "text": "So it's not that the new code was slow. It's that everything expired at once."
+    },
+    {
+      "speaker": "diego",
+      "start_ms": 178500,
+      "end_ms": 194200,
+      "text": "Exactly. A single batched query is actually faster than twelve small ones. But a thousand of those at the same instant is more than the database can handle, and the pool filled up with waiting connections."
+    },
+    {
+      "speaker": "nadia",
+      "start_ms": 195600,
+      "end_ms": 211700,
+      "text": "And the pool being full is why even the simple endpoints started failing. The health check shares the pool, so the load balancer marked instances unhealthy and restarted them, and each restart made the next spike worse."
+    },
+    {
+      "speaker": "marcus",
+      "start_ms": 213800,
+      "end_ms": 225500,
+      "text": "Which is the second contributing factor. Our health check depends on the same connection pool as the heavy queries. We should treat that as its own finding."
+    },
+    {
+      "speaker": "sam",
+      "start_ms": 226300,
+      "end_ms": 229800,
+      "text": "How did we eventually recover?"
+    },
+    {
+      "speaker": "nadia",
+      "start_ms": 231000,
+      "end_ms": 250600,
+      "text": "Two things. At fourteen-forty-one we rolled back the deploy, but that alone didn't help because the cache was still full of synchronized keys. At fourteen-fifty-one Diego flushed the cache manually and staggered the warm-up, and that's what finally stopped it. Full recovery was at fourteen-fifty-nine."
+    },
+    {
+      "speaker": "marcus",
+      "start_ms": 251300,
+      "end_ms": 255200,
+      "text": "So forty-seven minutes from first symptom to full recovery."
+    },
+    {
+      "speaker": "diego",
+      "start_ms": 256300,
+      "end_ms": 267200,
+      "text": "Forty-seven, yeah. And I'll own that the rollback was the wrong first move. We spent nineteen minutes on it before anyone looked at the cache."
+    },
+    {
+      "speaker": "marcus",
+      "start_ms": 268800,
+      "end_ms": 283100,
+      "text": "I'd push back on that framing, Diego. Based on what we knew at fourteen-twenty, rolling back was the standard play. Our runbook says roll back first. The runbook is what needs to change."
+    },
+    {
+      "speaker": "nadia",
+      "start_ms": 284000,
+      "end_ms": 290500,
+      "text": "Agreed. There's nothing in the runbook about cache behavior. I'll add a section on it."
+    },
+    {
+      "speaker": "priya",
+      "start_ms": 291900,
+      "end_ms": 303600,
+      "text": "Okay, can we talk about detection? Because from where I sat, I heard about this from Tom, who heard it from a customer, not from an alert."
+    },
+    {
+      "speaker": "nadia",
+      "start_ms": 305700,
+      "end_ms": 321400,
+      "text": "That one's on the alerting setup. The p95 latency alert did fire, at fourteen-fourteen. But it was routed to the old alerts channel from before the team reorganization, so nobody was paged. I found it afterwards."
+    },
+    {
+      "speaker": "marcus",
+      "start_ms": 322200,
+      "end_ms": 326100,
+      "text": "So the first human to notice was in support."
+    },
+    {
+      "speaker": "sam",
+      "start_ms": 327300,
+      "end_ms": 333800,
+      "text": "Yeah. Our first support ticket came in at fourteen-nineteen, and it got escalated at fourteen-twenty-two."
+    },
+    {
+      "speaker": "priya",
+      "start_ms": 334500,
+      "end_ms": 341000,
+      "text": "And the status page. I checked at fourteen-thirty and it still said everything was operational."
+    },
+    {
+      "speaker": "nadia",
+      "start_ms": 342100,
+      "end_ms": 355600,
+      "text": "We posted at fourteen-thirty-six, which was twenty-two minutes after the alert should have fired. Posting is manual, and the person who can do it was in the incident call, heads down."
+    },
+    {
+      "speaker": "priya",
+      "start_ms": 357200,
+      "end_ms": 373300,
+      "text": "So I'd propose that the status page goes up automatically when the latency alert has been firing for five minutes, with a generic message, and a human edits it afterwards. A wrong-but-early message beats a late one."
+    },
+    {
+      "speaker": "marcus",
+      "start_ms": 374200,
+      "end_ms": 377700,
+      "text": "I like that. Nadia, is that doable?"
+    },
+    {
+      "speaker": "nadia",
+      "start_ms": 379100,
+      "end_ms": 392100,
+      "text": "Our status page has an API, so yes. Two or three days of work, mostly writing the message templates. I can have it done before the end of next week."
+    },
+    {
+      "speaker": "priya",
+      "start_ms": 394200,
+      "end_ms": 410300,
+      "text": "Great. And for the customer summary, I'm going to write it tomorrow and send it to the admins of the affected workspaces. Can I have a sentence on the cause and the fix that I can quote?"
+    },
+    {
+      "speaker": "diego",
+      "start_ms": 411100,
+      "end_ms": 416800,
+      "text": "I'll write you two sentences in plain English after this call. No jargon."
+    },
+    {
+      "speaker": "sam",
+      "start_ms": 418000,
+      "end_ms": 428000,
+      "text": "One question on impact. Do we want to offer credits? Eleven hundred workspaces, but most were degraded for a few minutes, not down."
+    },
+    {
+      "speaker": "priya",
+      "start_ms": 428700,
+      "end_ms": 437800,
+      "text": "I'd say no blanket credits. Anyone on an enterprise plan with an SLA, I'll check individually. Tom is pulling that list."
+    },
+    {
+      "speaker": "marcus",
+      "start_ms": 438900,
+      "end_ms": 445000,
+      "text": "That makes sense. Let's move to what went well, because there was a lot."
+    },
+    {
+      "speaker": "nadia",
+      "start_ms": 446600,
+      "end_ms": 455300,
+      "text": "The incident channel worked. We had an incident commander within about six minutes of escalation, and updates every ten minutes."
+    },
+    {
+      "speaker": "diego",
+      "start_ms": 456200,
+      "end_ms": 468800,
+      "text": "And the feature flag for batching meant we could have disabled it in seconds, if we'd realized sooner that was the right lever. Next time that's a faster option."
+    },
+    {
+      "speaker": "sam",
+      "start_ms": 470200,
+      "end_ms": 478900,
+      "text": "Support also did a great job. They used the same holding message for every ticket, so customers got consistent answers."
+    },
+    {
+      "speaker": "marcus",
+      "start_ms": 481000,
+      "end_ms": 486200,
+      "text": "Good. Okay, let's turn this into actions. Diego, the cache fixes first."
+    },
+    {
+      "speaker": "diego",
+      "start_ms": 487000,
+      "end_ms": 510500,
+      "text": "So the cache fix is two parts. One, add random jitter of about twenty percent to every expiry time so keys can't line up. Two, single-flight coalescing, where if a hundred requests need the same missing key, only one recomputes and the rest wait for it. I can have both done by next Wednesday."
+    },
+    {
+      "speaker": "marcus",
+      "start_ms": 511700,
+      "end_ms": 528700,
+      "text": "Good. And the pool problem. Separate from the cache, a heavy query shouldn't be able to starve the health check. I'd like a dedicated small pool for health checks, and a concurrency limit per workspace for the aggregate queries."
+    },
+    {
+      "speaker": "diego",
+      "start_ms": 529400,
+      "end_ms": 540300,
+      "text": "That's more work than the cache fix. A week, maybe more, because the limit needs a sensible default and a bypass for our biggest customers."
+    },
+    {
+      "speaker": "marcus",
+      "start_ms": 541400,
+      "end_ms": 549200,
+      "text": "I'll take that one myself and scope it. I'll have it done by the end of the month."
+    },
+    {
+      "speaker": "nadia",
+      "start_ms": 550800,
+      "end_ms": 564300,
+      "text": "For the alerting, I fixed the routing for the p95 alert already. I'll double check the other six alerts that point to the old channel, and I'll report back by Friday."
+    },
+    {
+      "speaker": "priya",
+      "start_ms": 565200,
+      "end_ms": 572600,
+      "text": "I'll send the customer summary by end of day tomorrow, after Diego sends me his two sentences."
+    },
+    {
+      "speaker": "diego",
+      "start_ms": 574000,
+      "end_ms": 589700,
+      "text": "And I want to add a load test to the release checklist, specifically for the case where lots of cache keys expire at the same moment. We'd have caught this in staging if we'd tried it."
+    },
+    {
+      "speaker": "marcus",
+      "start_ms": 591800,
+      "end_ms": 606100,
+      "text": "Yes, please. Let's make it a required step for any change that touches the cache layer. And let's put a date on it so it doesn't drift. Is the ninth of October reasonable?"
+    },
+    {
+      "speaker": "diego",
+      "start_ms": 606900,
+      "end_ms": 610400,
+      "text": "The ninth of October works."
+    },
+    {
+      "speaker": "sam",
+      "start_ms": 611600,
+      "end_ms": 623800,
+      "text": "One open question I'd like on the list. Should we put a read replica behind the dashboard queries? It would take pressure off the primary regardless of caching."
+    },
+    {
+      "speaker": "marcus",
+      "start_ms": 624500,
+      "end_ms": 640200,
+      "text": "It's a good question, but it's a bigger decision with a real cost, so let's not decide it today. I'll put it on the list unassigned, and we can revisit it at the next architecture review."
+    },
+    {
+      "speaker": "nadia",
+      "start_ms": 641300,
+      "end_ms": 655200,
+      "text": "Can I ask that we do a short follow-up in two weeks to check that all of these actually landed? Last time we had a review and half the actions went quiet."
+    },
+    {
+      "speaker": "marcus",
+      "start_ms": 656800,
+      "end_ms": 663300,
+      "text": "Yes, I'll book it. Fifteen minutes, September thirtieth. Thanks, everyone, this was a good conversation."
+    },
+    {
+      "speaker": "priya",
+      "start_ms": 664200,
+      "end_ms": 669900,
+      "text": "Thanks, all. Very helpful. I feel much better about what I'm telling customers."
+    }
+  ],
+  "summary": {
+    "overview": "The team reviewed the 47-minute dashboard degradation on September 9, which affected roughly 1,100 of 1,840 active workspaces. A deploy of the new query batching code was followed by a cache stampede: a warm-up job gave every dashboard cache entry the same 60-second expiry, so they all expired and recomputed at once, saturating the database connection pool. The health check shared that pool, causing restarts that made it worse. The p95 alert fired but was routed to a retired channel, support noticed first, and the status page lagged by 22 minutes. The group agreed on jittered expiry with request coalescing, a separate health-check pool, alert routing fixes, automatic status page posts and a load test for cache changes.",
+    "bullet_points": [
+      "Timeline: deploy at 14:08 UTC, first spike at 14:12, rollback at 14:41 (which did not help), manual cache flush and staggered warm-up at 14:51, full recovery at 14:59.",
+      "Root cause: synchronized 60-second cache expiry created a stampede; a shared connection pool let heavy queries starve the health check, which triggered restarts.",
+      "Detection gap: the p95 latency alert fired at 14:14 but was routed to a retired channel; the first human notice was a support ticket and the status page updated 22 minutes late.",
+      "Customer response: no blanket credits; Priya will send a plain-language summary to affected admins and check enterprise SLA accounts individually.",
+      "Follow-ups: jittered TTL plus single-flight, a dedicated health-check pool and concurrency limits, automatic status page posting, a required cache load test, and a check-in on September 30."
+    ],
+    "keywords": [
+      "Incident review",
+      "Cache stampede",
+      "Connection pool",
+      "Alerting",
+      "Status page",
+      "Postmortem",
+      "Runbook",
+      "Customer communication"
+    ],
+    "generated_by": "seed"
+  },
+  "chapters": [
+    {
+      "title": "Ground rules and context",
+      "start_ms": 2000
+    },
+    {
+      "title": "Incident timeline",
+      "start_ms": 47200
+    },
+    {
+      "title": "Root cause: synchronized cache expiry",
+      "start_ms": 131800
+    },
+    {
+      "title": "Detection and communication gaps",
+      "start_ms": 291900
+    },
+    {
+      "title": "What went well",
+      "start_ms": 438900
+    },
+    {
+      "title": "Action items and follow-ups",
+      "start_ms": 481000
+    }
+  ],
+  "action_items": [
+    {
+      "text": "Add 20% jitter to cache expiry and single-flight request coalescing to the dashboard aggregate cache",
+      "assignee": "diego",
+      "due_date": "2026-09-23",
+      "is_completed": true,
+      "source_segment": 39
+    },
+    {
+      "text": "Add a dedicated health-check connection pool and per-workspace concurrency limits for heavy dashboard queries",
+      "assignee": "marcus",
+      "due_date": "2026-09-30",
+      "is_completed": false,
+      "source_segment": 42
+    },
+    {
+      "text": "Audit the other six alerts still routed to the retired channel and report back",
+      "assignee": "nadia",
+      "due_date": "2026-09-18",
+      "is_completed": true,
+      "source_segment": 43
+    },
+    {
+      "text": "Automate a generic status page post when the p95 latency alert fires for five minutes",
+      "assignee": "nadia",
+      "due_date": "2026-09-25",
+      "is_completed": true,
+      "source_segment": 29
+    },
+    {
+      "text": "Send a plain-language incident summary to admins of affected workspaces and check enterprise SLA accounts",
+      "assignee": "priya",
+      "due_date": "2026-09-17",
+      "is_completed": true,
+      "source_segment": 44
+    },
+    {
+      "text": "Add a synchronized-expiry load test to the release checklist for any cache-layer change",
+      "assignee": "diego",
+      "due_date": "2026-10-09",
+      "is_completed": false,
+      "source_segment": 47
+    },
+    {
+      "text": "Decide whether to put a read replica behind dashboard queries at the next architecture review",
+      "assignee": null,
+      "due_date": null,
+      "is_completed": false,
+      "source_segment": 49
+    }
+  ]
+}

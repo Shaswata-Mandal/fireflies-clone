@@ -1,0 +1,437 @@
+{
+  "title": "Lumen Retail: Quarterly Business Review",
+  "meeting_date": "2026-10-05T10:00:00Z",
+  "duration_ms": 566300,
+  "platform": "zoom",
+  "source": "seed",
+  "media_url": null,
+  "tags": [
+    "Customer",
+    "QBR"
+  ],
+  "participants": [
+    {
+      "key": "jade",
+      "name": "Jade Morrison",
+      "email": "jade.morrison@northwind.example",
+      "avatar_color": "#be185d",
+      "role": "host"
+    },
+    {
+      "key": "tom",
+      "name": "Tom Okafor",
+      "email": "tom.okafor@northwind.example",
+      "avatar_color": "#059669",
+      "role": "attendee"
+    },
+    {
+      "key": "rachel",
+      "name": "Rachel Kim",
+      "email": "rachel.kim@lumenretail.example",
+      "avatar_color": "#0d9488",
+      "role": "attendee"
+    },
+    {
+      "key": "owen",
+      "name": "Owen Park",
+      "email": "owen.park@lumenretail.example",
+      "avatar_color": "#4f46e5",
+      "role": "attendee"
+    }
+  ],
+  "segments": [
+    {
+      "speaker": "jade",
+      "start_ms": 2000,
+      "end_ms": 25900,
+      "text": "Good morning, everyone, and thank you for making time, Rachel and Owen. This is our quarterly business review for Lumen Retail. I've got four things on the agenda: how the quarter went, the issues we hit and what we did about them, a quick look at our roadmap, and then the renewal. Does that work?"
+    },
+    {
+      "speaker": "rachel",
+      "start_ms": 26600,
+      "end_ms": 36600,
+      "text": "That works. Honestly, I'm glad we're doing the issues part in the open. It's been a bumpy couple of months for my team."
+    },
+    {
+      "speaker": "jade",
+      "start_ms": 37700,
+      "end_ms": 55500,
+      "text": "Understood, and we'll get to it. Let me start with the usage numbers. This is the summary I'll send over afterwards. You're at two hundred and twelve active seats, up from a hundred and seventy-four at the start of the quarter."
+    },
+    {
+      "speaker": "tom",
+      "start_ms": 57100,
+      "end_ms": 72300,
+      "text": "And the part I always like pointing out: that's twenty-two percent growth in seats, and dashboards viewed per week is up thirty-one percent. So it's not just more licenses, it's more people actually using it."
+    },
+    {
+      "speaker": "rachel",
+      "start_ms": 73200,
+      "end_ms": 80600,
+      "text": "That tracks. The merchandising team basically lives in it now. We retired two weekly spreadsheets in September."
+    },
+    {
+      "speaker": "jade",
+      "start_ms": 82000,
+      "end_ms": 87700,
+      "text": "That's great to hear. Do you have a sense of the time saved?"
+    },
+    {
+      "speaker": "rachel",
+      "start_ms": 89800,
+      "end_ms": 97600,
+      "text": "Roughly, the weekly sales review prep went from about six hours to under two. Owen, you'd know better."
+    },
+    {
+      "speaker": "owen",
+      "start_ms": 98400,
+      "end_ms": 108400,
+      "text": "It's about that. The thing I'd add is that the analysts now build their own dashboards. Before, every request came through my team."
+    },
+    {
+      "speaker": "jade",
+      "start_ms": 109600,
+      "end_ms": 116100,
+      "text": "Self-service is exactly what we want to see. Okay, let's talk about the harder part."
+    },
+    {
+      "speaker": "rachel",
+      "start_ms": 116800,
+      "end_ms": 128100,
+      "text": "Yes. So, the Monday exports. For about six weeks, our weekly export jobs failed every Monday morning, and the merchandising team came in to empty reports."
+    },
+    {
+      "speaker": "owen",
+      "start_ms": 129200,
+      "end_ms": 148800,
+      "text": "They were hitting the rate limit. We run about forty export calls at once, every Monday at seven, and we were capped at six hundred requests a minute. We'd get four-twenty-nines, and the retry logic didn't help because every job retried at the same time."
+    },
+    {
+      "speaker": "tom",
+      "start_ms": 150400,
+      "end_ms": 162600,
+      "text": "And I want to say, I'm sorry about that. We raised the Growth tier limit to twelve hundred requests a minute in September. Have the Monday failures stopped?"
+    },
+    {
+      "speaker": "owen",
+      "start_ms": 163500,
+      "end_ms": 168300,
+      "text": "Since the fourteenth of September, yes. Zero failures for three Mondays."
+    },
+    {
+      "speaker": "tom",
+      "start_ms": 169700,
+      "end_ms": 181900,
+      "text": "Good. And Owen, a technical tip: if you add jitter to the retries, you'll be safer even if we're ever under load. I can send you an example."
+    },
+    {
+      "speaker": "owen",
+      "start_ms": 184000,
+      "end_ms": 188300,
+      "text": "Yes, please. That's actually a smart thing to do regardless."
+    },
+    {
+      "speaker": "rachel",
+      "start_ms": 189100,
+      "end_ms": 200800,
+      "text": "The other issue is dashboard speed. The sales dashboard has fourteen widgets, and when the whole team opens it at nine in the morning, it takes ages."
+    },
+    {
+      "speaker": "jade",
+      "start_ms": 202000,
+      "end_ms": 212900,
+      "text": "That's one we've seen across customers. Engineering shipped a fix in September, which batches the queries and caches the results. Have you noticed a difference?"
+    },
+    {
+      "speaker": "owen",
+      "start_ms": 213600,
+      "end_ms": 222700,
+      "text": "Definitely. It used to take about six seconds, it's about two now. There was one bad day in early September, though."
+    },
+    {
+      "speaker": "jade",
+      "start_ms": 223800,
+      "end_ms": 236000,
+      "text": "Yes, that was the incident on the ninth. We published a summary, and the cause was fixed the following week. I'll make sure you have the written version."
+    },
+    {
+      "speaker": "rachel",
+      "start_ms": 237600,
+      "end_ms": 243700,
+      "text": "I did get it. It was clear. I appreciated that it didn't make excuses."
+    },
+    {
+      "speaker": "jade",
+      "start_ms": 244600,
+      "end_ms": 248100,
+      "text": "Thank you. Okay, roadmap."
+    },
+    {
+      "speaker": "tom",
+      "start_ms": 249500,
+      "end_ms": 262500,
+      "text": "So, here's what's coming in the next quarter. First, SAML single sign-on, targeted for the end of October. I know Lumen uses Okta, and I believe you asked about this."
+    },
+    {
+      "speaker": "rachel",
+      "start_ms": 264600,
+      "end_ms": 272400,
+      "text": "We did. Our IT team would honestly make it a condition for the renewal if it wasn't coming."
+    },
+    {
+      "speaker": "tom",
+      "start_ms": 273200,
+      "end_ms": 282300,
+      "text": "Then good news. It's committed, and we'd love to have your IT team pilot it. Would they be open to that?"
+    },
+    {
+      "speaker": "rachel",
+      "start_ms": 283500,
+      "end_ms": 292600,
+      "text": "I think so. I'll ask them, but I can't promise anything yet. Let's leave it as an open question for now."
+    },
+    {
+      "speaker": "owen",
+      "start_ms": 293300,
+      "end_ms": 300300,
+      "text": "What about background exports? I know you mentioned it. That would solve our Monday problem permanently."
+    },
+    {
+      "speaker": "tom",
+      "start_ms": 301400,
+      "end_ms": 323100,
+      "text": "It's in the backlog, not committed for this quarter, because only a handful of customers need it. But your use case is exactly the evidence we need. If I can show them the volume you run, I think it moves up. Could you send me your export schedule and sizes?"
+    },
+    {
+      "speaker": "owen",
+      "start_ms": 324700,
+      "end_ms": 329900,
+      "text": "Sure, I can pull that together. By the end of this week?"
+    },
+    {
+      "speaker": "tom",
+      "start_ms": 330800,
+      "end_ms": 339500,
+      "text": "That would be perfect. And I'll ask product whether we can offer you early access if it makes the plan."
+    },
+    {
+      "speaker": "jade",
+      "start_ms": 340900,
+      "end_ms": 354400,
+      "text": "One more item, a new feature. Dashboards now show a small 'updated forty seconds ago' label with a refresh button, since results are cached. How has that landed with your users?"
+    },
+    {
+      "speaker": "rachel",
+      "start_ms": 356500,
+      "end_ms": 365200,
+      "text": "Honestly, it's been good. One person was confused at first, but now they use refresh when they need live numbers."
+    },
+    {
+      "speaker": "jade",
+      "start_ms": 366000,
+      "end_ms": 369500,
+      "text": "Great. Okay, the renewal."
+    },
+    {
+      "speaker": "tom",
+      "start_ms": 370700,
+      "end_ms": 383300,
+      "text": "So your contract ends on December thirty-first. I'd like to start the conversation early so there's no scramble in December. Rachel, what's most important to you for the renewal?"
+    },
+    {
+      "speaker": "rachel",
+      "start_ms": 384000,
+      "end_ms": 394900,
+      "text": "Price predictability, mainly. We're growing, and I need to tell our CFO what to expect for the next two years. And, as I said, SSO."
+    },
+    {
+      "speaker": "tom",
+      "start_ms": 396000,
+      "end_ms": 415600,
+      "text": "Understood. So, the Growth tier moves from forty-nine to fifty-nine dollars per seat in November, and that includes SSO and the higher rate limit. Existing customers are held at their current price until renewal. On renewal there's a twenty percent discount if you pay annually."
+    },
+    {
+      "speaker": "rachel",
+      "start_ms": 417200,
+      "end_ms": 422900,
+      "text": "So if we renew in December, we'd be at fifty-nine, minus the discount?"
+    },
+    {
+      "speaker": "tom",
+      "start_ms": 423800,
+      "end_ms": 439500,
+      "text": "Right, but what I want to explore is a twenty-four month agreement with the price locked for the whole term. That would give your CFO the predictability, and it's something I can bring to my team."
+    },
+    {
+      "speaker": "rachel",
+      "start_ms": 440900,
+      "end_ms": 452200,
+      "text": "That's interesting. At two hundred and twelve seats, and probably two-fifty by next year, a lock would be valuable. Can you put some numbers on paper?"
+    },
+    {
+      "speaker": "tom",
+      "start_ms": 454300,
+      "end_ms": 471300,
+      "text": "I'll send a proposal with three options: twelve months, twenty-four months with a price lock, and twenty-four with a seat band so you can grow without a new quote. I'll have it for you by the sixteenth of October."
+    },
+    {
+      "speaker": "rachel",
+      "start_ms": 472100,
+      "end_ms": 484300,
+      "text": "That works. I need to know our internal approval process before I can commit to a date, so let me check with finance and get back to you."
+    },
+    {
+      "speaker": "owen",
+      "start_ms": 485500,
+      "end_ms": 497200,
+      "text": "And can I raise one more thing before we finish? We're onboarding about fifteen new analysts next month. Is there any training we can do for them?"
+    },
+    {
+      "speaker": "jade",
+      "start_ms": 497900,
+      "end_ms": 508800,
+      "text": "Yes, absolutely. I can run a ninety-minute live workshop, and record it for future hires. Let me schedule it for the week of the twelfth."
+    },
+    {
+      "speaker": "owen",
+      "start_ms": 509900,
+      "end_ms": 513400,
+      "text": "Perfect, thank you."
+    },
+    {
+      "speaker": "jade",
+      "start_ms": 515000,
+      "end_ms": 538900,
+      "text": "So, to recap. I'll send the usage report and the deck today. Owen sends the export schedule by Friday. Tom sends the renewal proposal by the sixteenth and asks product about early access to background exports. Rachel confirms your approval process with finance. And I'll schedule the analyst workshop for the week of the twelfth."
+    },
+    {
+      "speaker": "rachel",
+      "start_ms": 539800,
+      "end_ms": 547200,
+      "text": "Sounds right. Thank you both for the honesty on the issues. It makes the renewal conversation easier."
+    },
+    {
+      "speaker": "tom",
+      "start_ms": 548600,
+      "end_ms": 556400,
+      "text": "Thank you, Rachel. We value the partnership. Let's meet again in three weeks to go through the proposal."
+    },
+    {
+      "speaker": "jade",
+      "start_ms": 558500,
+      "end_ms": 562000,
+      "text": "I'll send the invite. Thanks, everyone."
+    },
+    {
+      "speaker": "owen",
+      "start_ms": 562800,
+      "end_ms": 566300,
+      "text": "Thanks all, have a good week."
+    }
+  ],
+  "summary": {
+    "overview": "Lumen Retail's quarterly business review covered strong adoption (212 seats, up 22%, weekly dashboard views up 31%) and the issues behind a bumpy quarter. Monday export failures caused by the 600 requests-per-minute cap were fixed by raising Growth to 1,200 in September, and dashboard load improved from about six seconds to two after the batching and caching release. The team previewed SAML SSO for the end of October and kept background exports in the backlog pending Lumen's export volumes. For the December 31 renewal, Tom will send three options including a 24-month price lock, and Jade will run an onboarding workshop for 15 new analysts.",
+    "bullet_points": [
+      "Usage: 212 active seats (from 174), weekly dashboard views up 31%, two weekly spreadsheets retired; sales review prep dropped from about six hours to under two.",
+      "Issues resolved: Monday export failures stopped after the Growth rate limit rose from 600 to 1,200 requests per minute, and Owen will add retry jitter; dashboard load fell from roughly 6s to 2s.",
+      "Roadmap: SAML SSO targeted for the end of October with a possible pilot for Lumen's IT team; background exports stay in the backlog until Lumen shares export volumes.",
+      "Renewal: contract ends December 31; Growth moves to $59 per seat in November, existing customers are held until renewal, and annual billing gets 20% off; the proposal covers 12-month, 24-month price-lock and seat-band options.",
+      "Next steps: usage report and deck, export schedule from Owen, renewal proposal by October 16, finance approval timeline from Rachel, analyst workshop the week of October 12, and a follow-up in three weeks."
+    ],
+    "keywords": [
+      "QBR",
+      "Renewal",
+      "Rate limits",
+      "Dashboard speed",
+      "SAML SSO",
+      "Price lock",
+      "Background exports",
+      "Training"
+    ],
+    "generated_by": "seed"
+  },
+  "chapters": [
+    {
+      "title": "Welcome and agenda",
+      "start_ms": 2000
+    },
+    {
+      "title": "Q3 usage and wins",
+      "start_ms": 37700
+    },
+    {
+      "title": "Issues: rate limits and dashboard speed",
+      "start_ms": 109600
+    },
+    {
+      "title": "Roadmap preview",
+      "start_ms": 249500
+    },
+    {
+      "title": "Renewal and pricing",
+      "start_ms": 370700
+    },
+    {
+      "title": "Summary and next steps",
+      "start_ms": 515000
+    }
+  ],
+  "action_items": [
+    {
+      "text": "Send the QBR deck and usage report to Lumen Retail",
+      "assignee": "jade",
+      "due_date": "2026-10-06",
+      "is_completed": true,
+      "source_segment": 43
+    },
+    {
+      "text": "Send Owen an example of jittered retry logic for API calls",
+      "assignee": "tom",
+      "due_date": "2026-10-06",
+      "is_completed": true,
+      "source_segment": 13
+    },
+    {
+      "text": "Share the weekly export schedule and volumes so product can size background exports",
+      "assignee": "owen",
+      "due_date": "2026-10-09",
+      "is_completed": false,
+      "source_segment": 27
+    },
+    {
+      "text": "Schedule the 90-minute analyst onboarding workshop for the week of October 12",
+      "assignee": "jade",
+      "due_date": "2026-10-12",
+      "is_completed": false,
+      "source_segment": 41
+    },
+    {
+      "text": "Ask product about early access to background exports for Lumen",
+      "assignee": "tom",
+      "due_date": "2026-10-14",
+      "is_completed": false,
+      "source_segment": 28
+    },
+    {
+      "text": "Send a renewal proposal with 12-month, 24-month price-lock and seat-band options",
+      "assignee": "tom",
+      "due_date": "2026-10-16",
+      "is_completed": false,
+      "source_segment": 38
+    },
+    {
+      "text": "Confirm Lumen's internal approval process and timeline with finance",
+      "assignee": "rachel",
+      "due_date": null,
+      "is_completed": false,
+      "source_segment": 39
+    },
+    {
+      "text": "Decide whether Lumen's IT team will pilot SAML SSO in November",
+      "assignee": null,
+      "due_date": null,
+      "is_completed": false,
+      "source_segment": 24
+    }
+  ]
+}
