@@ -28,7 +28,7 @@ over clever code.
 | Backend | Python 3.11+, FastAPI, Pydantic v2, pydantic-settings |
 | ORM / migrations | SQLAlchemy 2.0 (typed `Mapped[]` style), Alembic |
 | Database | SQLite (`PRAGMA foreign_keys=ON` on every connection) |
-| LLM (optional) | Grok (xAI, OpenAI-compatible API via the `openai` SDK) if `LLM_API_KEY` is set; otherwise deterministic mock generator |
+| LLM (optional) | Groq (`groq` SDK, model `openai/gpt-oss-20b`) via `app/utils/llm_client.py` if `GROQ_API_KEY` is set; otherwise deterministic mock summaries and "ask" answers 503 |
 | Tests | pytest + FastAPI TestClient (backend) |
 | Lint/format | Ruff + Black (Python), ESLint + Prettier (TS) |
 | Deploy | Backend → Render/Railway, Frontend → Vercel |
@@ -60,6 +60,7 @@ fireflies-clone/
 │   │   │       └── router.py       # HTTP layer ONLY
 │   │   ├── utils/
 │   │   │   ├── transcript_parser.py  # .txt / .vtt / .json → list[ParsedSegment]
+│   │   │   ├── llm_client.py         # generate_text() → Groq; maps 429/other/missing key to AppExceptions
 │   │   │   └── summary_generator.py  # MockSummaryGenerator + LLMSummaryGenerator (same interface)
 │   │   └── seed/
 │   │       ├── seed.py             # idempotent: only seeds if DB empty
@@ -131,7 +132,7 @@ fireflies-clone/
 
 ### Config
 - All env vars read in `core/config.py` via `Settings(BaseSettings)`. No `os.getenv` elsewhere.
-- Required: `DATABASE_URL`, `CORS_ORIGINS`. Optional: `LLM_API_KEY`, `LLM_BASE_URL`, `LLM_MODEL`, `ENV`.
+- Required: `DATABASE_URL`, `CORS_ORIGINS`. Optional: `GROQ_API_KEY`, `LLM_MODEL`, `ENV`.
 
 ### Auth
 - No real auth. `core/deps.py::get_current_user` returns the seeded default user (id=1).

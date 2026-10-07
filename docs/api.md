@@ -140,7 +140,7 @@ Both fields optional, trimmed, must not be empty or null. Timestamps are not edi
 
 ### `POST /meetings/{id}/summary/generate`
 Regenerates summary, chapters, and (if `include_action_items: true`) appends extracted action items.
-Uses the LLM generator when `LLM_API_KEY` is configured, otherwise the deterministic mock.
+Uses the LLM generator when `GROQ_API_KEY` is configured, otherwise the deterministic mock.
 Body (optional): `{ "include_action_items": false }` → 200 `{ summary, chapters }`
 Replaces the existing summary and chapters in one transaction. Extracted action items are appended after the
 existing ones, skipping any whose text already exists (case-insensitive, trimmed). No transcript → 400 `EMPTY_TRANSCRIPT`.
@@ -209,8 +209,34 @@ CORS exposes `Content-Disposition` (`expose_headers`) so a cross-origin frontend
 
 ## Ask (bonus, LLM only)
 
-### `POST /meetings/{id}/ask` `{ "question": "..." }` → `{ "answer": "...", "citations": [{ "segment_id": 1, "start_ms": 5000 }] }`
-Returns 503 `LLM_NOT_CONFIGURED` when no API key is set.
+### `POST /meetings/{id}/ask` → 200
+```json
+{ "question": "What did we decide about pricing?",
+  "history": [ { "role": "user", "content": "..." }, { "role": "assistant", "content": "..." } ] }
+```
+`question`: 1–500 chars (trimmed). `history`: optional, at most 20 items accepted, only the last 6 are used.
+```json
+{ "answer": "We kept the annual plan.",
+  "citations": [ { "segment_id": 41, "start_ms": 120000, "speaker_label": "Priya" } ] }
+```
+The answer comes only from the transcript. The model cites lines as `[s:<segment id>]`; the server removes those
+tags from `answer` and returns `citations` for ids that belong to this meeting (others are dropped).
+Long transcripts are cut to the lines most related to the question (+ neighbours).
+
+Errors: 404 `MEETING_NOT_FOUND` (also another user's meeting), 400 `EMPTY_TRANSCRIPT`, 422 `VALIDATION_ERROR`,
+503 `LLM_NOT_CONFIGURED` (no `GROQ_API_KEY`), 429 `LLM_RATE_LIMITED` (`details: { "retry_after": 60 }`),
+502 `LLM_ERROR` (any other provider failure).
+
+### `POST /ask` → 200 (across all of the user's meetings; used by the home AskFred panel)
+Same request body as above. The prompt is built from the transcripts of the user's 20 newest meetings
+(only theirs), each line tagged with its meeting title; long input is cut to the lines most related to the
+question, or, when nothing matches, the newest meeting's lines first.
+```json
+{ "answer": "...",
+  "citations": [ { "segment_id": 41, "start_ms": 120000, "speaker_label": "Priya",
+                   "meeting_id": 3, "meeting_title": "Roadmap sync" } ] }
+```
+Errors as above, except there is no 404: 400 `EMPTY_TRANSCRIPT` means the user has no transcripts at all.
 
 ---
 

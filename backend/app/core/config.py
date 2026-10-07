@@ -25,11 +25,10 @@ class Settings(BaseSettings):
     # Free hosts wipe the disk on redeploy, so the seed runs at startup when the DB is empty.
     SEED_ON_STARTUP: bool = True
 
-    # Optional: when no key is set the deterministic mock summary generator is used.
-    LLM_API_KEY: str | None = None
-    # Grok (xAI) exposes an OpenAI-compatible API, so any compatible provider works via these two.
-    LLM_BASE_URL: str = "https://api.x.ai/v1"
-    LLM_MODEL: str = "grok-4"
+    # Optional: when no key is set the deterministic mock summary generator is used and
+    # "ask a question" answers 503 LLM_NOT_CONFIGURED. Secret: never log it.
+    GROQ_API_KEY: str | None = None
+    LLM_MODEL: str = "openai/gpt-oss-20b"
 
     @field_validator("CORS_ORIGIN_REGEX")
     @classmethod

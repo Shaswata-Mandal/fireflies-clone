@@ -27,8 +27,8 @@ differs, follow the host's current documentation and terms.
    |---|---|
    | `CORS_ORIGINS` | `["http://localhost:3000"]` for now (a JSON list, with the quotes). You fix it in step 3 below. |
    | `CORS_ORIGIN_REGEX` | Leave empty, or `https://<project>-.*\.vercel\.app` to allow Vercel preview deployments. |
-   | `LLM_API_KEY` | Leave empty to use the built-in mock summary generator. Set it only to use a real LLM. |
-   | `LLM_BASE_URL`, `LLM_MODEL` | Leave empty to use the defaults (`https://api.x.ai/v1`, `grok-4`). |
+   | `GROQ_API_KEY` | Leave empty to use the built-in mock summary generator (asking questions then returns 503). Set it to use Groq. |
+   | `LLM_MODEL` | Leave empty to use the default (`openai/gpt-oss-20b`). |
 
 4. Apply. Wait for the deploy to go live, then copy the service URL (`https://<name>.onrender.com`).
 
@@ -54,7 +54,7 @@ Environment variables:
 | `CORS_ORIGINS` | `["http://localhost:3000"]` for now |
 | `SEED_ON_STARTUP` | `true` |
 | `LOG_LEVEL` | `INFO` |
-| `CORS_ORIGIN_REGEX`, `LLM_API_KEY`, `LLM_BASE_URL`, `LLM_MODEL` | optional, as above |
+| `CORS_ORIGIN_REGEX`, `GROQ_API_KEY`, `LLM_MODEL` | optional, as above |
 
 ### What the start command does
 

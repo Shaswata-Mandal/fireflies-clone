@@ -1,13 +1,14 @@
-"""Summary generator tests. The LLM client is always a fake: no network."""
+"""Summary generator tests. `generate_text` is always faked: no network."""
 
 import json
 import logging
-from types import SimpleNamespace
 from typing import Any
 
 import pytest
 
 from app.core.config import Settings
+from app.core.exceptions import LLMRateLimitedError
+from app.utils import summary_generator
 from app.utils.summary_generator import (
     MAX_PROMPT_CHARS,
     GeneratedActionItem,
@@ -114,31 +115,24 @@ def test_mock_short_transcript_does_not_pad_chapters() -> None:
 # ---------------------------------------------------------------------------
 
 
-class FakeClient:
-    """Mimics `client.chat.completions.create(...)`; records the call for assertions."""
+class FakeLLM:
+    """Stands in for `generate_text`; records the call for assertions."""
 
     def __init__(self, content: str | None = None, error: Exception | None = None) -> None:
         self._content = content
         self._error = error
         self.calls: list[dict[str, Any]] = []
-        self.chat = SimpleNamespace(completions=SimpleNamespace(create=self._create))
 
-    def _create(self, **kwargs: Any) -> Any:
-        self.calls.append(kwargs)
+    def __call__(self, prompt: str, **kwargs: Any) -> str:
+        self.calls.append({"prompt": prompt, **kwargs})
         if self._error:
             raise self._error
-        message = SimpleNamespace(content=self._content)
-        return SimpleNamespace(choices=[SimpleNamespace(message=message)])
+        return self._content or ""
 
 
-def _llm(client: FakeClient) -> LLMSummaryGenerator:
-    return LLMSummaryGenerator(
-        api_key="test-key",
-        model="test-model",
-        base_url="http://unused",
-        fallback=MockSummaryGenerator(),
-        client=client,
-    )
+def _llm(fake: FakeLLM, monkeypatch: pytest.MonkeyPatch) -> LLMSummaryGenerator:
+    monkeypatch.setattr(summary_generator, "generate_text", fake)
+    return LLMSummaryGenerator(fallback=MockSummaryGenerator())
 
 
 VALID_PAYLOAD = {
@@ -153,9 +147,9 @@ VALID_PAYLOAD = {
 }
 
 
-def test_llm_valid_json_is_parsed_and_sanitised() -> None:
-    client = FakeClient(json.dumps(VALID_PAYLOAD))
-    summary = _llm(client).generate(SEGMENTS)
+def test_llm_valid_json_is_parsed_and_sanitised(monkeypatch: pytest.MonkeyPatch) -> None:
+    client = FakeLLM(json.dumps(VALID_PAYLOAD))
+    summary = _llm(client, monkeypatch).generate(SEGMENTS)
 
     assert summary.overview == "The team reviewed the roadmap."
     assert summary.chapters == [GeneratedChapter("Intro", 0)]
@@ -163,33 +157,42 @@ def test_llm_valid_json_is_parsed_and_sanitised() -> None:
         GeneratedActionItem("Send budget", "Rahul", 3),
         GeneratedActionItem("Ghost task", None, None),  # unknown speaker / bad index are cleared
     ]
-    assert client.calls[0]["model"] == "test-model"
-    assert client.calls[0]["response_format"] == {"type": "json_object"}
+    assert "JSON" in client.calls[0]["system_instruction"]
+    assert "[0] [00:00] Priya:" in client.calls[0]["prompt"]
 
 
-def test_llm_accepts_json_wrapped_in_code_fence() -> None:
-    client = FakeClient("```json\n" + json.dumps(VALID_PAYLOAD) + "\n```")
-    assert _llm(client).generate(SEGMENTS).overview == "The team reviewed the roadmap."
+def test_llm_accepts_json_wrapped_in_code_fence(monkeypatch: pytest.MonkeyPatch) -> None:
+    client = FakeLLM("```json\n" + json.dumps(VALID_PAYLOAD) + "\n```")
+    assert _llm(client, monkeypatch).generate(SEGMENTS).overview == "The team reviewed the roadmap."
 
 
 @pytest.mark.parametrize("content", ["not json at all", '{"overview": ""}', None])
-def test_llm_invalid_json_falls_back_to_mock(content: str | None, caplog) -> None:
+def test_llm_invalid_json_falls_back_to_mock(
+    content: str | None, caplog: pytest.LogCaptureFixture, monkeypatch: pytest.MonkeyPatch
+) -> None:
     with caplog.at_level(logging.WARNING):
-        summary = _llm(FakeClient(content)).generate(SEGMENTS)
+        summary = _llm(FakeLLM(content), monkeypatch).generate(SEGMENTS)
     assert summary == MockSummaryGenerator().generate(SEGMENTS)
     assert "using mock generator" in caplog.text
 
 
-def test_llm_client_exception_falls_back_to_mock(caplog) -> None:
+def test_llm_client_exception_falls_back_to_mock(
+    caplog: pytest.LogCaptureFixture, monkeypatch: pytest.MonkeyPatch
+) -> None:
     with caplog.at_level(logging.WARNING):
-        summary = _llm(FakeClient(error=TimeoutError("timed out"))).generate(SEGMENTS)
+        summary = _llm(FakeLLM(error=TimeoutError("timed out")), monkeypatch).generate(SEGMENTS)
     assert summary == MockSummaryGenerator().generate(SEGMENTS)
     assert "TimeoutError" in caplog.text
 
 
-def test_llm_empty_transcript_skips_the_call() -> None:
-    client = FakeClient(json.dumps(VALID_PAYLOAD))
-    summary = _llm(client).generate([])
+def test_llm_rate_limit_falls_back_to_mock(monkeypatch: pytest.MonkeyPatch) -> None:
+    fake = FakeLLM(error=LLMRateLimitedError(60))
+    assert _llm(fake, monkeypatch).generate(SEGMENTS) == MockSummaryGenerator().generate(SEGMENTS)
+
+
+def test_llm_empty_transcript_skips_the_call(monkeypatch: pytest.MonkeyPatch) -> None:
+    client = FakeLLM(json.dumps(VALID_PAYLOAD))
+    summary = _llm(client, monkeypatch).generate([])
     assert client.calls == []
     assert summary.overview == "No transcript content to summarize."
 
@@ -219,8 +222,7 @@ def _settings(api_key: str | None) -> Settings:
         _env_file=None,
         DATABASE_URL="sqlite://",
         CORS_ORIGINS=["http://testserver"],
-        LLM_API_KEY=api_key,
-        LLM_MODEL="grok-test",
+        GROQ_API_KEY=api_key,
     )
 
 

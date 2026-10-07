@@ -48,7 +48,7 @@ PRIYA = {"name": "Priya Shah", "email": "priya@acme.com"}
 @pytest.fixture(autouse=True)
 def mock_generator(monkeypatch: pytest.MonkeyPatch) -> None:
     """A developer's .env may hold a real LLM key; tests must always use the mock."""
-    monkeypatch.setattr(settings, "LLM_API_KEY", None)
+    monkeypatch.setattr(settings, "GROQ_API_KEY", None)
 
 
 def create_payload(**overrides: object) -> dict:

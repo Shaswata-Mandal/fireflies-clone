@@ -11,7 +11,7 @@ from app.utils.summary_generator import SegmentInput, get_summary_generator
 
 
 def current_generated_by() -> GeneratedBy:
-    return GeneratedBy.LLM if settings.LLM_API_KEY else GeneratedBy.MOCK
+    return GeneratedBy.LLM if settings.GROQ_API_KEY else GeneratedBy.MOCK
 
 
 def build_summary_graph(

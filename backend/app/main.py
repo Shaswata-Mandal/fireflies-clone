@@ -15,6 +15,7 @@ from app.core.health import router as health_router
 from app.core.logging import setup_logging
 from app.core.request_logging import RequestLoggingMiddleware
 from app.modules.action_items.router import router as action_items_router
+from app.modules.ask.router import router as ask_router
 from app.modules.exports.router import router as exports_router
 from app.modules.meetings.router import router as meetings_router
 from app.modules.participants.router import router as participants_router
@@ -64,6 +65,7 @@ def create_app() -> FastAPI:
         transcripts_router,
         action_items_router,
         summaries_router,
+        ask_router,
         participants_router,
         exports_router,
         users_router,

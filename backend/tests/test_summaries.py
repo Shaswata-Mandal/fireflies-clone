@@ -31,7 +31,7 @@ LINES = [
 
 @pytest.fixture(autouse=True)
 def mock_generator(monkeypatch: pytest.MonkeyPatch) -> None:
-    monkeypatch.setattr(settings, "LLM_API_KEY", None)
+    monkeypatch.setattr(settings, "GROQ_API_KEY", None)
 
 
 def generate_url(meeting_id: int) -> str:

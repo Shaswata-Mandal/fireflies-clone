@@ -11,10 +11,11 @@ import re
 from collections import Counter
 from collections.abc import Sequence
 from dataclasses import dataclass, field
-from typing import TYPE_CHECKING, Any, Protocol
+from typing import TYPE_CHECKING, Protocol
 
-from openai import OpenAI
 from pydantic import BaseModel, Field, ValidationError
+
+from app.utils.llm_client import generate_text
 
 if TYPE_CHECKING:
     # Type-only: importing app.core.config would build Settings (and require env vars) on import.
@@ -43,13 +44,12 @@ MIN_WORD_LENGTH = 3
 
 EMPTY_OVERVIEW = "No transcript content to summarize."
 
-LLM_TIMEOUT_SECONDS = 30.0
 # Rough budget: ~4 chars per token, so this stays well inside typical context windows.
 MAX_PROMPT_CHARS = 60_000
 OMITTED_MARKER = "[... {count} segments omitted to fit the context window ...]"
 
 # One space-separated blob is far easier to review and extend than a 150-item list literal.
-_STOPWORDS = frozenset("""
+STOPWORDS = frozenset("""
     a about above after again all also am an and any are aren't as at be because been before
     being below between both but by can can't cannot could couldn't did didn't do does doesn't
     doing don't down during each few for from further get gets getting go going got had hadn't
@@ -161,7 +161,7 @@ def _ranked_words(texts: Sequence[str]) -> list[str]:
     for text in texts:
         for word in _WORD.findall(text.lower().replace("’", "'")):
             word = word.removesuffix("'s")
-            if len(word) >= MIN_WORD_LENGTH and word not in _STOPWORDS:
+            if len(word) >= MIN_WORD_LENGTH and word not in STOPWORDS:
                 counts[word] += 1
     return [word for word, _ in sorted(counts.items(), key=lambda item: (-item[1], item[0]))]
 
@@ -263,11 +263,12 @@ class MockSummaryGenerator:
 
 
 # ---------------------------------------------------------------------------
-# LLM generator (Grok / any OpenAI-compatible API) with mock fallback
+# LLM generator (Groq) with mock fallback
 # ---------------------------------------------------------------------------
 
 _SYSTEM_PROMPT = (
-    "You summarize meeting transcripts. Reply with a single JSON object and nothing else, using "
+    "You summarize meeting transcripts. Reply with a single strict JSON object and nothing else "
+    "(no prose, no code fences), using "
     'exactly these keys: "overview" (string, 2-3 sentences), "bullet_points" (array of 4-6 '
     'strings), "keywords" (array of 6-8 short topic strings), "chapters" (array of 4-6 objects '
     'with "title" and "start_ms" in integer milliseconds), "action_items" (array of objects with '
@@ -331,20 +332,8 @@ def build_transcript_prompt(segments: Sequence[SegmentInput]) -> str:
 class LLMSummaryGenerator:
     """Asks the model for strict JSON, validates it, and falls back to `fallback` on any failure."""
 
-    def __init__(
-        self,
-        api_key: str,
-        model: str,
-        base_url: str,
-        fallback: SummaryGenerator,
-        client: Any | None = None,
-    ) -> None:
-        self._model = model
+    def __init__(self, fallback: SummaryGenerator) -> None:
         self._fallback = fallback
-        # Injectable so tests never build a real client (and never touch the network).
-        self._client = client or OpenAI(
-            api_key=api_key, base_url=base_url, timeout=LLM_TIMEOUT_SECONDS, max_retries=0
-        )
 
     def generate(self, segments: Sequence[SegmentInput]) -> GeneratedSummary:
         if not segments:
@@ -358,15 +347,9 @@ class LLMSummaryGenerator:
             return self._fallback.generate(segments)
 
     def _generate_with_llm(self, segments: Sequence[SegmentInput]) -> GeneratedSummary:
-        response = self._client.chat.completions.create(
-            model=self._model,
-            messages=[
-                {"role": "system", "content": _SYSTEM_PROMPT},
-                {"role": "user", "content": build_transcript_prompt(segments)},
-            ],
-            response_format={"type": "json_object"},
+        content = generate_text(
+            build_transcript_prompt(segments), system_instruction=_SYSTEM_PROMPT
         )
-        content = response.choices[0].message.content or ""
         try:
             parsed = _LLMResponse.model_validate_json(_CODE_FENCE.sub("", content.strip()))
         except ValidationError as exc:
@@ -406,11 +389,6 @@ class LLMSummaryGenerator:
 def get_summary_generator(settings: "Settings") -> SummaryGenerator:
     """LLM generator when an API key is configured, otherwise the deterministic mock."""
     mock = MockSummaryGenerator()
-    if not settings.LLM_API_KEY:
+    if not settings.GROQ_API_KEY:
         return mock
-    return LLMSummaryGenerator(
-        api_key=settings.LLM_API_KEY,
-        model=settings.LLM_MODEL,
-        base_url=settings.LLM_BASE_URL,
-        fallback=mock,
-    )
+    return LLMSummaryGenerator(fallback=mock)

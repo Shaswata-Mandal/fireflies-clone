@@ -19,7 +19,7 @@ Tick boxes as you go — this file is also Claude's progress tracker.
 - [x] `utils/transcript_parser.py` (txt/vtt/json) + unit tests (most testable code in the app)
 - [x] `utils/summary_generator.py`: `SummaryGenerator` protocol, `MockSummaryGenerator`
       (keyword frequency + chapter split by time + regex for "I'll / we need to / action:"),
-      `LLMSummaryGenerator` (Grok/xAI via OpenAI-compatible API; only if key set)
+      `LLMSummaryGenerator` (Groq via `utils/llm_client`; only if key set)
 - [ ] Seed: 6 meetings in `seed/data/*.json` — realistic, 60–150 segments each, 2–6 speakers,
       varied topics (product roadmap, sales call, hiring interview, sprint retro, customer onboarding,
       investor update), with summaries, chapters, action items (some completed). `seed.py` idempotent;
@@ -67,7 +67,7 @@ Tick boxes as you go — this file is also Claude's progress tracker.
 - [x] Export TXT / Markdown (meeting ⋯ menu → Download)
 - [ ] Global search (FTS5) in navbar dropdown → deep link
 - [ ] Home dashboard: recent meetings + open action items across meetings
-- [ ] Ask about this meeting (LLM) — only if time remains
+- [x] Ask about this meeting (LLM) — only if time remains
 
 ## Phase 6 — Ship (3h)
 - [x] Deployment readiness: `start.sh`, `render.yaml`, CORS from env (+ regex), `/health/db`, request logging,

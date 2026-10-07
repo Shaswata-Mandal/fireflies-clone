@@ -76,6 +76,31 @@ class EmptyTranscriptError(AppException):
         super().__init__("EMPTY_TRANSCRIPT", message, status.HTTP_400_BAD_REQUEST)
 
 
+class LLMNotConfiguredError(AppException):
+    def __init__(self, message: str = "AI features are not configured on this server") -> None:
+        super().__init__("LLM_NOT_CONFIGURED", message, status.HTTP_503_SERVICE_UNAVAILABLE)
+
+
+class LLMRateLimitedError(AppException):
+    """The provider answered 429. `details.retry_after` is how long the client should wait (s)."""
+
+    def __init__(self, retry_after: int) -> None:
+        super().__init__(
+            "LLM_RATE_LIMITED",
+            f"The AI provider is rate limited. Try again in {retry_after} seconds.",
+            status.HTTP_429_TOO_MANY_REQUESTS,
+            {"retry_after": retry_after},
+        )
+        self.retry_after = retry_after
+
+
+class LLMError(AppException):
+    """Any other provider failure (timeout, 5xx, empty reply). Provider details stay in the logs."""
+
+    def __init__(self, message: str = "The AI provider failed to answer") -> None:
+        super().__init__("LLM_ERROR", message, status.HTTP_502_BAD_GATEWAY)
+
+
 # ---------------------------------------------------------------------------
 # Handlers
 # ---------------------------------------------------------------------------

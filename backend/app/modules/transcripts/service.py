@@ -38,3 +38,8 @@ def update_segment(
         segment.speaker_label = data.speaker_label
     db.commit()
     return segment
+
+
+def list_recent_segments(db: Session, owner: User, meeting_limit: int) -> list[TranscriptSegment]:
+    """Segments across the owner's newest meetings (never anyone else's)."""
+    return repository.list_recent_owned(db, owner.id, meeting_limit)

@@ -32,9 +32,7 @@ services:
       - key: CORS_ORIGIN_REGEX
         sync: false
       # Optional: leave unset to use the deterministic mock summary generator.
-      - key: LLM_API_KEY
-        sync: false
-      - key: LLM_BASE_URL
+      - key: GROQ_API_KEY
         sync: false
       - key: LLM_MODEL
         sync: false

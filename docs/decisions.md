@@ -80,16 +80,15 @@ Format: **Decision** — why — alternatives considered.
 30. **`detect_format` is strict about extensions** — a known extension wins; an unknown one (`.pdf`) is
     `UNSUPPORTED_FILE` even if the content looks like a transcript; content sniffing only runs when the
     filename has no extension (e.g. pasted text). TXT is sniffed before JSON because both can start with `[`.
-31. **LLM provider is Grok (xAI) through the `openai` SDK, not Anthropic** — xAI's API is OpenAI-compatible,
-    so the only new pieces are the `openai` dependency (replaces `anthropic`, which was unused) and
-    `LLM_BASE_URL`. Model name still comes only from `settings.LLM_MODEL`; swapping provider = env change.
+31. **LLM provider is Groq through the official `groq` SDK** (supersedes the earlier Grok/`openai` choice; see
+    decision 110). Model name comes only from `settings.LLM_MODEL` (default `openai/gpt-oss-20b`).
 32. **Generator takes plain dataclasses and returns indices, not IDs** — `SegmentInput` in,
     `source_segment_index` (position in the input list) out, so the util has no DB/ORM knowledge; the
     service maps index → `transcript_segments.id`. LLM action items with a missing/out-of-range index or an
     unknown assignee are kept with `None` for that field rather than dropped (the DB columns are nullable).
 33. **LLM generator never raises** — any failure (timeout, API error, bad JSON, schema mismatch) logs a
-    warning and returns the mock's result, so summaries always exist. `max_retries=0` + 30 s timeout keeps
-    a bad key from stalling a request. Long transcripts keep head and tail, dropping the middle with a marker.
+    warning and returns the mock's result, so summaries always exist. `max_retries=0` + 30 s timeout (in `llm_client`)
+    keeps a bad key from stalling a request. Long transcripts keep head and tail, dropping the middle with a marker.
 34. **Mock is deterministic by construction** — ties in word frequency break alphabetically, chapters are
     equal *time* windows (empty windows skipped, so short transcripts get fewer chapters instead of fake ones),
     and each chapter bullet quotes the window's longest sentence (first sentences are often just "Yes.").
@@ -134,7 +133,7 @@ Format: **Decision** — why — alternatives considered.
     avoids a delete+insert of the same composite PK in one flush); removed ones are dropped by `delete-orphan`.
     `updated_at` is bumped by hand since link-only edits don't touch the meetings row.
 46. **Summary failure is non-fatal; `generated_by` is by config** — the generator call is wrapped so a failure logs and
-    the meeting is created without a summary. `generated_by` is `llm` when `LLM_API_KEY` is set, else `mock`; the
+    the meeting is created without a summary. `generated_by` is `llm` when `GROQ_API_KEY` is set, else `mock`; the
     LLM generator's internal fallback to the mock is not reported by the util, so it is still labelled `llm`.
 
 47. **PATCH null handling via `model_fields_set`** — "field not sent" and "sent as null" are different intents
@@ -328,3 +327,22 @@ Format: **Decision** — why — alternatives considered.
 109. **Frontend build fails without `NEXT_PUBLIC_API_URL`** — only when `NODE_ENV=production`. `next.config.ts` imports
     `shared/lib/env.ts` so the check runs at the very start of `next build`; a silent localhost fallback would ship a
     site that "builds fine" but cannot reach its API. Development keeps the localhost default.
+110. **One LLM door: `utils/llm_client.generate_text`** — mirrors the Node helper used in an earlier project
+    (optional system message, prior turns mapped to user/assistant, final user prompt, temperature 0.7). The
+    SDK is pinned (`groq==1.7.0`) and built with `max_retries=0` so a 429 is surfaced, not silently retried.
+111. **Provider errors become `AppException`s inside the client** — HTTP 429 → `LLM_RATE_LIMITED` (429,
+    `details.retry_after` = 60, a constant like the Node helper, not the provider header), any other failure →
+    `LLM_ERROR` (502), no key → `LLM_NOT_CONFIGURED` (503). Only the exception type and HTTP status are logged:
+    never the key, prompt or transcript text. Summary generation catches all of them and falls back to the mock;
+    "ask" lets them through so the user sees why there is no answer.
+112. **Ask has no repository** — the module reads segments through `transcripts.service.list_segments` (which also
+    enforces ownership → 404 for another user's meeting), so a repository would only duplicate that query.
+113. **Citations are parsed server-side** — the model is told to cite `[s:<segment id>]`; the service strips the tags
+    from the answer and returns `citations` only for ids that exist in *this* meeting (invented or foreign ids are
+    dropped, duplicates collapsed, first-mention order kept).
+114. **Ask prompt budget = 24 000 characters** — if the transcript is longer, keep the segments sharing the most
+    words with the question plus their neighbours (±1); with no keyword hit, alternate from start and end.
+    Gaps get a `[...]` marker. History is trimmed to the last 6 messages.
+115. **Home AskFred = `POST /ask` over the 20 newest meetings** — same Groq client, prompt budget and citation
+    validation as the per-meeting ask; lines carry the meeting title and citations carry `meeting_id` so the UI
+    links to `/meetings/{id}?t=<ms>`. No retrieval index: keyword overlap is enough for a demo-sized library.
