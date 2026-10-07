@@ -8,7 +8,7 @@ import { AskFredPanel } from "@/shared/components/layout/AskFredPanel";
 import { MobileNavDrawer } from "@/shared/components/layout/MobileNavDrawer";
 import { Navbar } from "@/shared/components/layout/Navbar";
 import { Sidebar } from "@/shared/components/layout/Sidebar";
-import { ROUTES } from "@/shared/constants/routes";
+import { ROUTES, isFullPageRoute } from "@/shared/constants/routes";
 import { useUI } from "@/shared/context/UIContext";
 import { cn } from "@/shared/utils/cn";
 
@@ -31,6 +31,10 @@ export function AppShell({ children }: AppShellProps) {
   function handleAsk() {
     setHasAskedFred(true);
     setAskFredOpen(true);
+  }
+
+  if (isFullPageRoute(pathname)) {
+    return <div className="h-dvh overflow-y-auto">{children}</div>;
   }
 
   return (

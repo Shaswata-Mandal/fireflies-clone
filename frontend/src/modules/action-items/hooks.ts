@@ -6,10 +6,16 @@ import {
   createActionItem,
   deleteActionItem,
   listActionItems,
+  listOpenActionItems,
   updateActionItem,
 } from "@/modules/action-items/api";
 import { ACTION_ITEMS_COPY } from "@/modules/action-items/constants";
-import type { ActionItem, ActionItemCreate, ActionItemUpdate } from "@/modules/action-items/types";
+import type {
+  ActionItem,
+  ActionItemCreate,
+  ActionItemUpdate,
+  OpenActionItemList,
+} from "@/modules/action-items/types";
 import { queryKeys } from "@/shared/constants/query-keys";
 import { isApiError } from "@/shared/lib/api-error";
 
@@ -141,5 +147,54 @@ export function useDeleteActionItem(meetingId: number) {
       toastItemError(error);
     },
     onSettled: () => refreshAfterChange(queryClient, meetingId),
+  });
+}
+
+// ---------------------------------------------------------------------------
+// Cross-meeting "open items" (Home dashboard)
+// ---------------------------------------------------------------------------
+
+export function useOpenActionItems(limit: number) {
+  return useQuery({
+    queryKey: queryKeys.actionItems.open(limit),
+    queryFn: ({ signal }) => listOpenActionItems(limit, signal),
+  });
+}
+
+/**
+ * Same optimistic toggle as the meeting page, but against the dashboard list: the row shows as done
+ * (and the open count drops) at once; the refetch in `onSettled` then removes it for good.
+ */
+export function useToggleOpenActionItem(limit: number) {
+  const queryClient = useQueryClient();
+  const queryKey = queryKeys.actionItems.open(limit);
+  return useMutation({
+    mutationFn: ({ id, isCompleted }: { id: number; isCompleted: boolean }) =>
+      updateActionItem(id, { is_completed: isCompleted }),
+    meta: { suppressErrorToast: true },
+    onMutate: async ({ id, isCompleted }) => {
+      await queryClient.cancelQueries({ queryKey });
+      const previous = queryClient.getQueryData<OpenActionItemList>(queryKey);
+      if (previous) {
+        queryClient.setQueryData<OpenActionItemList>(queryKey, {
+          ...previous,
+          total: Math.max(0, previous.total + (isCompleted ? -1 : 1)),
+          items: previous.items.map((item) =>
+            item.id === id ? { ...item, is_completed: isCompleted } : item,
+          ),
+        });
+      }
+      return { previous };
+    },
+    onError: (error, _variables, context) => {
+      if (context?.previous) queryClient.setQueryData(queryKey, context.previous);
+      toastItemError(error);
+    },
+    // `all` covers this list and every per-meeting list; the library's open counts change too.
+    onSettled: () =>
+      Promise.all([
+        queryClient.invalidateQueries({ queryKey: queryKeys.actionItems.all }),
+        queryClient.invalidateQueries({ queryKey: queryKeys.meetings.lists() }),
+      ]),
   });
 }

@@ -13,6 +13,8 @@ import {
 } from "@/shared/components/ui/dropdown-menu";
 import { Skeleton } from "@/shared/components/ui/skeleton";
 import { ACCOUNT_MENU_ITEMS } from "@/shared/constants/navigation";
+import { settingsTabRoute } from "@/shared/constants/routes";
+import { useTheme } from "@/shared/context/ThemeContext";
 import { showComingSoon } from "@/shared/utils/coming-soon";
 import { cn } from "@/shared/utils/cn";
 
@@ -27,6 +29,7 @@ const ITEM_CLASS = "text-default focus:bg-hover px-3 py-2 text-sm";
 /** Account menu from docs/reference/04 (left column): greeting, email, account links, logout. */
 export function AvatarMenu({ collapsed }: AvatarMenuProps) {
   const { data: user, isPending } = useCurrentUser();
+  const { theme } = useTheme();
 
   if (isPending) {
     return (
@@ -84,12 +87,14 @@ export function AvatarMenu({ collapsed }: AvatarMenuProps) {
               </DropdownMenuItem>
             ),
           )}
-          <DropdownMenuItem className={ITEM_CLASS} onSelect={() => showComingSoon("Theme")}>
-            Theme
-            <span className="rounded bg-primary-subtle-2 px-1.5 text-xs font-medium text-primary-fg">
-              BETA
-            </span>
-            <span className="ml-auto text-xs text-muted">Dark</span>
+          <DropdownMenuItem asChild className={ITEM_CLASS}>
+            <Link href={settingsTabRoute("appearance")}>
+              Theme
+              <span className="rounded bg-primary-subtle-2 px-1.5 text-xs font-medium text-primary-fg">
+                BETA
+              </span>
+              <span className="ml-auto text-xs text-muted capitalize">{theme}</span>
+            </Link>
           </DropdownMenuItem>
           <DropdownMenuItem className={ITEM_CLASS} onSelect={() => showComingSoon("Logout")}>
             Logout

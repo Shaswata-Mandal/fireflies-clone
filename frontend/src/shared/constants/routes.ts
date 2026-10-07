@@ -18,6 +18,21 @@ export function meetingDetailRoute(id: number): string {
   return `${ROUTES.MEETINGS}/${id}`;
 }
 
+/** `/settings?tab=appearance` */
+export function settingsTabRoute(tab: string): string {
+  return `${ROUTES.SETTINGS}?tab=${tab}`;
+}
+
+/** `/team?tab=teammates` */
+export function teamTabRoute(tab: string): string {
+  return `${ROUTES.TEAM}?tab=${tab}`;
+}
+
+/** Settings and Team replace the app sidebar/navbar with their own menu (docs/reference/31-37). */
+export function isFullPageRoute(pathname: string): boolean {
+  return isRouteActive(pathname, ROUTES.SETTINGS) || isRouteActive(pathname, ROUTES.TEAM);
+}
+
 /** The `[id]` route segment → a positive integer id, or null for "abc", "0", "1.5"… */
 export function parseMeetingIdParam(value: string): number | null {
   if (!/^\d+$/.test(value)) return null;

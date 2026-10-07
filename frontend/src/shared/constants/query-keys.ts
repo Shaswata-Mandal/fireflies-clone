@@ -18,6 +18,7 @@ export const queryKeys = {
   // its action items, and a future cross-meeting "my tasks" list can live under `all` too.
   actionItems: {
     all: ["action-items"] as const,
+    open: (limit: number) => [...queryKeys.actionItems.all, "open", limit] as const,
     byMeeting: (meetingId: number) => [...queryKeys.actionItems.all, "meeting", meetingId] as const,
   },
 };

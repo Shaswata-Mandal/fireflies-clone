@@ -43,3 +43,16 @@ export interface GroupedActionItems {
   open: ActionItem[];
   completed: ActionItem[];
 }
+
+/** Item from the cross-meeting list: the usual fields plus the title of the meeting it belongs to. */
+export interface OpenActionItem extends ActionItem {
+  meeting_title: string;
+}
+
+/** `GET /action-items?status=open` (paginated, newest meeting first). */
+export interface OpenActionItemList {
+  items: OpenActionItem[];
+  total: number;
+  page: number;
+  limit: number;
+}

@@ -1,7 +1,11 @@
-import { Settings } from "lucide-react";
-import { ComingSoon } from "@/shared/components/ComingSoon";
-import { ROUTE_TITLES, ROUTES } from "@/shared/constants/routes";
+import { Suspense } from "react";
+import { SettingsView } from "@/modules/settings/components/SettingsView";
 
 export default function SettingsPage() {
-  return <ComingSoon title={ROUTE_TITLES[ROUTES.SETTINGS]} icon={Settings} />;
+  // SettingsView reads ?tab= with useSearchParams, which needs a Suspense boundary for `next build`.
+  return (
+    <Suspense>
+      <SettingsView />
+    </Suspense>
+  );
 }

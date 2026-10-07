@@ -1,13 +1,11 @@
-import { Layers } from "lucide-react";
-import { ComingSoon } from "@/shared/components/ComingSoon";
-import { ROUTE_TITLES, ROUTES } from "@/shared/constants/routes";
+import { Suspense } from "react";
+import { IntegrationsView } from "@/modules/integrations/components/IntegrationsView";
 
 export default function IntegrationsPage() {
+  // IntegrationsView reads ?tab= with useSearchParams, which needs a Suspense boundary for `next build`.
   return (
-    <ComingSoon
-      title={ROUTE_TITLES[ROUTES.INTEGRATIONS]}
-      icon={Layers}
-      description="Zoom, Google Meet, calendar and CRM integrations are out of scope for this demo."
-    />
+    <Suspense>
+      <IntegrationsView />
+    </Suspense>
   );
 }
