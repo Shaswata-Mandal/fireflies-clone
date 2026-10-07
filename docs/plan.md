@@ -40,14 +40,14 @@ Tick boxes as you go — this file is also Claude's progress tracker.
 - [x] Meetings page: list/cards with title, date, duration, participant avatars, summary preview;
       search (debounced), participant filter, date-range filter, sort; skeleton/empty/error states
       (+ URL-synced state, channel tabs, row ⋯ menu, details dialog; Rename/Delete = Coming soon)
-- [ ] Create meeting modal: tabs Upload file / Paste transcript / Manual form; react-hook-form + zod
+- [x] Create meeting modal: tabs Upload file / Paste transcript / Manual form; react-hook-form + zod
+      (+ same form on /uploads, navbar "Upload" button opens it from anywhere)
 - [x] Placeholder pages: Integrations, Analytics, Team, Settings (Coming Soon cards styled like Fireflies)
       (also Home, Meetings, Tasks, Uploads until their slices land)
 
 ## Phase 4 — Meeting detail (6h) ← highest weight
-- [ ] Header: title (inline edit), date, duration, avatars, actions menu (Edit, Export, Delete w/ confirm)
-      (partial: title, date, duration, avatars, ⋯ menu with Copy Link + Export md/txt done;
-      inline edit, Edit and Delete-with-confirm pending → "Coming soon" toasts)
+- [x] Header: title, date, duration, avatars, actions menu (Rename, Edit, Export, Delete w/ confirm)
+      (inline title edit replaced by Rename → edit modal with the title selected)
 - [x] `PlayerProvider` + `PlayerBar` (play/pause, seek bar, time, ±15s, speed); simulated clock fallback
       (+ real <audio>/<video> engine, Space hotkey, ←/→ 5 s on seek bar, hover time bubble, video panel)
 - [x] Transcript panel: grouped speaker blocks, timestamps, active-line highlight + auto-scroll,
@@ -58,7 +58,8 @@ Tick boxes as you go — this file is also Claude's progress tracker.
       delete, optimistic toggle, "jump to" timestamp), Outline/Chapters (click → seek)
       (+ `?tab=` URL state, Regenerate / inline summary edit, AI Skills / Soundbites / Discussion / Bookmarks
       and right-panel AskFred as "Coming soon" tabs)
-- [ ] Edit meeting modal (title, participants)
+- [x] Edit meeting modal (title, participants)
+      (+ date; Rename / Edit / Delete wired in the library row menu and the detail header menu)
 - [x] `?t=ms` deep link seeks on load
 
 ## Phase 5 — Bonus (2.5h, pick in order)

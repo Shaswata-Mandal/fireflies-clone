@@ -61,6 +61,7 @@
   --border-default: #e6e6ea;
   --border-strong: #d4d4da;
   --border-focus: #6938ef;
+  --border-dropzone: #6938ef;
 
   /* text */
   --text-primary: #18181b;
@@ -128,6 +129,7 @@
   --border-default: #292929;
   --border-strong: #323235;
   --border-focus: #8173f0;
+  --border-dropzone: #6e75ff; /* colors.md 1.2, upload page dashed border */
 
   /* text */
   --text-primary: #fafafb;
@@ -264,6 +266,7 @@
   --border-color-default: var(--border-default);
   --border-color-strong: var(--border-strong);
   --border-color-focus: var(--border-focus);
+  --border-color-dropzone: var(--border-dropzone);
 
   /* text → text-primary, text-default, text-body, text-secondary, … */
   --text-color-primary: var(--text-primary);

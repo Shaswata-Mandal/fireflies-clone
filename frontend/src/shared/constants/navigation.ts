@@ -19,7 +19,7 @@ import { ROUTES } from "@/shared/constants/routes";
 // Sidebar items in the order of docs/reference/01-shell-sidebar-expanded. Items without `href` are
 // out of scope and show a "Coming soon" toast; `action` items are handled by the Sidebar itself.
 
-export type NavAction = "toggle-askfred";
+export type NavAction = "toggle-askfred" | "open-create-meeting";
 
 export interface NavItem {
   label: string;
@@ -75,10 +75,11 @@ export const ACCOUNT_MENU_ITEMS: AccountMenuItem[] = [
   { label: "Platform Rules" },
 ];
 
-// Capture split-button dropdown (docs/reference/27-upload-popup). Only uploads exist in this app.
+// Capture split-button dropdown (docs/reference/27-upload-popup). Only uploads exist in this app,
+// and they take transcripts (not audio/video), so that row says "Upload transcript".
 export const CAPTURE_MENU_ITEMS: NavItem[] = [
   { label: "Add to live meeting", icon: Video },
   { label: "Schedule new meeting", icon: Calendar },
-  { label: "Upload audio or video", icon: Upload, href: ROUTES.UPLOADS },
+  { label: "Upload transcript", icon: Upload, action: "open-create-meeting" },
   { label: "Start recording", icon: Mic },
 ];

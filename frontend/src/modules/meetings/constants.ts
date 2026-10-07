@@ -1,4 +1,4 @@
-import type { MeetingSort } from "@/modules/meetings/types";
+import type { MeetingSort, TranscriptFormat } from "@/modules/meetings/types";
 
 export const MEETINGS_PAGE_SIZE = 20;
 export const SEARCH_DEBOUNCE_MS = 300;
@@ -41,4 +41,57 @@ export const MEETINGS_COPY = {
   ERROR_TITLE: "Couldn't load your meetings",
   LINK_COPIED: "Link copied to clipboard",
   LINK_COPY_FAILED: "Couldn't copy the link",
+} as const;
+
+// ---------------------------------------------------------------------------
+// Create / edit form. Limits mirror the backend (meetings/schemas.py, meetings/service.py).
+// ---------------------------------------------------------------------------
+
+export const TITLE_MAX_LENGTH = 200;
+export const PARTICIPANT_NAME_MAX_LENGTH = 100;
+export const EMAIL_MAX_LENGTH = 255;
+/** Backend `MAX_UPLOAD_BYTES`: bigger files are rejected with 413 FILE_TOO_LARGE. */
+export const MAX_UPLOAD_BYTES = 2 * 1024 * 1024;
+export const BYTES_PER_KB = 1024;
+
+export const TRANSCRIPT_EXTENSIONS: ReadonlyArray<TranscriptFormat> = ["txt", "vtt", "json"];
+/** Value for `<input accept>`. */
+export const TRANSCRIPT_ACCEPT = TRANSCRIPT_EXTENSIONS.map((ext) => `.${ext}`).join(",");
+
+export const CREATE_TABS = {
+  UPLOAD: "upload",
+  PASTE: "paste",
+  MANUAL: "manual",
+} as const;
+
+export type CreateTab = (typeof CREATE_TABS)[keyof typeof CREATE_TABS];
+
+export const CREATE_TAB_ITEMS: ReadonlyArray<{ id: CreateTab; label: string }> = [
+  { id: CREATE_TABS.UPLOAD, label: "Upload file" },
+  { id: CREATE_TABS.PASTE, label: "Paste transcript" },
+  { id: CREATE_TABS.MANUAL, label: "Manual form" },
+];
+
+/** Backend error codes the create form shows inline (docs/api.md). */
+export const CREATE_ERROR_CODES = {
+  UNSUPPORTED_FILE: "UNSUPPORTED_FILE",
+  FILE_TOO_LARGE: "FILE_TOO_LARGE",
+  TRANSCRIPT_PARSE_ERROR: "TRANSCRIPT_PARSE_ERROR",
+  EMPTY_TRANSCRIPT: "EMPTY_TRANSCRIPT",
+  VALIDATION_ERROR: "VALIDATION_ERROR",
+} as const;
+
+export const FORM_COPY = {
+  TRANSCRIPT_HINT: "One line per utterance: [HH:MM:SS] Speaker Name: text",
+  TRANSCRIPT_PLACEHOLDER: "[00:00:05] Priya: Let's start with the roadmap.",
+  DROP_TITLE: "Upload a file to generate a transcript",
+  DROP_BODY: "Browse or drag and drop TXT, VTT or JSON transcripts. (Max file size: 2 MB)",
+  UPLOADING: "Uploading and processing…",
+  SAVING: "Saving…",
+  CREATED: "Meeting created",
+  UPDATED: "Meeting updated",
+  DELETED: "Meeting deleted",
+  VIEW_MEETING: "View meeting",
+  NO_CHANGES: "No changes to save",
+  MANUAL_HINT: "Add a meeting with just a title and date. You can add a transcript later.",
 } as const;

@@ -281,3 +281,28 @@ Format: **Decision** — why — alternatives considered.
     `useSyncExternalStore` index snapshot, re-rendering only when the chapter changes.
 93. **`color-scheme: dark` on `.dark`** — native controls (date picker icon, checkboxes, select popup) otherwise render
     light-theme glyphs on dark surfaces.
+94. **The create form is built from the brief, not the screenshots** — 27/28 show Fireflies' audio/video upload (a Capture
+    menu and a drop zone, no tabs or fields), 29 an info toast without an action. We keep their look (dashed drop zone,
+    "Browse Files", toast surface/border) but the clone uploads transcripts, so the navbar button became "Upload" and
+    opens a modal; the dropdown row reads "Upload transcript". The dashed border got its own token (`--border-dropzone`).
+95. **One form, three tabs** — a single react-hook-form instance holds every tab's fields so switching tabs keeps title,
+    date and participants; `superRefine` requires only the active tab's field (file / transcript text). The modal and
+    `/uploads` render the same `CreateMeetingForm`; the modal's state sits in its own `CreateMeetingContext` (not
+    `UIContext`, which is layout chrome only).
+96. **Client validation mirrors the backend** (`MAX_UPLOAD_BYTES` 2 MiB, `.txt/.vtt/.json`, title ≤ 200, name ≤ 100) so
+    the common failures never cost a round trip, but backend errors are still mapped inline (`mapCreateError`): parse
+    errors on the file / textarea with the line number, `VALIDATION_ERROR` on the named field or a banner. The global
+    toast still fires too; we added no second toast.
+97. **Dates cross the boundary in one place** — `datetime-local` has no zone, so `localInputToIso` / `isoToLocalInput`
+    are the only converters; the API always gets UTC ISO.
+98. **PATCH sends only what changed** (`buildMeetingPatch`): dates compare as instants, participants as a set by
+    name + email. No change → no request. The PATCH response (a full `MeetingDetail`) is written into the detail cache.
+99. **Delete is optimistic in the library, pessimistic on the detail page** — the hook removes the row from every cached
+    list page (and decrements `total`) and rolls back on error. On success it `removeQueries` the meeting's detail and
+    action items instead of invalidating them: an open detail page would otherwise refetch a 404 and flash "not found".
+    The detail page pauses the player first and navigates after the server confirms.
+100. **Dialogs live outside the dropdown** — Rename / Edit / Delete set state in the row / header component and the
+    dialogs render beside the menu, so they survive the menu unmounting. A `returnFocusRef` sends focus back to the ⋯
+    trigger on close, because the menu item that opened the dialog no longer exists.
+101. **`ConfirmDialog` is shared** — the action-item delete became a thin wrapper. It is not dismissable while pending;
+    the create and edit modals use the same Esc / outside-click guard.

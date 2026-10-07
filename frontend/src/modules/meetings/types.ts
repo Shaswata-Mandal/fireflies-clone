@@ -100,3 +100,43 @@ export interface MeetingsQuery {
   page?: number;
   limit?: number;
 }
+
+// ---------------------------------------------------------------------------
+// Create / update payloads (docs/api.md: POST /meetings, POST /meetings/upload, PATCH /meetings/{id})
+// ---------------------------------------------------------------------------
+
+export type TranscriptFormat = "txt" | "vtt" | "json";
+
+/** One entry of the `participants` list the API accepts; also what the tag input edits. */
+export interface ParticipantDraft {
+  name: string;
+  email: string | null;
+}
+
+/** JSON body of `POST /meetings` (pasted transcript, or no transcript at all). */
+export interface MeetingCreateBody {
+  title: string;
+  /** ISO 8601 UTC. */
+  meeting_date: string;
+  participants: ParticipantDraft[];
+  transcript_text?: string;
+  transcript_format?: TranscriptFormat;
+  generate_summary: boolean;
+}
+
+/** Same fields as the create body, plus the file; sent as multipart to `POST /meetings/upload`. */
+export interface MeetingUploadInput {
+  title: string;
+  meeting_date: string;
+  participants: ParticipantDraft[];
+  generate_summary: boolean;
+  file: File;
+}
+
+/** `PATCH /meetings/{id}`: only the fields that changed. */
+export interface MeetingUpdateBody {
+  title?: string;
+  meeting_date?: string;
+  /** When present it replaces the whole list. */
+  participants?: ParticipantDraft[];
+}

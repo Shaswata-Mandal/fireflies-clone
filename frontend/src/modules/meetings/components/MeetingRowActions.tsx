@@ -7,13 +7,16 @@ import {
   Download,
   Forward,
   MoreHorizontal,
+  Pencil,
   Share2,
   Trash2,
   Type,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import toast from "react-hot-toast";
+import { DeleteMeetingDialog } from "@/modules/meetings/components/DeleteMeetingDialog";
+import { EditMeetingModal } from "@/modules/meetings/components/EditMeetingModal";
 import { MeetingDetailsDialog } from "@/modules/meetings/components/MeetingDetailsDialog";
 import { MEETINGS_COPY } from "@/modules/meetings/constants";
 import type { MeetingListItem } from "@/modules/meetings/types";
@@ -35,12 +38,16 @@ interface MeetingRowActionsProps {
 const ITEM_CLASS = "h-9 gap-3 px-3 text-sm text-default";
 
 /**
- * "⋯" menu (screenshot 11) and "Details" popup (12). Open and Copy Link work; the rest are later
- * slices (Rename/Delete) or out of scope (Share/Download/Move), so they say "Coming soon".
+ * "⋯" menu (screenshot 11) and "Details" popup (12). Open, Copy Link, Rename, Edit and Delete work;
+ * Share / Download / Move are out of scope, so they say "Coming soon". The dialogs live here, next
+ * to the menu (not inside it), so they stay mounted after the menu closes.
  */
 export function MeetingRowActions({ meeting }: MeetingRowActionsProps) {
   const router = useRouter();
   const [isDetailsOpen, setDetailsOpen] = useState(false);
+  const [editMode, setEditMode] = useState<"edit" | "rename" | null>(null);
+  const [isDeleteOpen, setDeleteOpen] = useState(false);
+  const triggerRef = useRef<HTMLButtonElement>(null);
   const href = meetingDetailRoute(meeting.id);
 
   async function handleCopyLink() {
@@ -53,6 +60,7 @@ export function MeetingRowActions({ meeting }: MeetingRowActionsProps) {
     <div className="flex items-center gap-2">
       <DropdownMenu>
         <DropdownMenuTrigger
+          ref={triggerRef}
           aria-label={`More options for ${meeting.title}`}
           className="flex size-9 items-center justify-center rounded-md border bg-card text-default hover:bg-hover data-[state=open]:bg-hover"
         >
@@ -80,14 +88,17 @@ export function MeetingRowActions({ meeting }: MeetingRowActionsProps) {
           >
             <Forward aria-hidden="true" /> Move to channel
           </DropdownMenuItem>
-          <DropdownMenuItem className={ITEM_CLASS} onSelect={() => showComingSoon("Rename")}>
+          <DropdownMenuItem className={ITEM_CLASS} onSelect={() => setEditMode("rename")}>
             <Type aria-hidden="true" /> Rename
+          </DropdownMenuItem>
+          <DropdownMenuItem className={ITEM_CLASS} onSelect={() => setEditMode("edit")}>
+            <Pencil aria-hidden="true" /> Edit
           </DropdownMenuItem>
           <DropdownMenuSeparator />
           <DropdownMenuItem
             variant="destructive"
             className="h-9 gap-3 px-3 text-sm text-danger-fg"
-            onSelect={() => showComingSoon("Delete")}
+            onSelect={() => setDeleteOpen(true)}
           >
             <Trash2 aria-hidden="true" /> Delete
           </DropdownMenuItem>
@@ -109,6 +120,20 @@ export function MeetingRowActions({ meeting }: MeetingRowActionsProps) {
         fallbackTitle={meeting.title}
         open={isDetailsOpen}
         onOpenChange={setDetailsOpen}
+      />
+      <EditMeetingModal
+        meetingId={meeting.id}
+        open={editMode !== null}
+        onOpenChange={(open) => !open && setEditMode(null)}
+        focusTitle={editMode === "rename"}
+        returnFocusRef={triggerRef}
+      />
+      <DeleteMeetingDialog
+        meetingId={meeting.id}
+        title={meeting.title}
+        open={isDeleteOpen}
+        onOpenChange={setDeleteOpen}
+        returnFocusRef={triggerRef}
       />
     </div>
   );
